@@ -1,20 +1,22 @@
 #ifndef _DLL_H_
 #define _DLL_H_
 
-#pragma comment(lib,"user32.lib");
+#pragma comment(lib,"user32.lib")
  
 #include <windows.h>
 #include<conio.h>
 #include<iostream>
 #include<string>
 
-#define TARGET_FUNCTION "WriteFile"
-//#define TARGET_FUNCTION "lstrcmpA"
+//#define TARGET_FUNCTION "WriteFile"
+#define TARGET_FUNCTION "lstrcmpA"
 #define IMPORT_TABLE_OFFSET 1
 using namespace std;
 
 BOOL newWriteFile(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped);
 
+template <typename ... Args>
+void general_hook(Args... args);
 
 DWORD sourceAddr;
 //int newlstrcmpA();
