@@ -1,10 +1,13 @@
 #include "DLL.h"
+
+#define test_func(...) general_hook(__VA_ARGS__)
+
 BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 {
 	switch (reason)
 	{
 	case DLL_PROCESS_ATTACH:
-		IAThooking(GetModuleHandleA(NULL),TARGET_FUNCTION,newWriteFile); //newlstrcmpA);
+		IAThooking(GetModuleHandleA(NULL),TARGET_FUNCTION,test_func); //newlstrcmpA);
 		break;
 	case DLL_PROCESS_DETACH:
 		IAThooking(GetModuleHandleA(NULL),TARGET_FUNCTION,(void *)sourceAddr);
@@ -28,7 +31,7 @@ bool IAThooking(HMODULE hInstance,LPCSTR targetFunction,PVOID newFunc)
 	//pImportDesc = (PIMAGE_IMPORT_DESCRIPTOR)ImageDirectoryEntryToData(hInstance, TRUE, IMAGE_DIRECTORY_ENTRY_IMPORT, &ulSize); - You can just call this function to get the Import Table
 	while(*(WORD*)importedModule!=0) //over on the modules (DLLs)
 	{
-		printf("\n%s - %x:\n---------\n",(char*)((PBYTE)hInstance+importedModule->Name));//printing Module Name
+		printf("\n%s:\n---------\n",(char*)((PBYTE)hInstance+importedModule->Name));//printing Module Name
 		pFirstThunk=(PIMAGE_THUNK_DATA)((PBYTE)hInstance+ importedModule->FirstThunk);//pointing to its IAT
 		pOriginalFirstThunk=(PIMAGE_THUNK_DATA)((PBYTE)hInstance+ importedModule->OriginalFirstThunk);//pointing to OriginalThunk
 		pFuncData=(PIMAGE_IMPORT_BY_NAME)((PBYTE)hInstance+ pOriginalFirstThunk->u1.AddressOfData);// and to IMAGE_IMPORT_BY_NAME
@@ -59,6 +62,8 @@ __declspec( naked ) int newlstrcmpA()
 	}
 }
 */
+
+/*
 typedef BOOL (*WriteFuncPtr)(HANDLE, LPCVOID, DWORD, LPDWORD, LPOVERLAPPED);
 
 BOOL newWriteFile(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped) {
@@ -68,12 +73,37 @@ BOOL newWriteFile(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite, L
 	writingFunc(hFile, lpBuffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, lpOverlapped);
 	return 0;
 };
+*/
 
 int WINAPI newlstrcmpA(LPCSTR a,LPCSTR b)
 {
 	MessageBoxA(NULL,"hook called","hehe",MB_OK);
 	return 0;
 }
+
+template <typename T>
+void WINAPI get_details(T x) {
+    std::cout << "The type is: "  << typeid(x).name() << " , the value is: " << x << std::endl;
+    return;
+}
+template <typename T, typename ... Args>
+void get_details(T t, Args... args) {
+    get_details(t);
+    get_details(args...);
+    return;
+}
+
+typedef void* (*general_func)(...);
+
+
+template <typename ... Args>
+void general_hook(Args... args) {
+    general_func x = (general_func) &sourceAddr;
+    get_details(args...);
+    x(args...);
+}
+
+
 
 PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE hInstance)
 {
