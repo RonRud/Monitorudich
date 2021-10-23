@@ -4,10 +4,10 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 	switch (reason)
 	{
 	case DLL_PROCESS_ATTACH:
-		IAThooking(GetModuleHandleA(NULL),TARGET_FUNCTION,newWriteFile); //newlstrcmpA);
+		IAThooking(GetModuleHandleA(NULL),TARGET_FUNCTION);//,newWriteFile); //newlstrcmpA);
 		break;
 	case DLL_PROCESS_DETACH:
-		IAThooking(GetModuleHandleA(NULL),TARGET_FUNCTION,(void *)sourceAddr);
+		IAThooking(GetModuleHandleA(NULL),TARGET_FUNCTION);//,(void *)sourceAddr);
 		break;
 	case DLL_THREAD_ATTACH:
 		break;
@@ -16,7 +16,7 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 	}
 	return true;
 }
-bool IAThooking(HMODULE hInstance,LPCSTR targetFunction,PVOID newFunc)
+bool IAThooking(HMODULE hInstance,LPCSTR targetFunction) //,PVOID newFunc)
 {
 	bool flag=false;
 
@@ -38,8 +38,11 @@ bool IAThooking(HMODULE hInstance,LPCSTR targetFunction,PVOID newFunc)
 			if(strcmp(targetFunction,(char*)pFuncData->Name)==0)//checks if we are in the Target Function
 			{
 				printf("Hooking... \n");
+				inlineHookFunction(pFirstThunk->u1.Function);
+				/*
 				if(rewriteThunk(pFirstThunk,newFunc))
 					printf("Hooked %s successfully :)\n",targetFunction);
+				*/
 			}
 			pOriginalFirstThunk++; // next node (function) in the array
 			pFuncData=(PIMAGE_IMPORT_BY_NAME)((PBYTE)hInstance+ pOriginalFirstThunk->u1.AddressOfData);
@@ -58,7 +61,7 @@ __declspec( naked ) int newlstrcmpA()
 		RETN 8;
 	}
 }
-*/
+
 typedef BOOL (*WriteFuncPtr)(HANDLE, LPCVOID, DWORD, LPDWORD, LPOVERLAPPED);
 
 BOOL newWriteFile(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped) {
@@ -74,6 +77,65 @@ int WINAPI newlstrcmpA(LPCSTR a,LPCSTR b)
 	MessageBoxA(NULL,"hook called","hehe",MB_OK);
 	return 0;
 }
+*/
+
+
+void __declspec(naked) Hook() {
+    /*
+    //prolog
+    __asm {
+        push ebp ; Save ebp
+        mov ebp, esp ; Set stack frame pointer
+        push eax
+        push ebx
+        push ecx
+    }*/
+    std::cout << "Wha hooked" << std::endl;
+    DWORD originFuncAddr;
+    __asm {
+        //lea ecx, originFuncAddr
+        MOV EDI, EDI
+        POP EAX
+        PUSH EBP
+        PUSH EAX
+        lea EBP,[ESP+4]
+        //MOV EBP, ESP
+        RETN
+    };
+    /*
+    DWORD returnJmpAddress = hookAddress - 
+    __asm {
+        jmp 
+    }*/
+    /*
+    //epilog
+    __asm {
+        pop ecx
+        pop ebx
+        pop eax
+        mov esp, ebp
+        pop ebp
+        ret
+    }*/
+}
+
+
+void inlineHookFunction(DWORD Function)
+{ 
+    DWORD Old;
+    DWORD n;
+    DWORD numBytes = 5;
+    if (*(BYTE*)Function == 0xE9) {
+        Function += *(int*)(Function + 1) + 5;
+    }
+    VirtualProtect((void*)Function, 5, PAGE_EXECUTE_READWRITE, &Old);
+    //*(BYTE *)Function = 0xE9; //JMP Opcode
+    *(BYTE *)Function = 0xE8; //call Opcode
+    *(DWORD *)(Function+1) = (DWORD)Hook - (DWORD)Function - 5;//Calculate amount of bytes to jmp
+    VirtualProtect((void*)Function, 5, Old, &n);
+    //That's it...hooked.
+}
+
 
 PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE hInstance)
 {
