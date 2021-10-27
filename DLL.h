@@ -7,6 +7,9 @@
 #include<conio.h>
 #include<iostream>
 #include<string>
+#include <map>
+#include <format>
+#include <fstream>
 
 //#define TARGET_FUNCTION "WriteFile"
 #define TARGET_FUNCTION "lstrcmpA"
@@ -15,13 +18,14 @@ using namespace std;
 
 BOOL newWriteFile(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped);
 
-template <typename ... Args>
-void general_hook(Args... args);
+void Hook();
+void inlineHookFunction(DWORD Function);
 
 DWORD sourceAddr;
+std::map<DWORD, std::string*> addressNameMap;
 //int newlstrcmpA();
 int WINAPI newlstrcmpA(LPCSTR a,LPCSTR b);
-bool IAThooking(HMODULE,LPCSTR,PVOID);
+bool IAThooking(HMODULE,LPCSTR); //,PVOID);
 bool rewriteThunk(PIMAGE_THUNK_DATA pThunk,void* newFunc);
 PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE);
 BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved);
