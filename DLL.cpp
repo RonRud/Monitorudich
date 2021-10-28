@@ -86,6 +86,15 @@ int WINAPI newlstrcmpA(LPCSTR a,LPCSTR b)
 }
 */
 
+void writeToFile() {
+	std::fstream saveFile("inline_hook_logger_output.txt", std::ios::out | std::ios::app);
+	std::string str = *(addressNameMap[originFuncAddr - 5]);
+	if (saveFile.is_open()) {
+		saveFile << str;
+		saveFile << std::endl;
+		saveFile.close();
+	}
+}
 
 void __declspec(naked) Hook() {
     /*
@@ -97,22 +106,22 @@ void __declspec(naked) Hook() {
         push ebx
         push ecx
     }*/
-    std::cout << "Wha hooked" << std::endl;
-    DWORD originFuncAddr;
+    //std::cout << "Wha hooked" << std::endl;
     __asm {
         //lea ecx, originFuncAddr
         MOV EDI, EDI
         POP EAX
+		PUSH EBP
+		PUSH EAX
+		lea EBP, [ESP + 4]
 		MOV originFuncAddr, EAX
         //MOV EBP, ESP
         //RETN
     };
 	// -5 to account for the original function location being 5 bytes back (where the call instruction is)
-	std::cout << "address is: " << originFuncAddr-5 << " the name is: " << *(addressNameMap[(originFuncAddr-5)]) << std::endl;
+	//std::cout << "address is: " << originFuncAddr-5 << " the name is: " << *(addressNameMap[(originFuncAddr-5)]) << std::endl;
+	writeToFile();
 	__asm {
-		PUSH EBP
-		PUSH EAX
-		lea EBP, [ESP + 4]
 		RETN
 	}
 	/*

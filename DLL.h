@@ -22,7 +22,10 @@ void Hook();
 void inlineHookFunction(DWORD Function);
 
 DWORD sourceAddr;
+
 std::map<DWORD, std::string*> addressNameMap;
+DWORD originFuncAddr;
+
 //int newlstrcmpA();
 int WINAPI newlstrcmpA(LPCSTR a,LPCSTR b);
 bool IAThooking(HMODULE,LPCSTR); //,PVOID);
