@@ -7,6 +7,9 @@
 #include<conio.h>
 #include<iostream>
 #include<string>
+#include <map>
+#include <format>
+#include <fstream>
 
 //#define TARGET_FUNCTION "WriteFile"
 #define TARGET_FUNCTION "lstrcmpA"
@@ -19,6 +22,10 @@ void Hook();
 void inlineHookFunction(DWORD Function);
 
 DWORD sourceAddr;
+
+std::map<DWORD, std::string*> addressNameMap;
+DWORD originFuncAddr;
+
 //int newlstrcmpA();
 int WINAPI newlstrcmpA(LPCSTR a,LPCSTR b);
 bool IAThooking(HMODULE,LPCSTR); //,PVOID);

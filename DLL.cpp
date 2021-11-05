@@ -28,7 +28,7 @@ bool IAThooking(HMODULE hInstance,LPCSTR targetFunction) //,PVOID newFunc)
 	//pImportDesc = (PIMAGE_IMPORT_DESCRIPTOR)ImageDirectoryEntryToData(hInstance, TRUE, IMAGE_DIRECTORY_ENTRY_IMPORT, &ulSize); - You can just call this function to get the Import Table
 	while(*(WORD*)importedModule!=0) //over on the modules (DLLs)
 	{
-		printf("\n%s - %x:\n---------\n",(char*)((PBYTE)hInstance+importedModule->Name));//printing Module Name
+		printf("\n%s - :\n---------\n",(char*)((PBYTE)hInstance+importedModule->Name));//printing Module Name
 		pFirstThunk=(PIMAGE_THUNK_DATA)((PBYTE)hInstance+ importedModule->FirstThunk);//pointing to its IAT
 		pOriginalFirstThunk=(PIMAGE_THUNK_DATA)((PBYTE)hInstance+ importedModule->OriginalFirstThunk);//pointing to OriginalThunk
 		pFuncData=(PIMAGE_IMPORT_BY_NAME)((PBYTE)hInstance+ pOriginalFirstThunk->u1.AddressOfData);// and to IMAGE_IMPORT_BY_NAME
@@ -37,7 +37,13 @@ bool IAThooking(HMODULE hInstance,LPCSTR targetFunction) //,PVOID newFunc)
 			printf("%X %s\n",pFirstThunk->u1.Function,pFuncData->Name);//printing function's name and addr
 			if(strcmp(targetFunction,(char*)pFuncData->Name)==0)//checks if we are in the Target Function
 			{
-				printf("Hooking... \n");
+				char functionName[50] = { 0 };
+				//sprintf(functionName,"%s", pFuncData->Name);
+				//std::string* stringFunctionName = new std::string(pFuncData->Name);
+				//std::cout << "Function name: " << stringFunctionName << " function address: " << pFirstThunk->u1.Function << " , ";
+
+				addressNameMap[pFirstThunk->u1.Function] = new std::string(pFuncData->Name);
+				std::cout << "Hooking... " << *(addressNameMap[pFirstThunk->u1.Function]) << std::endl;
 				inlineHookFunction(pFirstThunk->u1.Function);
 				/*
 				if(rewriteThunk(pFirstThunk,newFunc))
@@ -79,6 +85,16 @@ int WINAPI newlstrcmpA(LPCSTR a,LPCSTR b)
 }
 */
 
+void writeToFile() {
+	std::fstream saveFile("inline_hook_logger_output.txt", std::ios::out | std::ios::app);
+	// -5 to account for the original function location being 5 bytes back (where the call instruction is)
+	std::string str = *(addressNameMap[originFuncAddr - 5]);
+	if (saveFile.is_open()) {
+		saveFile << str;
+		saveFile << std::endl;
+		saveFile.close();
+	}
+}
 
 void __declspec(naked) Hook() {
     /*
@@ -90,19 +106,24 @@ void __declspec(naked) Hook() {
         push ebx
         push ecx
     }*/
-    std::cout << "Wha hooked" << std::endl;
-    DWORD originFuncAddr;
+    //std::cout << "Wha hooked" << std::endl;
     __asm {
         //lea ecx, originFuncAddr
         MOV EDI, EDI
         POP EAX
-        PUSH EBP
-        PUSH EAX
-        lea EBP,[ESP+4]
+		PUSH EBP
+		PUSH EAX
+		lea EBP, [ESP + 4]
+		MOV originFuncAddr, EAX
         //MOV EBP, ESP
-        RETN
+        //RETN
     };
-    /*
+	//std::cout << "address is: " << originFuncAddr-5 << " the name is: " << *(addressNameMap[(originFuncAddr-5)]) << std::endl;
+	writeToFile();
+	__asm {
+		RETN
+	}
+	/*
     DWORD returnJmpAddress = hookAddress - 
     __asm {
         jmp 
@@ -120,19 +141,22 @@ void __declspec(naked) Hook() {
 }
 
 
-void inlineHookFunction(DWORD Function)
+void inlineHookFunction(DWORD function)
 { 
     DWORD Old;
     DWORD n;
     DWORD numBytes = 5;
-    if (*(BYTE*)Function == 0xE9) {
-        Function += *(int*)(Function + 1) + 5;
-    }
-    VirtualProtect((void*)Function, 5, PAGE_EXECUTE_READWRITE, &Old);
+    if (*(BYTE*)function == 0xE9) {
+        function += *(int*)(function + 1) + 5;
+	}
+	else if(*(BYTE*)function == 0xFF && *(BYTE*)(function+1) == 0x25) {
+		function = *(DWORD*)(function + 2);
+	}
+    VirtualProtect((void*)function, 5, PAGE_EXECUTE_READWRITE, &Old);
     //*(BYTE *)Function = 0xE9; //JMP Opcode
-    *(BYTE *)Function = 0xE8; //call Opcode
-    *(DWORD *)(Function+1) = (DWORD)Hook - (DWORD)Function - 5;//Calculate amount of bytes to jmp
-    VirtualProtect((void*)Function, 5, Old, &n);
+    *(BYTE *)function = 0xE8; //call Opcode
+    *(DWORD *)(function+1) = (DWORD)Hook - (DWORD)function - 5;//Calculate amount of bytes to jmp
+    VirtualProtect((void*)function, 5, Old, &n);
     //That's it...hooked.
 }
 
