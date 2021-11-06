@@ -18,9 +18,9 @@ int main(int argc, char *argv[])
 	while(1)
 	{
 		printf("Enter Process ID:\n");
-		std::cin >> ProcessID;
+		scanf("%u", &ProcessID);
 		printf("Enter DLL path:\n");
-		std::cin >> DLL_PATH;
+		scanf("%s",DLL_PATH);
 		InjectDLL(ProcessID,DLL_PATH);
 	}
 	return 0;

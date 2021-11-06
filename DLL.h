@@ -8,8 +8,8 @@
 #include<iostream>
 #include<string>
 #include <map>
-#include <format>
 #include <fstream>
+#include <vector>
 
 //#define TARGET_FUNCTION "WriteFile"
 #define TARGET_FUNCTION "lstrcmpA"
@@ -18,17 +18,16 @@ using namespace std;
 
 BOOL newWriteFile(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped);
 
+bool inlineHookFunction(DWORD Function, std::string* functionName);
 void Hook();
-void inlineHookFunction(DWORD Function);
 
 DWORD sourceAddr;
-
-std::map<DWORD, std::string*> addressNameMap;
 DWORD originFuncAddr;
+std::map<DWORD, std::string*> addressToNameMap;
 
 //int newlstrcmpA();
 int WINAPI newlstrcmpA(LPCSTR a,LPCSTR b);
-bool IAThooking(HMODULE,LPCSTR); //,PVOID);
+bool IAThooking(HMODULE, LPCSTR); //,PVOID);
 bool rewriteThunk(PIMAGE_THUNK_DATA pThunk,void* newFunc);
 PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE);
 BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved);

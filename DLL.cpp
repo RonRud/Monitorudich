@@ -4,10 +4,10 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 	switch (reason)
 	{
 	case DLL_PROCESS_ATTACH:
-		IAThooking(GetModuleHandleA(NULL),TARGET_FUNCTION);//,newWriteFile); //newlstrcmpA);
+		IAThooking(GetModuleHandleA(NULL), TARGET_FUNCTION);//,newWriteFile); //newlstrcmpA);
 		break;
 	case DLL_PROCESS_DETACH:
-		IAThooking(GetModuleHandleA(NULL),TARGET_FUNCTION);//,(void *)sourceAddr);
+		//IAThooking(GetModuleHandleA(NULL), TARGET_FUNCTION);//,(void *)sourceAddr);
 		break;
 	case DLL_THREAD_ATTACH:
 		break;
@@ -16,42 +16,58 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 	}
 	return true;
 }
-bool IAThooking(HMODULE hInstance,LPCSTR targetFunction) //,PVOID newFunc)
+bool IAThooking(HMODULE hInstance, LPCSTR targetFunction) //,PVOID newFunc)
 {
-	bool flag=false;
+	bool flag = false;
 
 	PIMAGE_IMPORT_DESCRIPTOR importedModule;
-	PIMAGE_THUNK_DATA pFirstThunk,pOriginalFirstThunk;
+	PIMAGE_THUNK_DATA pFirstThunk, pOriginalFirstThunk;
 	PIMAGE_IMPORT_BY_NAME pFuncData;
 
-	importedModule=getImportTable(hInstance);
+	importedModule = getImportTable(hInstance);
 	//pImportDesc = (PIMAGE_IMPORT_DESCRIPTOR)ImageDirectoryEntryToData(hInstance, TRUE, IMAGE_DIRECTORY_ENTRY_IMPORT, &ulSize); - You can just call this function to get the Import Table
-	while(*(WORD*)importedModule!=0) //over on the modules (DLLs)
+	while (*(WORD*)importedModule != 0) //over on the modules (DLLs)
 	{
-		printf("\n%s - :\n---------\n",(char*)((PBYTE)hInstance+importedModule->Name));//printing Module Name
-		pFirstThunk=(PIMAGE_THUNK_DATA)((PBYTE)hInstance+ importedModule->FirstThunk);//pointing to its IAT
-		pOriginalFirstThunk=(PIMAGE_THUNK_DATA)((PBYTE)hInstance+ importedModule->OriginalFirstThunk);//pointing to OriginalThunk
-		pFuncData=(PIMAGE_IMPORT_BY_NAME)((PBYTE)hInstance+ pOriginalFirstThunk->u1.AddressOfData);// and to IMAGE_IMPORT_BY_NAME
-		while(*(WORD*)pFirstThunk!=0 && *(WORD*)pOriginalFirstThunk!=0) //moving over IAT and over names' table
+		printf("\n%s:\n---------\n", (char*)((PBYTE)hInstance + importedModule->Name));//printing Module Name
+		pFirstThunk = (PIMAGE_THUNK_DATA)((PBYTE)hInstance + importedModule->FirstThunk);//pointing to its IAT
+		pOriginalFirstThunk = (PIMAGE_THUNK_DATA)((PBYTE)hInstance + importedModule->OriginalFirstThunk);//pointing to OriginalThunk
+		pFuncData = (PIMAGE_IMPORT_BY_NAME)((PBYTE)hInstance + pOriginalFirstThunk->u1.AddressOfData);// and to IMAGE_IMPORT_BY_NAME
+		while (*(WORD*)pFirstThunk != 0 && *(WORD*)pOriginalFirstThunk != 0) //moving over IAT and over names' table
 		{
-			printf("%X %s\n",pFirstThunk->u1.Function,pFuncData->Name);//printing function's name and addr
-			if(strcmp(targetFunction,(char*)pFuncData->Name)==0)//checks if we are in the Target Function
-			{
-				char functionName[50] = { 0 };
-				//sprintf(functionName,"%s", pFuncData->Name);
-				//std::string* stringFunctionName = new std::string(pFuncData->Name);
-				//std::cout << "Function name: " << stringFunctionName << " function address: " << pFirstThunk->u1.Function << " , ";
-
-				addressNameMap[pFirstThunk->u1.Function] = new std::string(pFuncData->Name);
-				std::cout << "Hooking... " << *(addressNameMap[pFirstThunk->u1.Function]) << std::endl;
-				inlineHookFunction(pFirstThunk->u1.Function);
-				/*
-				if(rewriteThunk(pFirstThunk,newFunc))
-					printf("Hooked %s successfully :)\n",targetFunction);
-				*/
+			printf("%X %s\n", pFirstThunk->u1.Function, pFuncData->Name);//printing function's name and addr
+			
+			std::vector<const char*> blackList = { "EnterCriticalSection", "LeaveCriticalSection", "HeapFree", "HeapAlloc", //8B = mov function crushes
+				"GetLastError", "SetLastError", "WriteFile", "GetProcessHeap", //FF 25 = call function crushes
+			//from here these are excludes from runtime problems 	
+			"MultiByteToWideChar"};
+			bool shouldHook = true;
+			for (const char* name : blackList) {
+				if (strcmp(name, (char*)pFuncData->Name) == 0) {
+					shouldHook = false;
+					std::cout << "Blacklisted, not hooked" << std::endl << std::endl;
+					break;
+				}
 			}
+			//std::cout << "function name check: " << *addressToNameMap[pFirstThunk->u1.Function] << std::endl;
+			//if(strcmp(targetFunction,(char*)pFuncData->Name)==0)//checks if we are in the Target Function
+			//{
+			if (shouldHook) {
+				bool isHooked = inlineHookFunction(pFirstThunk->u1.Function, new std::string(pFuncData->Name));
+				if (isHooked) {
+					std::cout << "Hooked function successfully" << std::endl;
+				}
+				else {
+					std::cout << "Didn't Hook function" << std::endl;
+				}
+				std::cout << std::endl;
+			}
+			/*
+			if(rewriteThunk(pFirstThunk,newFunc))
+				printf("Hooked %s successfully :)\n",targetFunction);
+			*/
+			//}
 			pOriginalFirstThunk++; // next node (function) in the array
-			pFuncData=(PIMAGE_IMPORT_BY_NAME)((PBYTE)hInstance+ pOriginalFirstThunk->u1.AddressOfData);
+			pFuncData = (PIMAGE_IMPORT_BY_NAME)((PBYTE)hInstance + pOriginalFirstThunk->u1.AddressOfData);
 			pFirstThunk++;// next node (function) in the array
 		}
 		importedModule++; //next module (DLL)
@@ -85,79 +101,85 @@ int WINAPI newlstrcmpA(LPCSTR a,LPCSTR b)
 }
 */
 
-void writeToFile() {
-	std::fstream saveFile("inline_hook_logger_output.txt", std::ios::out | std::ios::app);
-	// -5 to account for the original function location being 5 bytes back (where the call instruction is)
-	std::string str = *(addressNameMap[originFuncAddr - 5]);
-	if (saveFile.is_open()) {
-		saveFile << str;
-		saveFile << std::endl;
-		saveFile.close();
-	}
+void logHook() {
+	std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::app);
+	saveFile << *addressToNameMap[originFuncAddr-5];
+	saveFile << std::endl;
+	saveFile.close();
 }
 
 void __declspec(naked) Hook() {
-    /*
-    //prolog
-    __asm {
-        push ebp ; Save ebp
-        mov ebp, esp ; Set stack frame pointer
-        push eax
-        push ebx
-        push ecx
-    }*/
-    //std::cout << "Wha hooked" << std::endl;
-    __asm {
-        //lea ecx, originFuncAddr
-        MOV EDI, EDI
-        POP EAX
+	/*
+	//prologue
+	__asm {
+		push ebp ; Save ebp
+		mov ebp, esp ; Set stack frame pointer
+		push eax
+		push ebx
+		push ecx
+	}*/
+	__asm {
+		//lea ecx, originFuncAddr
+		MOV EDI, EDI
+		POP EAX
+		MOV originFuncAddr, EAX
 		PUSH EBP
 		PUSH EAX
 		lea EBP, [ESP + 4]
-		MOV originFuncAddr, EAX
-        //MOV EBP, ESP
-        //RETN
-    };
-	//std::cout << "address is: " << originFuncAddr-5 << " the name is: " << *(addressNameMap[(originFuncAddr-5)]) << std::endl;
-	writeToFile();
-	__asm {
-		RETN
-	}
+	};
+	logHook();
+	__asm RETN
 	/*
-    DWORD returnJmpAddress = hookAddress - 
-    __asm {
-        jmp 
-    }*/
-    /*
-    //epilog
-    __asm {
-        pop ecx
-        pop ebx
-        pop eax
-        mov esp, ebp
-        pop ebp
-        ret
-    }*/
+	DWORD returnJmpAddress = hookAddress -
+	__asm {
+		jmp
+	}*/
+	/*
+	//epilogue
+	__asm {
+		pop ecx
+		pop ebx
+		pop eax
+		mov esp, ebp
+		pop ebp
+		ret
+	}*/
 }
 
 
-void inlineHookFunction(DWORD function)
-{ 
-    DWORD Old;
-    DWORD n;
-    DWORD numBytes = 5;
-    if (*(BYTE*)function == 0xE9) {
-        function += *(int*)(function + 1) + 5;
+bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
+{
+	DWORD Old;
+	DWORD n;
+	DWORD numBytes = 5;
+	std::cout << "The first bytes of the function are: ";
+	printf("%02X %02X %02X %02X %02X %02X", *(BYTE*)functionAddr, *(BYTE*)(functionAddr+1), *(BYTE*)(functionAddr+2), *(BYTE*)(functionAddr+3), *(BYTE*)(functionAddr+4), *(BYTE*)(functionAddr+5));
+	std::cout << std::endl;
+	if(*(BYTE*)functionAddr == 0x8B && *(BYTE*)(functionAddr + 1) == 0xFF) {
+
+	} else if(*(BYTE*)functionAddr == 0xE9) {
+		functionAddr += *(int*)(functionAddr + 1) + 5;
+	} else if (*(BYTE*)functionAddr == 0xFF && *(BYTE*)(functionAddr + 1) == 0x25) { //TODO this is working very questionably at best
+		DWORD dsOffsetOfFunction = *(DWORD*)(functionAddr + 2);
+		__asm {
+			push eax
+			mov eax, ds: [dsOffsetOfFunction]
+			mov functionAddr, eax
+			pop eax
+		}
+		//need to check what the hell is in functionAddr
 	}
-	else if(*(BYTE*)function == 0xFF && *(BYTE*)(function+1) == 0x25) {
-		function = *(DWORD*)(function + 2);
+	else {
+		return false;
 	}
-    VirtualProtect((void*)function, 5, PAGE_EXECUTE_READWRITE, &Old);
-    //*(BYTE *)Function = 0xE9; //JMP Opcode
-    *(BYTE *)function = 0xE8; //call Opcode
-    *(DWORD *)(function+1) = (DWORD)Hook - (DWORD)function - 5;//Calculate amount of bytes to jmp
-    VirtualProtect((void*)function, 5, Old, &n);
-    //That's it...hooked.
+	addressToNameMap[functionAddr] = functionName;
+	VirtualProtect((void*)functionAddr, 5, PAGE_EXECUTE_READWRITE, &Old);
+	//*(BYTE *)Function = 0xE9; //JMP Opcode
+	*(BYTE*)functionAddr = 0xE8; //call Opcode
+	*(DWORD*)(functionAddr + 1) = (DWORD)Hook - (DWORD)functionAddr - 5;//Calculate amount of bytes to jmp
+	VirtualProtect((void*)functionAddr, 5, Old, &n);
+	//That's it...hooked.
+	return true;
 }
 
 
@@ -168,20 +190,20 @@ PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE hInstance)
 	PIMAGE_NT_HEADERS ntHeader;
 	IMAGE_DATA_DIRECTORY dataDirectory;
 
-	dosHeader=(PIMAGE_DOS_HEADER)hInstance;//cast hInstance to (IMAGE_DOS_HEADER *) - the MZ Header
-	ntHeader=(PIMAGE_NT_HEADERS)((PBYTE)dosHeader+dosHeader->e_lfanew);//The PE Header begin after the MZ Header (which has size of e_lfanew)
-	optionalHeader=(IMAGE_OPTIONAL_HEADER)(ntHeader->OptionalHeader); //Getting OptionalHeader
-	dataDirectory=(IMAGE_DATA_DIRECTORY)(optionalHeader.DataDirectory[IMPORT_TABLE_OFFSET]);//Getting the import table of DataDirectory
+	dosHeader = (PIMAGE_DOS_HEADER)hInstance;//cast hInstance to (IMAGE_DOS_HEADER *) - the MZ Header
+	ntHeader = (PIMAGE_NT_HEADERS)((PBYTE)dosHeader + dosHeader->e_lfanew);//The PE Header begin after the MZ Header (which has size of e_lfanew)
+	optionalHeader = (IMAGE_OPTIONAL_HEADER)(ntHeader->OptionalHeader); //Getting OptionalHeader
+	dataDirectory = (IMAGE_DATA_DIRECTORY)(optionalHeader.DataDirectory[IMPORT_TABLE_OFFSET]);//Getting the import table of DataDirectory
 	return (PIMAGE_IMPORT_DESCRIPTOR)((PBYTE)hInstance + dataDirectory.VirtualAddress);//ImageBase+RVA to import table
 
 }
-bool rewriteThunk(PIMAGE_THUNK_DATA pThunk,void* newFunc)
+bool rewriteThunk(PIMAGE_THUNK_DATA pThunk, void* newFunc)
 {
 	DWORD CurrentProtect;
 	DWORD junk;
-	VirtualProtect(pThunk,4096, PAGE_READWRITE, &CurrentProtect);//allow write to the page
-	sourceAddr=pThunk->u1.Function;
-	pThunk->u1.Function=(DWORD) newFunc; // rewrite the IAT to new function
-	VirtualProtect(pThunk,4096, CurrentProtect,&junk);//return previous premissions
+	VirtualProtect(pThunk, 4096, PAGE_READWRITE, &CurrentProtect);//allow write to the page
+	sourceAddr = pThunk->u1.Function;
+	pThunk->u1.Function = (DWORD)newFunc; // rewrite the IAT to new function
+	VirtualProtect(pThunk, 4096, CurrentProtect, &junk);//return previous premissions
 	return true;
 }
