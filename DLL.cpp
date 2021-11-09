@@ -159,6 +159,7 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 
 	} else if(*(BYTE*)functionAddr == 0xE9) {
 		functionAddr += *(int*)(functionAddr + 1) + 5;
+		return inlineHookFunction(functionAddr,functionName);
 	} else if (*(BYTE*)functionAddr == 0xFF && *(BYTE*)(functionAddr + 1) == 0x25) { //TODO this is working very questionably at best
 		DWORD dsOffsetOfFunction = *(DWORD*)(functionAddr + 2);
 		__asm {
@@ -167,6 +168,7 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 			mov functionAddr, eax
 			pop eax
 		}
+		return inlineHookFunction(functionAddr,functionName);
 		//need to check what the hell is in functionAddr
 	}
 	else {
