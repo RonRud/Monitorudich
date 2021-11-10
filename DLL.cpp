@@ -152,7 +152,7 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 	DWORD Old;
 	DWORD n;
 	DWORD numBytes = 5;
-	std::cout << "before ifs function addr: " << functionAddr << std::endl;
+	//std::cout << "function addr: " << functionAddr << std::endl;
 	std::cout << "The first bytes of the function are: ";
 	printf("%02X %02X %02X %02X %02X %02X", *(BYTE*)functionAddr, *(BYTE*)(functionAddr+1), *(BYTE*)(functionAddr+2), *(BYTE*)(functionAddr+3), *(BYTE*)(functionAddr+4), *(BYTE*)(functionAddr+5));
 	std::cout << std::endl;
@@ -162,7 +162,6 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 		functionAddr += *(int*)(functionAddr + 1) + 5;
 		return inlineHookFunction(functionAddr,functionName);
 	} else if (*(BYTE*)functionAddr == 0xFF && *(BYTE*)(functionAddr + 1) == 0x25) { //TODO this is working very questionably at best
-		std::cout << "before calc function addr: " << functionAddr << std::endl;
 		DWORD dsOffsetOfFunction = *(DWORD*)(functionAddr + 2);
 
 		__asm {
@@ -174,7 +173,6 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 			pop ebx
 			pop eax
 		}
-		std::cout << "Function name:" << *functionName << " calculated function address: " << functionAddr << std::endl;
 		return inlineHookFunction(functionAddr,functionName);
 		//need to check what the hell is in functionAddr
 	}
