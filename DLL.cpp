@@ -3,9 +3,13 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 {
 	switch (reason)
 	{
-	case DLL_PROCESS_ATTACH:
+	case DLL_PROCESS_ATTACH: {
 		IAThooking(GetModuleHandleA(NULL), TARGET_FUNCTION);//,newWriteFile); //newlstrcmpA);
+		//initialize an empty file
+		std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::trunc);
+		saveFile.close();
 		break;
+	}
 	case DLL_PROCESS_DETACH:
 		//IAThooking(GetModuleHandleA(NULL), TARGET_FUNCTION);//,(void *)sourceAddr);
 		break;
