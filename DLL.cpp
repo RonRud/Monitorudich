@@ -43,7 +43,7 @@ bool IAThooking(HMODULE hInstance, LPCSTR targetFunction) //,PVOID newFunc)
 			std::vector<const char*> blackList = { "EnterCriticalSection", "LeaveCriticalSection", "HeapFree", "HeapAlloc", //8B = mov function crushes
 				"GetLastError", "SetLastError", "WriteFile", "GetProcessHeap", //FF 25 = call function crushes
 			//from here these are excludes from runtime problems 	
-			"MultiByteToWideChar"};
+			"MultiByteToWideChar", "free", "malloc"};
 			bool shouldHook = true;
 			for (const char* name : blackList) {
 				if (strcmp(name, (char*)pFuncData->Name) == 0) {
@@ -108,6 +108,7 @@ int WINAPI newlstrcmpA(LPCSTR a,LPCSTR b)
 void logHookName() {
 	std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::app);
 	saveFile << "name: " << *addressToNameMap[originFuncAddr-5] << ", ";
+	saveFile << "address: " << originFuncAddr - 5 << ", ";
 	//saveFile << std::endl;
 	saveFile.close();
 }
@@ -133,7 +134,7 @@ void logEditionalVariables() {
 		//}
 		if (*(BYTE*)(funcAddrPtr) == 0xC2) { //&& *(BYTE*)(funcAddrPtr+2)==0x00) {
 			//std::cout << "found 0xC2 in if" << std::endl;
-			saveFile << "params amount: " << std::hex << (int)*(BYTE*)(funcAddrPtr+1) << ", ";
+			saveFile << "params bytes: " << (int)*(BYTE*)(funcAddrPtr+1) << ", ";
 			break;
 		}
 		funcAddrPtr++;
