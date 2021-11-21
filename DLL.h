@@ -24,6 +24,13 @@ void Hook();
 DWORD sourceAddr;
 DWORD originFuncAddr;
 std::map<DWORD, std::string*> addressToNameMap;
+int functionPararametersNum;
+BYTE functionParameters[256];
+
+DWORD savedEax;
+DWORD savedEbx;
+DWORD savedEcx;
+DWORD savedEdx;
 
 //int newlstrcmpA();
 int WINAPI newlstrcmpA(LPCSTR a,LPCSTR b);

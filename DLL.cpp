@@ -43,7 +43,7 @@ bool IAThooking(HMODULE hInstance, LPCSTR targetFunction) //,PVOID newFunc)
 			std::vector<const char*> blackList = { "EnterCriticalSection", "LeaveCriticalSection", "HeapFree", "HeapAlloc", //8B = mov function crushes
 				"GetLastError", "SetLastError", "WriteFile", "GetProcessHeap", //FF 25 = call function crushes
 			//from here these are excludes from runtime problems 	
-			"MultiByteToWideChar"};
+			"MultiByteToWideChar", "free", "malloc"};
 			bool shouldHook = true;
 			for (const char* name : blackList) {
 				if (strcmp(name, (char*)pFuncData->Name) == 0) {
@@ -105,9 +105,44 @@ int WINAPI newlstrcmpA(LPCSTR a,LPCSTR b)
 }
 */
 
-void logHook() {
+void logHookName() {
 	std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::app);
-	saveFile << *addressToNameMap[originFuncAddr-5];
+	saveFile << "name: " << *addressToNameMap[originFuncAddr-5] << ", ";
+	saveFile << "address: " << originFuncAddr - 5 << ", ";
+	//saveFile << std::endl;
+	saveFile.close();
+}
+
+void logEditionalVariables() {
+	/*
+	std::cout << "In findParamtersNum() " << "in function: " << *addressToNameMap[originFuncAddr - 5] << std::endl;
+	__asm {
+		mov edi, edi
+		mov edi, edi
+		mov edi, edi
+		mov edi, edi
+		mov edi, edi
+		mov edi, edi
+	}*/
+	DWORD funcAddrPtr = originFuncAddr;
+	std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::app);
+	//printf("%02X, ", *(BYTE*)funcAddrPtr);
+	while (*(BYTE*)(funcAddrPtr) != 0xC3 && *(BYTE*)(funcAddrPtr) != 0xCB) {
+		//printf("%02X, ", *(BYTE*)funcAddrPtr);
+		//if (strcmp("free", (char*)*addressToNameMap[originFuncAddr - 5]->c_str()) == 0) {
+		//	printf("%02X", *(BYTE*)funcAddrPtr);
+		//}
+		if (*(BYTE*)(funcAddrPtr) == 0xC2) { //&& *(BYTE*)(funcAddrPtr+2)==0x00) {
+			//std::cout << "found 0xC2 in if" << std::endl;
+			saveFile << "params bytes: " << (int)*(BYTE*)(funcAddrPtr+1) << ", ";
+			break;
+		}
+		funcAddrPtr++;
+	}
+	saveFile << "eax: " << savedEax << ", ";
+	saveFile << "ebx: " << savedEbx << ", ";
+	saveFile << "ecx: " << savedEcx << ", ";
+	saveFile << "edx: " << savedEdx << ", ";
 	saveFile << std::endl;
 	saveFile.close();
 }
@@ -124,14 +159,18 @@ void __declspec(naked) Hook() {
 	}*/
 	__asm {
 		//lea ecx, originFuncAddr
-		MOV EDI, EDI
 		POP EAX
+		mov savedEax, eax
+		mov savedEbx, ebx
+		mov savedEcx, ecx
+		mov savedEdx, edx
 		MOV originFuncAddr, EAX
 		PUSH EBP
 		PUSH EAX
 		lea EBP, [ESP + 4]
 	};
-	logHook();
+	logHookName();
+	logEditionalVariables();
 	__asm RETN
 	/*
 	DWORD returnJmpAddress = hookAddress -
@@ -156,7 +195,7 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 	DWORD Old;
 	DWORD n;
 	DWORD numBytes = 5;
-	//std::cout << "function addr: " << functionAddr << std::endl;
+	std::cout << "function addr: " << std::hex << functionAddr << std::endl;
 	std::cout << "The first bytes of the function are: ";
 	printf("%02X %02X %02X %02X %02X %02X", *(BYTE*)functionAddr, *(BYTE*)(functionAddr+1), *(BYTE*)(functionAddr+2), *(BYTE*)(functionAddr+3), *(BYTE*)(functionAddr+4), *(BYTE*)(functionAddr+5));
 	std::cout << std::endl;
