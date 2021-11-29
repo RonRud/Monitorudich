@@ -24,13 +24,18 @@ void Hook();
 DWORD sourceAddr;
 DWORD originFuncAddr;
 std::map<DWORD, std::string*> addressToNameMap;
-int functionPararametersNum;
-BYTE functionParameters[256];
 
+int functionParamsNum;
+bool foundWINAPICleanup;
+DWORD functionParameters[50];
+
+//saved values from within the hooked function
 DWORD savedEax;
 DWORD savedEbx;
 DWORD savedEcx;
 DWORD savedEdx;
+DWORD beforeFunctionEsp;
+DWORD beforeFunctionEbp;
 
 //int newlstrcmpA();
 int WINAPI newlstrcmpA(LPCSTR a,LPCSTR b);

@@ -126,7 +126,14 @@ void logEditionalVariables() {
 	}*/
 	DWORD funcAddrPtr = originFuncAddr;
 	std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::app);
+	saveFile << "eax: " << savedEax << ", ";
+	saveFile << "ebx: " << savedEbx << ", ";
+	saveFile << "ecx: " << savedEcx << ", ";
+	saveFile << "edx: " << savedEdx << ", ";
+	saveFile << std::endl;
+
 	//printf("%02X, ", *(BYTE*)funcAddrPtr);
+	foundWINAPICleanup = false;
 	while (*(BYTE*)(funcAddrPtr) != 0xC3 && *(BYTE*)(funcAddrPtr) != 0xCB) {
 		//printf("%02X, ", *(BYTE*)funcAddrPtr);
 		//if (strcmp("free", (char*)*addressToNameMap[originFuncAddr - 5]->c_str()) == 0) {
@@ -134,18 +141,45 @@ void logEditionalVariables() {
 		//}
 		if (*(BYTE*)(funcAddrPtr) == 0xC2) { //&& *(BYTE*)(funcAddrPtr+2)==0x00) {
 			//std::cout << "found 0xC2 in if" << std::endl;
-			saveFile << "params bytes: " << (int)*(BYTE*)(funcAddrPtr+1) << ", ";
+			functionParamsNum = (int)*(BYTE*)(funcAddrPtr + 1);
+			saveFile << "params bytes: " << functionParamsNum << ", ";
+			foundWINAPICleanup = true;
 			break;
 		}
 		funcAddrPtr++;
 	}
-	saveFile << "eax: " << savedEax << ", ";
-	saveFile << "ebx: " << savedEbx << ", ";
-	saveFile << "ecx: " << savedEcx << ", ";
-	saveFile << "edx: " << savedEdx << ", ";
-	saveFile << std::endl;
 	saveFile.close();
 }
+
+void __declspec(naked) LogStack() {
+
+	if (foundWINAPICleanup) {
+		for (int i = 0; i < functionParamsNum * 4; i += 4) { //start with an offset of 4 because the top of the stack is the return addr
+			__asm {
+				push eax
+				push ebx
+				push ecx
+				push ebp
+
+				//lea eax, beforeFunctionEsp
+				//add eax, i
+				lea ecx, functionParameters
+				add ecx, i
+				add ebp, i
+				mov ebx, dword ptr[ebp];
+				mov[ecx], ebx
+
+				pop ebp
+				pop ecx
+				pop ebx
+				pop eax
+			}
+			std::cout << functionParameters[i] << ", ";
+		}
+		std::cout << std::endl;
+	}
+}
+
 
 void __declspec(naked) Hook() {
 	/*
@@ -159,18 +193,28 @@ void __declspec(naked) Hook() {
 	}*/
 	__asm {
 		//lea ecx, originFuncAddr
-		POP EAX
 		mov savedEax, eax
 		mov savedEbx, ebx
 		mov savedEcx, ecx
 		mov savedEdx, edx
+		/*
+		lea ecx , [ebp]
+		mov beforeFunctionEbp, ecx
+		lea ecx, [esp]
+		mov beforeFunctionEsp, ecx
+		*/
+		POP EAX
 		MOV originFuncAddr, EAX
+	};
+	
+	logHookName();
+	logEditionalVariables();
+	
+	__asm {
 		PUSH EBP
 		PUSH EAX
 		lea EBP, [ESP + 4]
 	};
-	logHookName();
-	logEditionalVariables();
 	__asm RETN
 	/*
 	DWORD returnJmpAddress = hookAddress -
