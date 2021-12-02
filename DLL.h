@@ -29,6 +29,8 @@ int functionParamsNum;
 bool foundWINAPICleanup;
 DWORD functionParameters[50];
 
+int i;
+
 //saved values from within the hooked function
 DWORD savedEax;
 DWORD savedEbx;

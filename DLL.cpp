@@ -53,8 +53,8 @@ bool IAThooking(HMODULE hInstance, LPCSTR targetFunction) //,PVOID newFunc)
 				}
 			}
 			//std::cout << "function name check: " << *addressToNameMap[pFirstThunk->u1.Function] << std::endl;
-			//if(strcmp(targetFunction,(char*)pFuncData->Name)==0)//checks if we are in the Target Function
-			//{
+			if(strcmp(targetFunction,(char*)pFuncData->Name)==0)//checks if we are in the Target Function
+			{
 			if (shouldHook) {
 				bool isHooked = inlineHookFunction(pFirstThunk->u1.Function, new std::string(pFuncData->Name));
 				if (isHooked) {
@@ -69,7 +69,7 @@ bool IAThooking(HMODULE hInstance, LPCSTR targetFunction) //,PVOID newFunc)
 			if(rewriteThunk(pFirstThunk,newFunc))
 				printf("Hooked %s successfully :)\n",targetFunction);
 			*/
-			//}
+			}
 			pOriginalFirstThunk++; // next node (function) in the array
 			pFuncData = (PIMAGE_IMPORT_BY_NAME)((PBYTE)hInstance + pOriginalFirstThunk->u1.AddressOfData);
 			pFirstThunk++;// next node (function) in the array
@@ -113,7 +113,7 @@ void logHookName() {
 	saveFile.close();
 }
 
-void logEditionalVariables() {
+void logAdditionalVariables() {
 	/*
 	std::cout << "In findParamtersNum() " << "in function: " << *addressToNameMap[originFuncAddr - 5] << std::endl;
 	__asm {
@@ -141,7 +141,8 @@ void logEditionalVariables() {
 		//}
 		if (*(BYTE*)(funcAddrPtr) == 0xC2) { //&& *(BYTE*)(funcAddrPtr+2)==0x00) {
 			//std::cout << "found 0xC2 in if" << std::endl;
-			functionParamsNum = (int)*(BYTE*)(funcAddrPtr + 1);
+			//functionParamsNum = (int)*(BYTE*)(funcAddrPtr + 1);
+			//functionParamsNum = (functionParamsNum + (functionParamsNum % 4)) / 4; // every stack entry is 4 bytes, makes sure all bytes are included by adding to a number divided by 4
 			saveFile << "params bytes: " << functionParamsNum << ", ";
 			foundWINAPICleanup = true;
 			break;
@@ -151,33 +152,32 @@ void logEditionalVariables() {
 	saveFile.close();
 }
 
-void __declspec(naked) LogStack() {
+void __declspec(naked) logStack() {
 
 	if (foundWINAPICleanup) {
-		for (int i = 0; i < functionParamsNum * 4; i += 4) { //start with an offset of 4 because the top of the stack is the return addr
+		for (i = 0; i < functionParamsNum * 4; i += 4) { //start with an offset of 4 because the top of the stack is the return addr
 			__asm {
-				push eax
-				push ebx
-				push ecx
-				push ebp
-
 				//lea eax, beforeFunctionEsp
 				//add eax, i
 				lea ecx, functionParameters
 				add ecx, i
-				add ebp, i
-				mov ebx, dword ptr[ebp];
+				add esp, i
+				mov ebx, dword ptr[esp];
 				mov[ecx], ebx
-
-				pop ebp
-				pop ecx
-				pop ebx
-				pop eax
-			}
-			std::cout << functionParameters[i] << ", ";
+				
+				mov esp, beforeFunctionEsp // reset esp to it's original value
+			}	
 		}
-		std::cout << std::endl;
+		__asm ret
 	}
+	__asm ret
+}
+
+void printStack() {
+	for (int i = 0; i < functionParamsNum; i++) {
+		std::cout << functionParameters[i] << ", ";
+	}
+	std::cout << std::endl;
 }
 
 
@@ -197,24 +197,24 @@ void __declspec(naked) Hook() {
 		mov savedEbx, ebx
 		mov savedEcx, ecx
 		mov savedEdx, edx
-		/*
-		lea ecx , [ebp]
-		mov beforeFunctionEbp, ecx
-		lea ecx, [esp]
-		mov beforeFunctionEsp, ecx
-		*/
+		
+		mov beforeFunctionEbp, ebp
+		mov beforeFunctionEsp, esp
+		
 		POP EAX
 		MOV originFuncAddr, EAX
 	};
-	
 	logHookName();
-	logEditionalVariables();
-	
+	logAdditionalVariables();
+	logStack();
+	printStack();
+
 	__asm {
 		PUSH EBP
-		PUSH EAX
+		PUSH originFuncAddr
 		lea EBP, [ESP + 4]
 	};
+
 	__asm RETN
 	/*
 	DWORD returnJmpAddress = hookAddress -
