@@ -130,7 +130,6 @@ void logAdditionalVariables() {
 	saveFile << "ebx: " << savedEbx << ", ";
 	saveFile << "ecx: " << savedEcx << ", ";
 	saveFile << "edx: " << savedEdx << ", ";
-	saveFile << std::endl;
 
 	//printf("%02X, ", *(BYTE*)funcAddrPtr);
 	foundWINAPICleanup = false;
@@ -149,39 +148,43 @@ void logAdditionalVariables() {
 		}
 		funcAddrPtr++;
 	}
+	if (foundWINAPICleanup == false) {
+		functionParamsNum = (beforeFunctionEbp - beforeFunctionEsp) / 4; // gets all the stack between ebp of last function (before api function call) to the api function return address
+																		 // this includes the stack parameters for the function and the local variables of the last function. 
+		functionParamsNum--; // removes the two extra stack entries caused by the push of the return address of the api function and the hook function.
+	}
 	saveFile.close();
 }
 
-void __declspec(naked) logStack() {
+void __declspec(naked) getStack() {
 
-	if (foundWINAPICleanup) {
-		for (i = 0; i < functionParamsNum * 4; i += 4) {
-			__asm {
-				//lea eax, beforeFunctionEsp
-				//add eax, i
-				lea ecx, functionParameters
-				add ecx, i
+	for (i = 0; i < functionParamsNum * 4; i += 4) {
+		__asm {
+			//lea eax, beforeFunctionEsp
+			//add eax, i
+			lea ecx, functionParameters
+			add ecx, i
 				
-				add esp, 8 //adds an offset of 8 because the top of the stack is the return addr from this function, than the return address which called the api function
-				add esp, i
-				mov ebx, dword ptr[esp];
-				mov[ecx], ebx
+			add esp, 8 //adds an offset of 8 because the top of the stack is the return addr from this function, than the return address which called the api function
+			add esp, i
+			mov ebx, dword ptr[esp];
+			mov[ecx], ebx
 				
-				mov esp, beforeFunctionEsp // reset esp to it's original value
-			}	
-		}
-		__asm ret
+			mov esp, beforeFunctionEsp // reset esp to it's original value
+		}	
 	}
 	__asm ret
 }
 
-void printStack() {
-	if (foundWINAPICleanup) { // TODO remove!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		for (int i = 0; i < functionParamsNum; i++) {
-			std::cout << functionParameters[i] << ", ";
-		}
-		std::cout << std::endl;
+void logStack() {
+	std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::app);
+	saveFile << "presumed function bytes in hex: ";
+	for (int i = 0; i < functionParamsNum; i++) {
+		saveFile << std::hex << functionParameters[i] << "-";
 	}
+	saveFile << ", ";
+	saveFile << std::endl;
+	saveFile.close();
 }
 
 
@@ -210,13 +213,18 @@ void __declspec(naked) Hook() {
 	};
 	logHookName();
 	logAdditionalVariables();
+	getStack();
 	logStack();
-	printStack();
 
 	__asm {
 		PUSH EBP
 		PUSH originFuncAddr
 		lea EBP, [ESP + 4]
+
+		mov eax, savedEax
+		mov ebx, savedEbx
+		mov ecx, savedEcx
+		mov edx, savedEdx
 	};
 
 	__asm RETN
