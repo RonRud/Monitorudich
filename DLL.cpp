@@ -53,8 +53,8 @@ bool IAThooking(HMODULE hInstance, LPCSTR targetFunction) //,PVOID newFunc)
 				}
 			}
 			//std::cout << "function name check: " << *addressToNameMap[pFirstThunk->u1.Function] << std::endl;
-			if(strcmp(targetFunction,(char*)pFuncData->Name)==0)//checks if we are in the Target Function
-			{
+			//if(strcmp(targetFunction,(char*)pFuncData->Name)==0)//checks if we are in the Target Function
+			//{
 			if (shouldHook) {
 				bool isHooked = inlineHookFunction(pFirstThunk->u1.Function, new std::string(pFuncData->Name));
 				if (isHooked) {
@@ -64,7 +64,7 @@ bool IAThooking(HMODULE hInstance, LPCSTR targetFunction) //,PVOID newFunc)
 					std::cout << "Didn't Hook function" << std::endl;
 				}
 				std::cout << std::endl;
-			}
+			//}
 			/*
 			if(rewriteThunk(pFirstThunk,newFunc))
 				printf("Hooked %s successfully :)\n",targetFunction);
@@ -141,9 +141,9 @@ void logAdditionalVariables() {
 		//}
 		if (*(BYTE*)(funcAddrPtr) == 0xC2) { //&& *(BYTE*)(funcAddrPtr+2)==0x00) {
 			//std::cout << "found 0xC2 in if" << std::endl;
-			//functionParamsNum = (int)*(BYTE*)(funcAddrPtr + 1);
-			//functionParamsNum = (functionParamsNum + (functionParamsNum % 4)) / 4; // every stack entry is 4 bytes, makes sure all bytes are included by adding to a number divided by 4
+			functionParamsNum = (int)*(BYTE*)(funcAddrPtr + 1);
 			saveFile << "params bytes: " << functionParamsNum << ", ";
+			functionParamsNum = (functionParamsNum + (functionParamsNum % 4)) / 4; // every stack entry is 4 bytes, makes sure all bytes are included by adding to a number divided by 4
 			foundWINAPICleanup = true;
 			break;
 		}
@@ -155,12 +155,14 @@ void logAdditionalVariables() {
 void __declspec(naked) logStack() {
 
 	if (foundWINAPICleanup) {
-		for (i = 0; i < functionParamsNum * 4; i += 4) { //start with an offset of 4 because the top of the stack is the return addr
+		for (i = 0; i < functionParamsNum * 4; i += 4) {
 			__asm {
 				//lea eax, beforeFunctionEsp
 				//add eax, i
 				lea ecx, functionParameters
 				add ecx, i
+				
+				add esp, 8 //adds an offset of 8 because the top of the stack is the return addr from this function, than the return address which called the api function
 				add esp, i
 				mov ebx, dword ptr[esp];
 				mov[ecx], ebx
@@ -174,10 +176,12 @@ void __declspec(naked) logStack() {
 }
 
 void printStack() {
-	for (int i = 0; i < functionParamsNum; i++) {
-		std::cout << functionParameters[i] << ", ";
+	if (foundWINAPICleanup) { // TODO remove!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		for (int i = 0; i < functionParamsNum; i++) {
+			std::cout << functionParameters[i] << ", ";
+		}
+		std::cout << std::endl;
 	}
-	std::cout << std::endl;
 }
 
 
