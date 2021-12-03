@@ -1,57 +1,69 @@
-#include <iostream>
 #include <Windows.h>
-#include <stdio.h>
-#include <tlhelp32.h>
+#include <iostream>
+//#include <stdio.h>
+// #include <tlhelp32.h>
+#include <string>
 
-using namespace std;
-#define MSGRET(str, ret) { cout << "ERROR: " << str << endl; system("pause"); return ret; }
+bool InjectDLL(DWORD ProcessID, LPCSTR DLL_PATH)
+{
+	//Get the current memory location of LoadLibraryA function in the current loaded instance of kernel32.dll
+	LPVOID llAddress = GetProcAddress(GetModuleHandleA("kernel32.dll"), "LoadLibraryA");
+	if (!llAddress) { // if GetProcAddress fails than it will return null and go in this error
+		std::cout << "Error: cant get procAddress, error code: " << std::hex << GetLastError() << std::endl;
+		return false;
+	}
+	//Get access to the process that the program desires to hook
+	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ProcessID);
+	if (!hProcess) {
+		std::cout << "Error: cant open Process!, error code: " << std::hex << GetLastError() << std::endl;
+		return false;
+	}
+	//Save the full path of the injected dll in the inspected process (needs to be in it's address space in order to be called by a thread in the other process)
+	LPVOID lpDllAddress = VirtualAllocEx(hProcess, NULL, strlen(DLL_PATH) + 1, MEM_COMMIT, PAGE_READWRITE);
+	DWORD nBytesWritten;
 
-
-//#define DLL_PATH "C:\\uriel\\Programming\\C++\\DLL Injection\\myDLL.dll"
-
-void InjectDLL(DWORD ProcessID, LPCSTR DLL_PATH);
+	if (WriteProcessMemory(hProcess, lpDllAddress, DLL_PATH, strlen(DLL_PATH) + 1, &nBytesWritten) == 0 || nBytesWritten == 0) //if WriteProcessMemory fails the return value is zero
+	{
+		std::cout << "Error: WriteProcessMemory failed!, error code: " << std::hex << GetLastError() << std::endl;
+		return false;
+	}
+	//Create the thread that runs the injected dll
+	HANDLE hThread = CreateRemoteThread(hProcess, NULL, NULL, (LPTHREAD_START_ROUTINE)llAddress, lpDllAddress, NULL, NULL);
+	if (!hThread) {
+		std::cout << "Error: CreateRemoteThread failed!, error code: " << std::hex << GetLastError() << std::endl;
+		return false;
+	}
+	else { //it succeeded!
+		CloseHandle(hThread);
+	}
+	
+	std::cout << "Successful dll injection" << std::endl;
+	return true;
+}
 
 int main(int argc, char* argv[])
 {
-	char DLL_PATH[50] = { 0 };
+	char thisFilePath[100] = { 0 };
+
+	GetModuleFileName(NULL, thisFilePath, 100);
+	std::string DllPath = std::string(thisFilePath);
+	const size_t last_slash_idx = DllPath.rfind('\\'); //Get the last occurareance of \\ (before the exe name)
+	if (std::string::npos != last_slash_idx) {
+		DllPath = DllPath.substr(0, last_slash_idx + 1) + "DLL.dll"; // Than add the dll file name to it
+	};
 	DWORD ProcessID;
 	while (1)
 	{
 		printf("Enter Process ID:\n");
 		std::cin >> ProcessID;
-		printf("Enter DLL path:\n");
-		std::cin >> DLL_PATH;
-		InjectDLL(ProcessID, DLL_PATH);
+
+		bool is_successful = InjectDLL(ProcessID, DllPath.c_str());
 	}
 	return 0;
 }
 
-void InjectDLL(DWORD ProcessID, LPCSTR DLL_PATH)
-{
-	LPVOID llAddress;
-	HANDLE hProcess;
-	if (!(llAddress = GetProcAddress(GetModuleHandleA("kernel32.dll"), "LoadLibraryA")))
-		printf("Error: cant get procAddr %d", GetLastError());
-	if (!(hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ProcessID)))
-		printf("Error cant open Process! (%d)", GetLastError());
-	LPVOID lpDllAddress = VirtualAllocEx(hProcess, NULL, strlen(DLL_PATH) + 1, MEM_COMMIT, PAGE_READWRITE);
-	DWORD nBytesWritten;
-
-	if (!WriteProcessMemory(hProcess, lpDllAddress, DLL_PATH, strlen(DLL_PATH) + 1, &nBytesWritten) || nBytesWritten == 0)
-	{
-		printf("Error: WriteProcessMemory! (%d)\n", GetLastError());
-	}
-	else
-	{
-		HANDLE hThread = CreateRemoteThread(hProcess, NULL, NULL, (LPTHREAD_START_ROUTINE)llAddress, lpDllAddress, NULL, NULL);
-		if (!hThread)
-			printf("Error: CreateRemoteThread! (%d)\n", GetLastError());
-		else
-			CloseHandle(hThread);
-	}
-	printf("Done!\n");
-}
 /*
+* #define MSGRET(str, ret) { cout << "ERROR: " << str << endl; system("pause"); return ret; }
 DWORD procNameToPID(const char *procName)
 {
 		HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
