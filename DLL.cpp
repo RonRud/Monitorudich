@@ -64,12 +64,12 @@ bool IAThooking(HMODULE hInstance, LPCSTR targetFunction) //,PVOID newFunc)
 					std::cout << "Didn't Hook function" << std::endl;
 				}
 				std::cout << std::endl;
-			}
+			//}
 			/*
 			if(rewriteThunk(pFirstThunk,newFunc))
 				printf("Hooked %s successfully :)\n",targetFunction);
 			*/
-			//}
+			}
 			pOriginalFirstThunk++; // next node (function) in the array
 			pFuncData = (PIMAGE_IMPORT_BY_NAME)((PBYTE)hInstance + pOriginalFirstThunk->u1.AddressOfData);
 			pFirstThunk++;// next node (function) in the array
@@ -113,7 +113,7 @@ void logHookName() {
 	saveFile.close();
 }
 
-void logEditionalVariables() {
+void logAdditionalVariables() {
 	/*
 	std::cout << "In findParamtersNum() " << "in function: " << *addressToNameMap[originFuncAddr - 5] << std::endl;
 	__asm {
@@ -126,7 +126,13 @@ void logEditionalVariables() {
 	}*/
 	DWORD funcAddrPtr = originFuncAddr;
 	std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::app);
+	saveFile << "eax: " << savedEax << ", ";
+	saveFile << "ebx: " << savedEbx << ", ";
+	saveFile << "ecx: " << savedEcx << ", ";
+	saveFile << "edx: " << savedEdx << ", ";
+
 	//printf("%02X, ", *(BYTE*)funcAddrPtr);
+	foundWINAPICleanup = false;
 	while (*(BYTE*)(funcAddrPtr) != 0xC3 && *(BYTE*)(funcAddrPtr) != 0xCB) {
 		//printf("%02X, ", *(BYTE*)funcAddrPtr);
 		//if (strcmp("free", (char*)*addressToNameMap[originFuncAddr - 5]->c_str()) == 0) {
@@ -134,18 +140,53 @@ void logEditionalVariables() {
 		//}
 		if (*(BYTE*)(funcAddrPtr) == 0xC2) { //&& *(BYTE*)(funcAddrPtr+2)==0x00) {
 			//std::cout << "found 0xC2 in if" << std::endl;
-			saveFile << "params bytes: " << (int)*(BYTE*)(funcAddrPtr+1) << ", ";
+			functionParamsNum = (int)*(BYTE*)(funcAddrPtr + 1);
+			saveFile << "params bytes: " << functionParamsNum << ", ";
+			functionParamsNum = (functionParamsNum + (functionParamsNum % 4)) / 4; // every stack entry is 4 bytes, makes sure all bytes are included by adding to a number divided by 4
+			foundWINAPICleanup = true;
 			break;
 		}
 		funcAddrPtr++;
 	}
-	saveFile << "eax: " << savedEax << ", ";
-	saveFile << "ebx: " << savedEbx << ", ";
-	saveFile << "ecx: " << savedEcx << ", ";
-	saveFile << "edx: " << savedEdx << ", ";
+	if (foundWINAPICleanup == false) {
+		functionParamsNum = (beforeFunctionEbp - beforeFunctionEsp) / 4; // gets all the stack between ebp of last function (before api function call) to the api function return address
+																		 // this includes the stack parameters for the function and the local variables of the last function. 
+		functionParamsNum--; // removes the two extra stack entries caused by the push of the return address of the api function and the hook function.
+	}
+	saveFile.close();
+}
+
+void __declspec(naked) getStack() {
+
+	for (i = 0; i < functionParamsNum * 4; i += 4) {
+		__asm {
+			//lea eax, beforeFunctionEsp
+			//add eax, i
+			lea ecx, functionParameters
+			add ecx, i
+				
+			add esp, 8 //adds an offset of 8 because the top of the stack is the return addr from this function, than the return address which called the api function
+			add esp, i
+			mov ebx, dword ptr[esp];
+			mov[ecx], ebx
+				
+			mov esp, beforeFunctionEsp // reset esp to it's original value
+		}	
+	}
+	__asm ret
+}
+
+void logStack() {
+	std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::app);
+	saveFile << "presumed function bytes in hex: ";
+	for (int i = 0; i < functionParamsNum; i++) {
+		saveFile << std::hex << functionParameters[i] << "-";
+	}
+	saveFile << ", ";
 	saveFile << std::endl;
 	saveFile.close();
 }
+
 
 void __declspec(naked) Hook() {
 	/*
@@ -159,18 +200,33 @@ void __declspec(naked) Hook() {
 	}*/
 	__asm {
 		//lea ecx, originFuncAddr
-		POP EAX
 		mov savedEax, eax
 		mov savedEbx, ebx
 		mov savedEcx, ecx
 		mov savedEdx, edx
+		
+		mov beforeFunctionEbp, ebp
+		mov beforeFunctionEsp, esp
+		
+		POP EAX
 		MOV originFuncAddr, EAX
-		PUSH EBP
-		PUSH EAX
-		lea EBP, [ESP + 4]
 	};
 	logHookName();
-	logEditionalVariables();
+	logAdditionalVariables();
+	getStack();
+	logStack();
+
+	__asm {
+		PUSH EBP
+		PUSH originFuncAddr
+		lea EBP, [ESP + 4]
+
+		mov eax, savedEax
+		mov ebx, savedEbx
+		mov ecx, savedEcx
+		mov edx, savedEdx
+	};
+
 	__asm RETN
 	/*
 	DWORD returnJmpAddress = hookAddress -
