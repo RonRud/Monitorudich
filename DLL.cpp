@@ -4,14 +4,13 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 	switch (reason)
 	{
 	case DLL_PROCESS_ATTACH: {
-		IAThooking(GetModuleHandleA(NULL), TARGET_FUNCTION);//,newWriteFile); //newlstrcmpA);
+		IAThooking(GetModuleHandleA(NULL));
 		//initialize an empty file
 		std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::trunc);
 		saveFile.close();
 		break;
 	}
 	case DLL_PROCESS_DETACH:
-		//IAThooking(GetModuleHandleA(NULL), TARGET_FUNCTION);//,(void *)sourceAddr);
 		break;
 	case DLL_THREAD_ATTACH:
 		break;
@@ -20,7 +19,7 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 	}
 	return true;
 }
-bool IAThooking(HMODULE hInstance, LPCSTR targetFunction) //,PVOID newFunc)
+bool IAThooking(HMODULE hInstance)
 {
 	bool flag = false;
 
@@ -43,7 +42,7 @@ bool IAThooking(HMODULE hInstance, LPCSTR targetFunction) //,PVOID newFunc)
 			std::vector<const char*> blackList = { "EnterCriticalSection", "LeaveCriticalSection", "HeapFree", "HeapAlloc", //8B = mov function crushes
 				"GetLastError", "SetLastError", "WriteFile", "GetProcessHeap", //FF 25 = call function crushes
 			//from here these are excludes from runtime problems 	
-			"MultiByteToWideChar", "free", "malloc"};
+			"MultiByteToWideChar"};//, "free", "malloc"}; they might be broken still
 			bool shouldHook = true;
 			for (const char* name : blackList) {
 				if (strcmp(name, (char*)pFuncData->Name) == 0) {
@@ -52,9 +51,7 @@ bool IAThooking(HMODULE hInstance, LPCSTR targetFunction) //,PVOID newFunc)
 					break;
 				}
 			}
-			//std::cout << "function name check: " << *addressToNameMap[pFirstThunk->u1.Function] << std::endl;
-			//if(strcmp(targetFunction,(char*)pFuncData->Name)==0)//checks if we are in the Target Function
-			//{
+
 			if (shouldHook) {
 				bool isHooked = inlineHookFunction(pFirstThunk->u1.Function, new std::string(pFuncData->Name));
 				if (isHooked) {
@@ -64,11 +61,6 @@ bool IAThooking(HMODULE hInstance, LPCSTR targetFunction) //,PVOID newFunc)
 					std::cout << "Didn't Hook function" << std::endl;
 				}
 				std::cout << std::endl;
-			//}
-			/*
-			if(rewriteThunk(pFirstThunk,newFunc))
-				printf("Hooked %s successfully :)\n",targetFunction);
-			*/
 			}
 			pOriginalFirstThunk++; // next node (function) in the array
 			pFuncData = (PIMAGE_IMPORT_BY_NAME)((PBYTE)hInstance + pOriginalFirstThunk->u1.AddressOfData);
@@ -79,51 +71,15 @@ bool IAThooking(HMODULE hInstance, LPCSTR targetFunction) //,PVOID newFunc)
 	return false;
 }
 
-/*
-__declspec( naked ) int newlstrcmpA()
-{
-	_asm{
-		XOR eax,eax;
-		RETN 8;
-	}
-}
-
-typedef BOOL (*WriteFuncPtr)(HANDLE, LPCVOID, DWORD, LPDWORD, LPOVERLAPPED);
-
-BOOL newWriteFile(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped) {
-	MessageBoxA(NULL,"hook called","hehe",MB_OK);
-	UINT_PTR funcPtr = sourceAddr;
-	WriteFuncPtr writingFunc = (WriteFuncPtr)funcPtr;
-	writingFunc(hFile, lpBuffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, lpOverlapped);
-	return 0;
-};
-
-int WINAPI newlstrcmpA(LPCSTR a,LPCSTR b)
-{
-	MessageBoxA(NULL,"hook called","hehe",MB_OK);
-	return 0;
-}
-*/
-
 void logHookName() {
 	std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::app);
-	saveFile << "name: " << *addressToNameMap[originFuncAddr-5] << ", ";
+	saveFile << "name: " << *addressToNameMap[originFuncAddr-5] << ", "; //gets the function's name from the table. The function address which is gathered from the stack 
+																		 //has 5 more so it points to the instruction after the jmp in the function and not the function starting point.
 	saveFile << "address: " << originFuncAddr - 5 << ", ";
-	//saveFile << std::endl;
 	saveFile.close();
 }
 
 void logAdditionalVariables() {
-	/*
-	std::cout << "In findParamtersNum() " << "in function: " << *addressToNameMap[originFuncAddr - 5] << std::endl;
-	__asm {
-		mov edi, edi
-		mov edi, edi
-		mov edi, edi
-		mov edi, edi
-		mov edi, edi
-		mov edi, edi
-	}*/
 	DWORD funcAddrPtr = originFuncAddr;
 	std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::app);
 	saveFile << "eax: " << savedEax << ", ";
@@ -131,15 +87,9 @@ void logAdditionalVariables() {
 	saveFile << "ecx: " << savedEcx << ", ";
 	saveFile << "edx: " << savedEdx << ", ";
 
-	//printf("%02X, ", *(BYTE*)funcAddrPtr);
 	foundWINAPICleanup = false;
 	while (*(BYTE*)(funcAddrPtr) != 0xC3 && *(BYTE*)(funcAddrPtr) != 0xCB) {
-		//printf("%02X, ", *(BYTE*)funcAddrPtr);
-		//if (strcmp("free", (char*)*addressToNameMap[originFuncAddr - 5]->c_str()) == 0) {
-		//	printf("%02X", *(BYTE*)funcAddrPtr);
-		//}
-		if (*(BYTE*)(funcAddrPtr) == 0xC2) { //&& *(BYTE*)(funcAddrPtr+2)==0x00) {
-			//std::cout << "found 0xC2 in if" << std::endl;
+		if (*(BYTE*)(funcAddrPtr) == 0xC2) { //&& *(BYTE*)(funcAddrPtr+2)==0x00) { add this if the parameters of winapi bug
 			functionParamsNum = (int)*(BYTE*)(funcAddrPtr + 1);
 			saveFile << "params bytes: " << functionParamsNum << ", ";
 			functionParamsNum = (functionParamsNum + (functionParamsNum % 4)) / 4; // every stack entry is 4 bytes, makes sure all bytes are included by adding to a number divided by 4
@@ -160,8 +110,6 @@ void __declspec(naked) getStack() {
 
 	for (i = 0; i < functionParamsNum * 4; i += 4) {
 		__asm {
-			//lea eax, beforeFunctionEsp
-			//add eax, i
 			lea ecx, functionParameters
 			add ecx, i
 				
@@ -188,18 +136,11 @@ void logStack() {
 }
 
 
-void __declspec(naked) Hook() {
-	/*
-	//prologue
+void __declspec(naked) Hook() { // this means compiler doesn't go here
+								// this function definition tells the compiler not to touch the stack
+								// __declspecc(naked) means that there is no compiler setup of stack and therefor usage of local variables needs to be cleaned up manually
+								// therfor all variables here are global 
 	__asm {
-		push ebp ; Save ebp
-		mov ebp, esp ; Set stack frame pointer
-		push eax
-		push ebx
-		push ecx
-	}*/
-	__asm {
-		//lea ecx, originFuncAddr
 		mov savedEax, eax
 		mov savedEbx, ebx
 		mov savedEcx, ecx
@@ -228,21 +169,6 @@ void __declspec(naked) Hook() {
 	};
 
 	__asm RETN
-	/*
-	DWORD returnJmpAddress = hookAddress -
-	__asm {
-		jmp
-	}*/
-	/*
-	//epilogue
-	__asm {
-		pop ecx
-		pop ebx
-		pop eax
-		mov esp, ebp
-		pop ebp
-		ret
-	}*/
 }
 
 
@@ -260,7 +186,7 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 	} else if(*(BYTE*)functionAddr == 0xE9) {
 		functionAddr += *(int*)(functionAddr + 1) + 5;
 		return inlineHookFunction(functionAddr,functionName);
-	} else if (*(BYTE*)functionAddr == 0xFF && *(BYTE*)(functionAddr + 1) == 0x25) { //TODO this is working very questionably at best
+	} else if (*(BYTE*)functionAddr == 0xFF && *(BYTE*)(functionAddr + 1) == 0x25) {
 		DWORD dsOffsetOfFunction = *(DWORD*)(functionAddr + 2);
 
 		__asm {
@@ -273,18 +199,17 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 			pop eax
 		}
 		return inlineHookFunction(functionAddr,functionName);
-		//need to check what the hell is in functionAddr
 	}
 	else {
 		return false;
 	}
 	addressToNameMap[functionAddr] = functionName;
 	VirtualProtect((void*)functionAddr, 5, PAGE_EXECUTE_READWRITE, &Old);
-	//*(BYTE *)Function = 0xE9; //JMP Opcode
 	*(BYTE*)functionAddr = 0xE8; //call Opcode
-	*(DWORD*)(functionAddr + 1) = (DWORD)Hook - (DWORD)functionAddr - 5;//Calculate amount of bytes to jmp
+	*(DWORD*)(functionAddr + 1) = (DWORD)Hook - (DWORD)functionAddr - 5; //Calculate amount of bytes to jmp
 	VirtualProtect((void*)functionAddr, 5, Old, &n);
 	//That's it...hooked.
+	//it only required a bit of satanic worship, only a couple things were sacrificed
 	return true;
 }
 
@@ -302,14 +227,4 @@ PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE hInstance)
 	dataDirectory = (IMAGE_DATA_DIRECTORY)(optionalHeader.DataDirectory[IMPORT_TABLE_OFFSET]);//Getting the import table of DataDirectory
 	return (PIMAGE_IMPORT_DESCRIPTOR)((PBYTE)hInstance + dataDirectory.VirtualAddress);//ImageBase+RVA to import table
 
-}
-bool rewriteThunk(PIMAGE_THUNK_DATA pThunk, void* newFunc)
-{
-	DWORD CurrentProtect;
-	DWORD junk;
-	VirtualProtect(pThunk, 4096, PAGE_READWRITE, &CurrentProtect);//allow write to the page
-	sourceAddr = pThunk->u1.Function;
-	pThunk->u1.Function = (DWORD)newFunc; // rewrite the IAT to new function
-	VirtualProtect(pThunk, 4096, CurrentProtect, &junk);//return previous premissions
-	return true;
 }
