@@ -32,6 +32,11 @@ bool IAThooking(HMODULE hInstance, LPCSTR targetFunction) //,PVOID newFunc)
 	//pImportDesc = (PIMAGE_IMPORT_DESCRIPTOR)ImageDirectoryEntryToData(hInstance, TRUE, IMAGE_DIRECTORY_ENTRY_IMPORT, &ulSize); - You can just call this function to get the Import Table
 	while (*(WORD*)importedModule != 0) //over on the modules (DLLs)
 	{
+		if (strcmp((char*)((PBYTE)hInstance + importedModule->Name), (char*)"mscoree.dll") == 0) {
+			std::cout << (char*)((PBYTE)hInstance + importedModule->Name) << "skipped" << std::endl;
+			importedModule++;
+			continue;
+		}
 		printf("\n%s:\n---------\n", (char*)((PBYTE)hInstance + importedModule->Name));//printing Module Name
 		pFirstThunk = (PIMAGE_THUNK_DATA)((PBYTE)hInstance + importedModule->FirstThunk);//pointing to its IAT
 		pOriginalFirstThunk = (PIMAGE_THUNK_DATA)((PBYTE)hInstance + importedModule->OriginalFirstThunk);//pointing to OriginalThunk

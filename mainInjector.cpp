@@ -4,8 +4,20 @@
 // #include <tlhelp32.h>
 #include <string>
 
-bool InjectDLL(DWORD ProcessID, LPCSTR DLL_PATH)
+bool InjectDLL(DWORD ProcessID)
 {
+
+	char thisFilePath[100] = { 0 };
+
+	GetModuleFileName(NULL, thisFilePath, 100);
+	std::string DllPath = std::string(thisFilePath);
+	const size_t last_slash_idx = DllPath.rfind('\\'); //Get the last occurareance of \\ (before the exe name)
+	if (std::string::npos != last_slash_idx) {
+		DllPath = DllPath.substr(0, last_slash_idx + 1) + "DLL.dll"; // Than add the dll file name to it
+	};
+
+
+
 	//Get the current memory location of LoadLibraryA function in the current loaded instance of kernel32.dll
 	LPVOID llAddress = GetProcAddress(GetModuleHandleA("kernel32.dll"), "LoadLibraryA");
 	if (!llAddress) { // if GetProcAddress fails than it will return null and go in this error
@@ -19,10 +31,10 @@ bool InjectDLL(DWORD ProcessID, LPCSTR DLL_PATH)
 		return false;
 	}
 	//Save the full path of the injected dll in the inspected process (needs to be in it's address space in order to be called by a thread in the other process)
-	LPVOID lpDllAddress = VirtualAllocEx(hProcess, NULL, strlen(DLL_PATH) + 1, MEM_COMMIT, PAGE_READWRITE);
+	LPVOID lpDllAddress = VirtualAllocEx(hProcess, NULL, strlen(DllPath.c_str()) + 1, MEM_COMMIT, PAGE_READWRITE);
 	DWORD nBytesWritten;
 
-	if (WriteProcessMemory(hProcess, lpDllAddress, DLL_PATH, strlen(DLL_PATH) + 1, &nBytesWritten) == 0 || nBytesWritten == 0) //if WriteProcessMemory fails the return value is zero
+	if (WriteProcessMemory(hProcess, lpDllAddress, DllPath.c_str(), strlen(DllPath.c_str()) + 1, &nBytesWritten) == 0 || nBytesWritten == 0) //if WriteProcessMemory fails the return value is zero
 	{
 		std::cout << "Error: WriteProcessMemory failed!, error code: " << std::hex << GetLastError() << std::endl;
 		return false;
@@ -43,21 +55,13 @@ bool InjectDLL(DWORD ProcessID, LPCSTR DLL_PATH)
 
 int main(int argc, char* argv[])
 {
-	char thisFilePath[100] = { 0 };
-
-	GetModuleFileName(NULL, thisFilePath, 100);
-	std::string DllPath = std::string(thisFilePath);
-	const size_t last_slash_idx = DllPath.rfind('\\'); //Get the last occurareance of \\ (before the exe name)
-	if (std::string::npos != last_slash_idx) {
-		DllPath = DllPath.substr(0, last_slash_idx + 1) + "DLL.dll"; // Than add the dll file name to it
-	};
 	DWORD ProcessID;
 	while (1)
 	{
-		printf("Enter Process ID:\n");
+		std::cout << "Enter Process ID:" << std::endl;
 		std::cin >> ProcessID;
 
-		bool is_successful = InjectDLL(ProcessID, DllPath.c_str());
+		bool is_successful = InjectDLL(ProcessID);
 	}
 	return 0;
 }
