@@ -1,7 +1,5 @@
 #include <Windows.h>
 #include <iostream>
-//#include <stdio.h>
-// #include <tlhelp32.h>
 #include <string>
 
 bool InjectDLL(DWORD ProcessID)
