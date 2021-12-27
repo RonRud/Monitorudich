@@ -326,6 +326,7 @@ PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE hInstance)
 	for (int i = 0; i < imageNTHeaders->FileHeader.NumberOfSections; i++) {
 		PIMAGE_SECTION_HEADER sectionHeader = (PIMAGE_SECTION_HEADER)sectionLocation;
 		saveFile << "\t" << sectionHeader->Name << std::endl;
+		std::cout << sectionHeader->Name << std::endl;
 		saveFile << "\t\t0x" << std::hex << sectionHeader->Misc.VirtualSize << "\t\tVirtual Size" << std::endl;
 		saveFile << "\t\t0x" << std::hex << sectionHeader->VirtualAddress << "\t\tVirtual Address" << std::endl;
 		saveFile << "\t\t0x" << std::hex << sectionHeader->SizeOfRawData << "\t\tSize Of Raw Data" << std::endl;
@@ -341,6 +342,35 @@ PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE hInstance)
 			PIMAGE_SECTION_HEADER importSection = sectionHeader;
 			}
 		sectionLocation += sectionSize;
+		if (strcmp((char*)(sectionHeader->Name), (char*)".text") != 0) {
+			DWORD rawDataPtr = sectionHeader->PointerToRawData;
+			std::cout << "got in" << std::endl;
+			std::cout << "sectionHeader->PointerToRawData: " << std::hex << rawDataPtr << std::endl;
+			std::cout << "pointed char: " << *(byte*)(rawDataPtr + i) << std::endl;
+			int minSize = 3, maxSize = 30, size = 0;
+			std::string currentStr = "";
+			for (int i = 0; i < (int)sectionHeader->SizeOfRawData; i++) {
+				byte currentByte = *(byte*)(rawDataPtr + i);
+				if (currentByte == 0x0) {
+					if (size < minSize || size > maxSize) {
+					}
+					else { //save string
+						addressToStringLiteral[sectionHeader->PointerToRawData + i - size] = new std::string((char*)(sectionHeader->PointerToRawData + i - size));
+					}
+					size = 0;
+					currentStr = "";
+				}
+			}
+		}
+		else {
+			std::cout << "didn't get in" << std::endl;
+		}
+		std::cout << "done" << std::endl;
+	}
+	std::cout << "addressToStringLiteral map" << std::endl;
+	for (auto it = addressToStringLiteral.cbegin(); it != addressToStringLiteral.cend(); ++it)
+	{
+		std::cout << it->first << " " << it->second << std::endl ;
 	}
 	
 	IMAGE_OPTIONAL_HEADER optionalHeader;

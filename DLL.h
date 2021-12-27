@@ -18,6 +18,8 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved);
 bool inlineHookFunction(DWORD Function, std::string* functionName);
 void Hook();
 
+std::map<DWORD, std::string*> addressToStringLiteral;
+
 DWORD originFuncAddr;
 std::map<DWORD, std::string*> addressToNameMap;
 
