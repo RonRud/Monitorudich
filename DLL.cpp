@@ -220,22 +220,16 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 }
 
 
-PIMAGE_IMPORT_DESCRIPTOR (HMODULE hInstance)
+PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE hInstance)
 {
-	std::cout << "IN PE Logger" << std::endl;
+	std::map<int, char*> subsystemsDict{ {0,"IMAGE_SUBSYSTEM_UNKNOWN"}, {1,"IMAGE_SUBSYSTEM_NATIVE"}, {2,"IMAGE_SUBSYSTEM_WINDOWS_GUI"}, {3,"IMAGE_SUBSYSTEM_WINDOWS_CUI"},
+		{5,"IMAGE_SUBSYSTEM_OS2_CUI"}, {7,"IMAGE_SUBSYSTEM_POSIX_CUI"}, {9,"IMAGE_SUBSYSTEM_WINDOWS_CE_GUI"}, {10,"IMAGE_SUBSYSTEM_EFI_APPLICATION"}, {11,"IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER"},
+		{12,"IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER"}, {13,"IMAGE_SUBSYSTEM_EFI_ROM"}, {14,"IMAGE_SUBSYSTEM_XBOX"}, {16,"IMAGE_SUBSYSTEM_WINDOWS_BOOT_APPLICATION"} };
+	//std::cout << "IN PE Logger" << std::endl;
 	std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::app);
-	saveFile << "PE header extraction";
-	saveFile << std::endl;
-	saveFile.flush();
-	if (saveFile.is_open()) {
-		std::cout << "file opened" << std::endl;
-	}
-	else {
-		std::cout << "file not opened" << std::endl;
-	}
-	
+	saveFile << "PE header extraction" << std::endl << std::endl;
 	// IMAGE_DOS_HEADER
-	 PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)hInstance;
+	PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)hInstance;
 	saveFile << "--DOS HEADER--" << std::endl;
 	if (dosHeader->e_magic != 0x5a4d) { //check if MZ (signature of DOS)
 		throw std::invalid_argument("received non DOS file");
@@ -262,13 +256,13 @@ PIMAGE_IMPORT_DESCRIPTOR (HMODULE hInstance)
 	// IMAGE_NT_HEADERS
 	PIMAGE_NT_HEADERS imageNTHeaders = (PIMAGE_NT_HEADERS)((DWORD)hInstance + dosHeader->e_lfanew); //the offset of the new technology header from the start of the file
 	saveFile << "--NT HEADERS--" << std::endl;
-	saveFile << "\t" << std::hex << "\t\tSignature" << imageNTHeaders->Signature << std::endl;
+	saveFile << "\t" << std::hex << imageNTHeaders->Signature << "\t\tSignature" << std::endl;
 
 	// FILE_HEADER
 	saveFile << "--FILE HEADER--" << std::endl;
 	saveFile << "\t0x" << std::hex << imageNTHeaders->FileHeader.Machine << "\t\tMachine" << std::endl;
 	saveFile << "\t0x" << std::hex << imageNTHeaders->FileHeader.NumberOfSections << "\t\tNumber of Sections" << std::endl;
-	saveFile << "\t0x" << std::hex << imageNTHeaders->FileHeader.TimeDateStamp << "\t\tTime Stamp" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->FileHeader.TimeDateStamp << "\tTime Stamp" << std::endl;
 	saveFile << "\t0x" << std::hex << imageNTHeaders->FileHeader.PointerToSymbolTable << "\t\tPointer to Symbol Table" << std::endl;
 	saveFile << "\t0x" << std::hex << imageNTHeaders->FileHeader.NumberOfSymbols << "\t\tNumber of Symbols" << std::endl;
 	saveFile << "\t0x" << std::hex << imageNTHeaders->FileHeader.SizeOfOptionalHeader << "\t\tSize of Optional Header" << std::endl;
@@ -299,7 +293,11 @@ PIMAGE_IMPORT_DESCRIPTOR (HMODULE hInstance)
 	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.SizeOfImage << "\t\tSize Of Image" << std::endl;
 	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.SizeOfHeaders << "\t\tSize Of Headers" << std::endl;
 	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.CheckSum << "\t\tCheckSum" << std::endl;
-	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.Subsystem << "\t\tSubsystem" << std::endl; //perhaps add translation here (cui/gui/...)
+	if(subsystemsDict.find(imageNTHeaders->OptionalHeader.Subsystem) != subsystemsDict.end()) { //this means it found the subsystem therefore adding translation (cui/gui/...)
+		saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.Subsystem << " (speculated): " << subsystemsDict[imageNTHeaders->OptionalHeader.Subsystem] << "\t\tSubsystem" << std::endl;
+	} else {
+		saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.Subsystem << "\t\tSubsystem" << std::endl;
+	}
 	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.DllCharacteristics << "\t\tDllCharacteristics" << std::endl;
 	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.SizeOfStackReserve << "\t\tSize Of Stack Reserve" << std::endl;
 	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.SizeOfStackCommit << "\t\tSize Of Stack Commit" << std::endl;
