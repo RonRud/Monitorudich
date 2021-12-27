@@ -4,10 +4,11 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 	switch (reason)
 	{
 	case DLL_PROCESS_ATTACH: {
-		IAThooking(GetModuleHandleA(NULL));
 		//initialize an empty file
 		std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::trunc);
 		saveFile.close();
+
+		IAThooking(GetModuleHandleA(NULL));
 		break;
 	}
 	case DLL_PROCESS_DETACH:
@@ -221,7 +222,127 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 
 PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE hInstance)
 {
-	PIMAGE_DOS_HEADER dosHeader;
+	std::map<int, char*> subsystemsDict{ {0,"IMAGE_SUBSYSTEM_UNKNOWN"}, {1,"IMAGE_SUBSYSTEM_NATIVE"}, {2,"IMAGE_SUBSYSTEM_WINDOWS_GUI"}, {3,"IMAGE_SUBSYSTEM_WINDOWS_CUI"},
+		{5,"IMAGE_SUBSYSTEM_OS2_CUI"}, {7,"IMAGE_SUBSYSTEM_POSIX_CUI"}, {9,"IMAGE_SUBSYSTEM_WINDOWS_CE_GUI"}, {10,"IMAGE_SUBSYSTEM_EFI_APPLICATION"}, {11,"IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER"},
+		{12,"IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER"}, {13,"IMAGE_SUBSYSTEM_EFI_ROM"}, {14,"IMAGE_SUBSYSTEM_XBOX"}, {16,"IMAGE_SUBSYSTEM_WINDOWS_BOOT_APPLICATION"} };
+	//std::cout << "IN PE Logger" << std::endl;
+	std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::app);
+	saveFile << "PE header extraction" << std::endl << std::endl;
+	// IMAGE_DOS_HEADER
+	PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)hInstance;
+	saveFile << "--DOS HEADER--" << std::endl;
+	if (dosHeader->e_magic != 0x5a4d) { //check if MZ (signature of DOS)
+		throw std::invalid_argument("received non DOS file");
+	}
+	saveFile << "\t0x" << std::hex << dosHeader->e_magic << "\t\tMagic number" << std::endl; 
+	saveFile << "\t0x" << std::hex << dosHeader->e_cblp << "\t\tBytes on last page of file" << std::endl;
+	saveFile << "\t0x" << std::hex << dosHeader->e_cp << "\t\tPages in file" << std::endl;
+	saveFile << "\t0x" << std::hex << dosHeader->e_crlc << "\t\tRelocations" << std::endl;
+	saveFile << "\t0x" << std::hex << dosHeader->e_cparhdr << "\t\tSize of header in paragraphs" << std::endl;
+	saveFile << "\t0x" << std::hex << dosHeader->e_minalloc << "\t\tMinimum extra paragraphs needed" << std::endl;
+	saveFile << "\t0x" << std::hex << dosHeader->e_maxalloc << "\t\tMaximum extra paragraphs needed" << std::endl;
+	saveFile << "\t0x" << std::hex << dosHeader->e_ss << "\t\tInitial (relative) SS value" << std::endl;
+	saveFile << "\t0x" << std::hex << dosHeader->e_sp << "\t\tInitial SP value" << std::endl;
+	saveFile << "\t0x" << std::hex << dosHeader->e_csum << "\t\tChecksum" << std::endl;
+	saveFile << "\t0x" << std::hex << dosHeader->e_ip << "\t\tInitial IP value" << std::endl;
+	saveFile << "\t0x" << std::hex << dosHeader->e_cs << "\t\tInitial (relative) CS value" << std::endl;
+	saveFile << "\t0x" << std::hex << dosHeader->e_lfarlc << "\t\tFile address of relocation table" << std::endl;
+	saveFile << "\t0x" << std::hex << dosHeader->e_ovno << "\t\tOverlay number" << std::endl;
+	saveFile << "\t0x" << std::hex << dosHeader->e_oemid << "\t\tOEM identifier (for e_oeminfo)" << std::endl;
+	saveFile << "\t0x" << std::hex << dosHeader->e_oeminfo << "\t\tOEM information; e_oemid specific" << std::endl;
+	saveFile << "\t0x" << std::hex << dosHeader->e_lfanew << "\t\tFile address of new exe header" << std::endl;
+	saveFile.flush();
+
+	// IMAGE_NT_HEADERS
+	PIMAGE_NT_HEADERS imageNTHeaders = (PIMAGE_NT_HEADERS)((DWORD)hInstance + dosHeader->e_lfanew); //the offset of the new technology header from the start of the file
+	saveFile << "--NT HEADERS--" << std::endl;
+	saveFile << "\t" << std::hex << imageNTHeaders->Signature << "\t\tSignature" << std::endl;
+
+	// FILE_HEADER
+	saveFile << "--FILE HEADER--" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->FileHeader.Machine << "\t\tMachine" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->FileHeader.NumberOfSections << "\t\tNumber of Sections" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->FileHeader.TimeDateStamp << "\tTime Stamp" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->FileHeader.PointerToSymbolTable << "\t\tPointer to Symbol Table" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->FileHeader.NumberOfSymbols << "\t\tNumber of Symbols" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->FileHeader.SizeOfOptionalHeader << "\t\tSize of Optional Header" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->FileHeader.Characteristics << "\t\tCharacteristics" << std::endl;
+	saveFile.flush();
+
+	// OPTIONAL_HEADER
+	saveFile << "--OPTIONAL HEADER--" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.Magic << "\t\tMagic" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.MajorLinkerVersion << "\t\tMajor Linker Version" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.MinorLinkerVersion << "\t\tMinor Linker Version" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.SizeOfCode << "\t\tSize Of Code" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.SizeOfInitializedData << "\t\tSize Of Initialized Data" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.SizeOfUninitializedData << "\t\tSize Of UnInitialized Data" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.AddressOfEntryPoint << "\t\tAddress Of Entry Point (.text)" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.BaseOfCode << "\t\tBase Of Code" << std::endl;
+	//saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.BaseOfData << "\t\tBase Of Data" << std::endl; not sure why this was commented out
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.ImageBase << "\t\tImage Base" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.SectionAlignment << "\t\tSection Alignment" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.FileAlignment << "\t\tFile Alignment" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.MajorOperatingSystemVersion << "\t\tMajor Operating System Version" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.MinorOperatingSystemVersion << "\t\tMinor Operating System Version" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.MajorImageVersion << "\t\tMajor Image Version" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.MinorImageVersion << "\t\tMinor Image Version" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.MajorSubsystemVersion << "\t\tMajor Subsystem Version" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.MinorSubsystemVersion << "\t\tMinor Subsystem Version" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.Win32VersionValue << "\t\tWin32 Version Value" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.SizeOfImage << "\t\tSize Of Image" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.SizeOfHeaders << "\t\tSize Of Headers" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.CheckSum << "\t\tCheckSum" << std::endl;
+	if(subsystemsDict.find(imageNTHeaders->OptionalHeader.Subsystem) != subsystemsDict.end()) { //this means it found the subsystem therefore adding translation (cui/gui/...)
+		saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.Subsystem << " (speculated): " << subsystemsDict[imageNTHeaders->OptionalHeader.Subsystem] << "\t\tSubsystem" << std::endl;
+	} else {
+		saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.Subsystem << "\t\tSubsystem" << std::endl;
+	}
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.DllCharacteristics << "\t\tDllCharacteristics" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.SizeOfStackReserve << "\t\tSize Of Stack Reserve" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.SizeOfStackCommit << "\t\tSize Of Stack Commit" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.SizeOfHeapReserve << "\t\tSize Of Heap Reserve" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.SizeOfHeapCommit << "\t\tSize Of Heap Commit" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.LoaderFlags << "\t\tLoader Flags" << std::endl;
+	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.NumberOfRvaAndSizes << "\t\tNumber Of Rva And Sizes" << std::endl;
+	saveFile.flush();
+
+	// DATA_DIRECTORIES
+	saveFile << "--DATA DIRECTORIES--" << std::endl;
+	saveFile << "\tExport Directory Address: 0x" << std::hex << imageNTHeaders->OptionalHeader.DataDirectory[0].VirtualAddress << "; Size: 0x" << std::hex <<  imageNTHeaders->OptionalHeader.DataDirectory[0].Size << std::endl;
+	saveFile << "\tImport Directory Address: 0x" << std::hex << imageNTHeaders->OptionalHeader.DataDirectory[1].VirtualAddress << "; Size: 0x" << std::hex << imageNTHeaders->OptionalHeader.DataDirectory[1].Size << std::endl;
+	// TODO consider adding more data directories information
+	
+	// SECTION_HEADERS
+	saveFile << "--SECTION HEADERS--" << std::endl;
+	// get offset to first section header
+	DWORD sectionLocation = (DWORD)imageNTHeaders + sizeof(DWORD) + (DWORD)(sizeof(IMAGE_FILE_HEADER)) + (DWORD)imageNTHeaders->FileHeader.SizeOfOptionalHeader;
+	DWORD sectionSize = (DWORD)sizeof(IMAGE_SECTION_HEADER);
+
+	// get offset to the import directory RVA
+	DWORD importDirectoryRVA = imageNTHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
+
+	// print section data
+	for (int i = 0; i < imageNTHeaders->FileHeader.NumberOfSections; i++) {
+		PIMAGE_SECTION_HEADER sectionHeader = (PIMAGE_SECTION_HEADER)sectionLocation;
+		saveFile << "\t" << sectionHeader->Name << std::endl;
+		saveFile << "\t\t0x" << std::hex << sectionHeader->Misc.VirtualSize << "\t\tVirtual Size" << std::endl;
+		saveFile << "\t\t0x" << std::hex << sectionHeader->VirtualAddress << "\t\tVirtual Address" << std::endl;
+		saveFile << "\t\t0x" << std::hex << sectionHeader->SizeOfRawData << "\t\tSize Of Raw Data" << std::endl;
+		saveFile << "\t\t0x" << std::hex << sectionHeader->PointerToRawData << "\t\tPointer To Raw Data" << std::endl;
+		saveFile << "\t\t0x" << std::hex << sectionHeader->PointerToRelocations << "\t\tPointer To Relocations" << std::endl;
+		saveFile << "\t\t0x" << std::hex << sectionHeader->PointerToLinenumbers << "\t\tPointer To Line Numbers" << std::endl;
+		saveFile << "\t\t0x" << std::hex << sectionHeader->NumberOfRelocations << "\t\tNumber Of Relocations" << std::endl;
+		saveFile << "\t\t0x" << std::hex << sectionHeader->NumberOfLinenumbers << "\t\tNumber Of Line Numbers" << std::endl;
+		saveFile << "\t\t0x" << std::hex << sectionHeader->Characteristics << "\tCharacteristics" << std::endl;
+
+		// save section that contains import directory table
+		if (importDirectoryRVA >= sectionHeader->VirtualAddress && importDirectoryRVA < sectionHeader->VirtualAddress + sectionHeader->Misc.VirtualSize){
+			PIMAGE_SECTION_HEADER importSection = sectionHeader;
+			}
+		sectionLocation += sectionSize;
+	}
+	
 	IMAGE_OPTIONAL_HEADER optionalHeader;
 	PIMAGE_NT_HEADERS ntHeader;
 	IMAGE_DATA_DIRECTORY dataDirectory;
@@ -230,6 +351,8 @@ PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE hInstance)
 	ntHeader = (PIMAGE_NT_HEADERS)((PBYTE)dosHeader + dosHeader->e_lfanew);//The PE Header begin after the MZ Header (which has size of e_lfanew)
 	optionalHeader = (IMAGE_OPTIONAL_HEADER)(ntHeader->OptionalHeader); //Getting OptionalHeader
 	dataDirectory = (IMAGE_DATA_DIRECTORY)(optionalHeader.DataDirectory[IMPORT_TABLE_OFFSET]);//Getting the import table of DataDirectory
+	
+	saveFile.close();
 	return (PIMAGE_IMPORT_DESCRIPTOR)((PBYTE)hInstance + dataDirectory.VirtualAddress);//ImageBase+RVA to import table
 
 }
