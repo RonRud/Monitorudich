@@ -4,6 +4,8 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 	switch (reason)
 	{
 	case DLL_PROCESS_ATTACH: {
+		//__debugbreak();
+		//DebugBreak();
 		//initialize an empty file
 		std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::trunc);
 		saveFile.close();
@@ -30,30 +32,35 @@ bool IAThooking(HMODULE hInstance)
 
 	importedModule = getImportTable(hInstance);
 	//pImportDesc = (PIMAGE_IMPORT_DESCRIPTOR)ImageDirectoryEntryToData(hInstance, TRUE, IMAGE_DIRECTORY_ENTRY_IMPORT, &ulSize); - You can just call this function to get the Import Table
+	
+	//log file 
+	std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::app);
+
 	while (*(WORD*)importedModule != 0) //over on the modules (DLLs)
 	{
-		if (strcmp((char*)((PBYTE)hInstance + importedModule->Name), (char*)"mscoree.dll") == 0) {
+		if (strcmp((char*)((PBYTE)hInstance + importedModule->Name), (char*)"COMCTL32.dll") == 0 || strcmp((char*)((PBYTE)hInstance + importedModule->Name), (char*)"SHELL32.dll") == 0 
+			|| strcmp((char*)((PBYTE)hInstance + importedModule->Name), (char*)"OLEAUT32.dll") == 0) {
 			std::cout << (char*)((PBYTE)hInstance + importedModule->Name) << "skipped" << std::endl;
 			importedModule++;
 			continue;
 		}
-		printf("\n%s:\n---------\n", (char*)((PBYTE)hInstance + importedModule->Name));//printing Module Name
+		saveFile << std::endl << (char*)((PBYTE)hInstance + importedModule->Name) << ":" << std::endl;//printing Module Name
 		pFirstThunk = (PIMAGE_THUNK_DATA)((PBYTE)hInstance + importedModule->FirstThunk);//pointing to its IAT
 		pOriginalFirstThunk = (PIMAGE_THUNK_DATA)((PBYTE)hInstance + importedModule->OriginalFirstThunk);//pointing to OriginalThunk
 		pFuncData = (PIMAGE_IMPORT_BY_NAME)((PBYTE)hInstance + pOriginalFirstThunk->u1.AddressOfData);// and to IMAGE_IMPORT_BY_NAME
 		while (*(WORD*)pFirstThunk != 0 && *(WORD*)pOriginalFirstThunk != 0) //moving over IAT and over names' table
 		{
-			printf("%X %s\n", pFirstThunk->u1.Function, pFuncData->Name);//printing function's name and addr
+			saveFile << "0x" << std::hex << pFirstThunk->u1.Function << "\t\t" << pFuncData->Name << std::endl;//printing function's name and addr
 			
 			std::vector<const char*> blackList = { "EnterCriticalSection", "LeaveCriticalSection", "HeapFree", "HeapAlloc", //8B = mov function crushes
 				"GetLastError", "SetLastError", "WriteFile", "GetProcessHeap", //FF 25 = call function crushes
 			//from here these are excludes from runtime problems 	
-			"MultiByteToWideChar"};//, "free", "malloc"}; they might be broken still
+			"MultiByteToWideChar","FlushFileBuffers","SetFilePointerEx","CreateFileW","CloseHandle","TryEnterCriticalSection","GetFileType" };//, "free", "malloc"}; they might be broken still
 			bool shouldHook = true;
 			for (const char* name : blackList) {
 				if (strcmp(name, (char*)pFuncData->Name) == 0) {
 					shouldHook = false;
-					std::cout << "Blacklisted, not hooked" << std::endl << std::endl;
+					saveFile << "Blacklisted, not hooked" << std::endl << std::endl;
 					break;
 				}
 			}
@@ -61,12 +68,12 @@ bool IAThooking(HMODULE hInstance)
 			if (shouldHook) {
 				bool isHooked = inlineHookFunction(pFirstThunk->u1.Function, new std::string(pFuncData->Name));
 				if (isHooked) {
-					std::cout << "Hooked function successfully" << std::endl;
+					saveFile << "Hooked function successfully" << std::endl;
 				}
 				else {
-					std::cout << "Didn't Hook function" << std::endl;
+					saveFile << "Didn't Hook function" << std::endl;
 				}
-				std::cout << std::endl;
+				saveFile << std::endl;
 			}
 			pOriginalFirstThunk++; // next node (function) in the array
 			pFuncData = (PIMAGE_IMPORT_BY_NAME)((PBYTE)hInstance + pOriginalFirstThunk->u1.AddressOfData);
@@ -74,6 +81,7 @@ bool IAThooking(HMODULE hInstance)
 		}
 		importedModule++; //next module (DLL)
 	}
+	saveFile.close();
 	return false;
 }
 
@@ -180,13 +188,16 @@ void __declspec(naked) Hook() { // this means compiler doesn't go here
 
 bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 {
+	std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::app);
+
 	DWORD Old;
 	DWORD n;
 	DWORD numBytes = 5;
-	std::cout << "function addr: " << std::hex << functionAddr << std::endl;
-	std::cout << "The first bytes of the function are: ";
-	printf("%02X %02X %02X %02X %02X %02X", *(BYTE*)functionAddr, *(BYTE*)(functionAddr+1), *(BYTE*)(functionAddr+2), *(BYTE*)(functionAddr+3), *(BYTE*)(functionAddr+4), *(BYTE*)(functionAddr+5));
-	std::cout << std::endl;
+	saveFile << "function addr: " << std::hex << functionAddr << std::endl;
+	saveFile << "The first bytes of the function are: ";
+	char buffer[100];
+	sprintf(buffer, "%02X %02X %02X %02X %02X %02X", *(BYTE*)functionAddr, *(BYTE*)(functionAddr+1), *(BYTE*)(functionAddr+2), *(BYTE*)(functionAddr+3), *(BYTE*)(functionAddr+4), *(BYTE*)(functionAddr+5));
+	saveFile << buffer << std::endl;
 	if(*(BYTE*)functionAddr == 0x8B && *(BYTE*)(functionAddr + 1) == 0xFF) {
 
 	} else if(*(BYTE*)functionAddr == 0xE9) {
@@ -216,6 +227,7 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 	VirtualProtect((void*)functionAddr, 5, Old, &n);
 	//That's it...hooked.
 	//it only required a bit of satanic worship, only a couple things were sacrificed
+	saveFile.close();
 	return true;
 }
 
