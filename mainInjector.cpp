@@ -2,6 +2,13 @@
 #include <iostream>
 #include <string>
 
+#include <map>
+#include <fstream>
+#include <vector>
+
+#pragma comment(lib,"pdh.lib")
+#include <Pdh.h>
+
 bool InjectDLL(DWORD ProcessID)
 {
 
@@ -54,12 +61,69 @@ bool InjectDLL(DWORD ProcessID)
 int main(int argc, char* argv[])
 {
 	DWORD ProcessID;
+	std::string processName;
 	while (1)
 	{
 		std::cout << "Enter Process ID:" << std::endl;
 		std::cin >> ProcessID;
-
+		std::cout << "Enter Executable Name: " << std::endl;
+		std::cin >> processName;
+		
 		bool is_successful = InjectDLL(ProcessID);
+		if (is_successful == false) {
+			std::cout << "DLL injection failed" << std::endl;
+		}
+
+		std::ofstream saveFile("process_resources_logger.txt", std::ios::out | std::ios::trunc);
+
+		HQUERY query;
+		PDH_STATUS status = PdhOpenQuery(NULL, NULL, &query);
+
+		if (status != ERROR_SUCCESS) {
+
+			std::cout << "Open Query Error" << std::endl;
+		}
+		std::vector<std::string> performanceCounterNamesVector{ "% Privileged Time","% Processor Time","% User time","Creating Process ID","Elapsed Time","Handle Count","ID Process","IO Data Bytes/sec"
+																,"IO Data Operations/sec","IO Other Bytes/sec","IO Read Bytes/sec","IO Write Operations/sec","Page Faults/sec"
+																,"Page File Bytes","Page File Bytes Peak","Pool Nonpaged Bytes","Priority Base","Private Bytes","Private Bytes"
+																,"Thread Count","Virtual Bytes","Virtual Bytes Peak","Working Set","Working Set - Private","Working Set Peak" };
+		std::map<std::string, HCOUNTER> performanceCounterNamesToHandle;
+
+		std::vector<const wchar_t*> cleanupVector;
+		for (std::string counterName : performanceCounterNamesVector) {
+			std::string wha = "\\Process(" + processName + ")\\" + counterName;
+			std::wstring* wha2 = new std::wstring(wha.begin(), wha.end());
+			const wchar_t* counterPath = (*wha2).c_str();
+			cleanupVector.push_back(counterPath);
+
+			status = PdhAddCounterW(query, LPWSTR(counterPath), NULL, &performanceCounterNamesToHandle[counterName]);
+			if (status != ERROR_SUCCESS) {
+				std::cout << "Add Counter " << counterName << " Error, status: " << std::hex << status << std::endl;
+			}
+		}
+		PdhCollectQueryData(query);
+		while (1) {
+			PdhCollectQueryData(query);
+
+			PDH_FMT_COUNTERVALUE pdhValue;
+			DWORD dwValue;
+			for (auto& iterator : performanceCounterNamesToHandle) {
+				status = PdhGetFormattedCounterValue(iterator.second, PDH_FMT_DOUBLE, &dwValue, &pdhValue);
+				if (status != ERROR_SUCCESS) {
+					std::cout << "Value Error in counter " << iterator.first << " ,status: " << status << std::endl;
+				}
+				saveFile << iterator.first << ": " << pdhValue.doubleValue << std::endl;
+			}
+			saveFile << std::endl;
+			saveFile.flush();
+			Sleep(1000);
+		}
+		// TODO clean the WSTRING!!!
+		for (const wchar_t* windowsStringShit : cleanupVector) {
+			delete windowsStringShit;
+		}
+		PdhCloseQuery(query);
+		saveFile.close();
 	}
 	return 0;
 }
