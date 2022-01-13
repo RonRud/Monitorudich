@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
 		NULL,           // Process handle not inheritable
 		NULL,           // Thread handle not inheritable
 		FALSE,          // Set handle inheritance to FALSE
-		CREATE_SUSPENDED,              // No creation flags
+		CREATE_SUSPENDED | CREATE_NEW_CONSOLE,              // No creation flags
 		NULL,           // Use parent's environment block
 		NULL,           // Use parent's starting directory 
 		LPSTARTUPINFOW(&si),            // Pointer to STARTUPINFO structure
