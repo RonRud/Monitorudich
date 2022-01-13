@@ -1,0 +1,202 @@
+#include <Windows.h>
+#include <iostream>
+#include <string>
+#include <thread>
+
+#include <map>
+#include <fstream>
+#include <vector>
+
+#pragma comment(lib,"pdh.lib")
+#include <Pdh.h>
+
+bool keepLoggingSystemResources;
+
+bool InjectDLL(DWORD ProcessID)
+{
+
+	char thisFilePath[100] = { 0 };
+
+	GetModuleFileName(NULL, thisFilePath, 100);
+	std::string DllPath = std::string(thisFilePath);
+	const size_t last_slash_idx = DllPath.rfind('\\'); //Get the last occurareance of \\ (before the exe name)
+	if (std::string::npos != last_slash_idx) {
+		DllPath = DllPath.substr(0, last_slash_idx + 1) + "DLL.dll"; // Than add the dll file name to it
+	};
+
+
+	//Get the current memory location of LoadLibraryA function in the current loaded instance of kernel32.dll
+	LPVOID llAddress = GetProcAddress(GetModuleHandleA("kernel32.dll"), "LoadLibraryA");
+	if (!llAddress) { // if GetProcAddress fails than it will return null and go in this error
+		std::cout << "Error: cant get procAddress, error code: " << std::hex << GetLastError() << std::endl;
+		return false;
+	}
+	//Get access to the process that the program desires to hook
+	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ProcessID);
+	if (!hProcess) {
+		std::cout << "Error: cant open Process!, error code: " << std::hex << GetLastError() << std::endl;
+		return false;
+	}
+	//Save the full path of the injected dll in the inspected process (needs to be in it's address space in order to be called by a thread in the other process)
+	LPVOID lpDllAddress = VirtualAllocEx(hProcess, NULL, strlen(DllPath.c_str()) + 1, MEM_COMMIT, PAGE_READWRITE);
+	DWORD nBytesWritten;
+
+	if (WriteProcessMemory(hProcess, lpDllAddress, DllPath.c_str(), strlen(DllPath.c_str()) + 1, &nBytesWritten) == 0 || nBytesWritten == 0) //if WriteProcessMemory fails the return value is zero
+	{
+		std::cout << "Error: WriteProcessMemory failed!, error code: " << std::hex << GetLastError() << std::endl;
+		return false;
+	}
+	//Create the thread that runs the injected dll
+	HANDLE hThread = CreateRemoteThread(hProcess, NULL, NULL, (LPTHREAD_START_ROUTINE)llAddress, lpDllAddress, NULL, NULL);
+	if (!hThread) {
+		std::cout << "Error: CreateRemoteThread failed!, error code: " << std::hex << GetLastError() << std::endl;
+		return false;
+	}
+	else { //it succeeded!
+		CloseHandle(hThread);
+	}
+
+	std::cout << "Successful dll injection" << std::endl;
+	return true;
+}
+
+void LogSystemResourcesForProcess(std::string processName) {
+	try {
+		std::ofstream saveFile("process_resources_logger.txt", std::ios::out | std::ios::trunc);
+
+		HQUERY query;
+		PDH_STATUS status = PdhOpenQuery(NULL, NULL, &query);
+
+		if (status != ERROR_SUCCESS) {
+
+			std::cout << "Open Query Error" << std::endl;
+		}
+		std::vector<std::string> performanceCounterNamesVector{ "% Privileged Time","% Processor Time","% User time","Creating Process ID","Elapsed Time","Handle Count","ID Process","IO Data Bytes/sec"
+																,"IO Data Operations/sec","IO Other Bytes/sec","IO Read Bytes/sec","IO Write Operations/sec","Page Faults/sec"
+																,"Page File Bytes","Page File Bytes Peak","Pool Nonpaged Bytes","Priority Base","Private Bytes","Private Bytes"
+																,"Thread Count","Virtual Bytes","Virtual Bytes Peak","Working Set","Working Set - Private","Working Set Peak" };
+		std::map<std::string, HCOUNTER> performanceCounterNamesToHandle;
+
+		std::vector<const wchar_t*> cleanupVector;
+		for (std::string counterName : performanceCounterNamesVector) {
+			std::string wha = "\\Process(" + processName + ")\\" + counterName;
+			std::wstring* wha2 = new std::wstring(wha.begin(), wha.end());
+			const wchar_t* counterPath = (*wha2).c_str();
+			cleanupVector.push_back(counterPath);
+
+			status = PdhAddCounterW(query, LPWSTR(counterPath), NULL, &performanceCounterNamesToHandle[counterName]);
+			if (status != ERROR_SUCCESS) {
+				std::cout << "Add Counter " << counterName << " Error, status: " << std::hex << status << std::endl;
+			}
+		}
+		PdhCollectQueryData(query);
+		while (keepLoggingSystemResources) {
+			PdhCollectQueryData(query);
+			PDH_FMT_COUNTERVALUE pdhValue;
+			DWORD dwValue;
+			for (auto& iterator : performanceCounterNamesToHandle) {
+				status = PdhGetFormattedCounterValue(iterator.second, PDH_FMT_DOUBLE, &dwValue, &pdhValue);
+				if (status != ERROR_SUCCESS) {
+					std::cout << "Value Error in counter " << iterator.first << " ,status: " << status << std::endl;
+				}
+				saveFile << iterator.first << ": " << pdhValue.doubleValue << std::endl;
+			}
+			saveFile << std::endl;
+			saveFile.flush();
+			Sleep(1000);
+		}
+		//clean the WSTRINGS
+		for (const wchar_t* windowsStringShit : cleanupVector) {
+			delete windowsStringShit;
+		}
+		PdhCloseQuery(query);
+		saveFile.close();
+	}
+	catch (const std::exception& e) { std::cout << e.what() << std::endl; }
+}
+
+int main(int argc, char* argv[])
+{
+	std::string inspectedProcessPath;
+	std::cout << "Enter the full path of the executable you wish to inspect: " << std::endl;
+	std::cin >> inspectedProcessPath;
+
+	//opening the executable
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	ZeroMemory(&pi, sizeof(pi));
+
+	std::wstring* windwosStringShit = new std::wstring(inspectedProcessPath.begin(), inspectedProcessPath.end());
+	const wchar_t* exePathWchars = (*windwosStringShit).c_str();
+	LPCWSTR exePath = const_cast<LPCWSTR>(exePathWchars);
+
+	// Start the child process suspended. 
+	if (!CreateProcessW(exePath,   // No module name (use command line)
+		NULL,        // 
+		NULL,           // Process handle not inheritable
+		NULL,           // Thread handle not inheritable
+		FALSE,          // Set handle inheritance to FALSE
+		CREATE_SUSPENDED,              // No creation flags
+		NULL,           // Use parent's environment block
+		NULL,           // Use parent's starting directory 
+		LPSTARTUPINFOW(&si),            // Pointer to STARTUPINFO structure
+		&pi)           // Pointer to PROCESS_INFORMATION structure
+		)
+	{
+		std::cout << "CreateProcess failed, error: " << GetLastError() << std::endl;
+		return 0;
+	} 
+	std::cout << "created process with pid " << pi.dwProcessId << std::endl;
+
+	//now hook the inspected child process
+	
+	bool is_successful = InjectDLL(pi.dwProcessId);
+	if (is_successful == false) {
+		std::cout << "DLL injection failed" << std::endl;
+	}
+	//resumes (starts in this case) the child process
+	ResumeThread(pi.hThread);
+	try {
+		//Log processes system resources
+		keepLoggingSystemResources = true;
+		const size_t last_slash_idx = inspectedProcessPath.rfind('\\');
+		//TODO add with threading
+		std::thread threadThing(LogSystemResourcesForProcess, inspectedProcessPath.substr(last_slash_idx + 1, inspectedProcessPath.length()-5-last_slash_idx)); //makes sure to pass the name without .exe
+
+		// Wait until child process exits.
+		std::cout << "before process terminate check" << std::endl;
+		WaitForSingleObject(pi.hProcess, INFINITE);
+		std::cout << "after process terminate check" << std::endl;
+		keepLoggingSystemResources = false;
+
+		// Close process and thread handles. 
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+	}
+	catch (const std::exception& e) { std::cout << "crushed, error: " << e.what() << std::endl; }
+	return 0;
+}
+
+/*
+* #define MSGRET(str, ret) { cout << "ERROR: " << str << endl; system("pause"); return ret; }
+DWORD procNameToPID(const char *procName)
+{
+		HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+		if (snapshot == INVALID_HANDLE_VALUE)
+				MSGRET("Unable to create snapshot.", 0)
+
+		PROCESSENTRY32 process;
+		process.dwSize = sizeof(PROCESSENTRY32);
+
+		Process32First(snapshot, &process);
+		do
+		{
+				if (strstr(process.szExeFile, procName))
+						return process.th32ProcessID;
+		}
+		while (Process32Next(snapshot, &process));
+
+		return 0;
+}*/

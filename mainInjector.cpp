@@ -22,7 +22,6 @@ bool InjectDLL(DWORD ProcessID)
 	};
 
 
-
 	//Get the current memory location of LoadLibraryA function in the current loaded instance of kernel32.dll
 	LPVOID llAddress = GetProcAddress(GetModuleHandleA("kernel32.dll"), "LoadLibraryA");
 	if (!llAddress) { // if GetProcAddress fails than it will return null and go in this error
