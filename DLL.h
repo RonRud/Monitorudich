@@ -18,6 +18,8 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved);
 bool inlineHookFunction(DWORD Function, std::string* functionName);
 void Hook();
 
+const char loggerFilePath[] = "C:\\Users\\Rudic\\source\\repos\\RonRud\\Monitorudich\\logger_output.txt";
+
 DWORD originFuncAddr;
 std::map<DWORD, std::string*> addressToNameMap;
 

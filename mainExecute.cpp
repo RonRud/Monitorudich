@@ -6,6 +6,7 @@
 #include <map>
 #include <fstream>
 #include <vector>
+#include <algorithm>
 
 #pragma comment(lib,"pdh.lib")
 #include <Pdh.h>
@@ -114,13 +115,29 @@ void LogSystemResourcesForProcess(std::string processName) {
 	}
 	catch (const std::exception& e) { std::cout << e.what() << std::endl; }
 }
+std::string replaceSubstrInString(std::string str, std::string replaceStr, std::string toStr) {
+	size_t index = 0;
+	while (true) {
+		/* Locate the substring to replace. */
+		index = str.find(replaceStr, index);
+		if (index == std::string::npos) break;
+
+		/* Make the replacement. */
+		str.replace(index, toStr.length(), toStr);
+
+		/* Advance index forward so the next iteration doesn't pick it up as well. */
+		index += toStr.length();
+	}
+	return str;
+}
 
 int main(int argc, char* argv[])
 {
 	std::string inspectedProcessPath;
 	std::cout << "Enter the full path of the executable you wish to inspect: " << std::endl;
-	std::cin >> inspectedProcessPath;
-
+	std::cin >> inspectedProcessPath; 
+	replaceSubstrInString(inspectedProcessPath, "\\\\", "\\");
+	replaceSubstrInString(inspectedProcessPath, "\\", "\\\\");
 	//opening the executable
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;

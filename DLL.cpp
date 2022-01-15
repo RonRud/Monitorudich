@@ -7,7 +7,7 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 		//__debugbreak();
 		//DebugBreak();
 		//initialize an empty file
-		std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::trunc);
+		std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::trunc);
 		saveFile.close();
 
 		IAThooking(GetModuleHandleA(NULL));
@@ -34,7 +34,7 @@ bool IAThooking(HMODULE hInstance)
 	//pImportDesc = (PIMAGE_IMPORT_DESCRIPTOR)ImageDirectoryEntryToData(hInstance, TRUE, IMAGE_DIRECTORY_ENTRY_IMPORT, &ulSize); - You can just call this function to get the Import Table
 	
 	//log file 
-	std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::app);
+	std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::app);
 
 	while (*(WORD*)importedModule != 0) //over on the modules (DLLs)
 	{
@@ -86,7 +86,7 @@ bool IAThooking(HMODULE hInstance)
 }
 
 void logHookName() {
-	std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::app);
+	std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::app);
 	saveFile << "name: " << *addressToNameMap[originFuncAddr-5] << ", "; //gets the function's name from the table. The function address which is gathered from the stack 
 																		 //has 5 more so it points to the instruction after the jmp in the function and not the function starting point.
 	saveFile << "address: " << originFuncAddr - 5 << ", ";
@@ -95,7 +95,7 @@ void logHookName() {
 
 void logAdditionalVariables() {
 	DWORD funcAddrPtr = originFuncAddr;
-	std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::app);
+	std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::app);
 	saveFile << "eax: " << savedEax << ", ";
 	saveFile << "ebx: " << savedEbx << ", ";
 	saveFile << "ecx: " << savedEcx << ", ";
@@ -139,7 +139,7 @@ void __declspec(naked) getStack() {
 }
 
 void logStack() {
-	std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::app);
+	std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::app);
 	saveFile << "presumed function bytes in hex: ";
 	for (int i = 0; i < functionParamsNum; i++) {
 		saveFile << std::hex << functionParameters[i] << "-";
@@ -188,7 +188,7 @@ void __declspec(naked) Hook() { // this means compiler doesn't go here
 
 bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 {
-	std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::app);
+	std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::app);
 
 	DWORD Old;
 	DWORD n;
@@ -238,7 +238,7 @@ PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE hInstance)
 		{5,"IMAGE_SUBSYSTEM_OS2_CUI"}, {7,"IMAGE_SUBSYSTEM_POSIX_CUI"}, {9,"IMAGE_SUBSYSTEM_WINDOWS_CE_GUI"}, {10,"IMAGE_SUBSYSTEM_EFI_APPLICATION"}, {11,"IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER"},
 		{12,"IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER"}, {13,"IMAGE_SUBSYSTEM_EFI_ROM"}, {14,"IMAGE_SUBSYSTEM_XBOX"}, {16,"IMAGE_SUBSYSTEM_WINDOWS_BOOT_APPLICATION"} };
 	//std::cout << "IN PE Logger" << std::endl;
-	std::ofstream saveFile("logger_output.txt", std::ios::out | std::ios::app);
+	std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::app);
 	saveFile << "PE header extraction" << std::endl << std::endl;
 	// IMAGE_DOS_HEADER
 	PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)hInstance;
