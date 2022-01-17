@@ -199,6 +199,41 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 	sprintf(buffer, "%02X %02X %02X %02X %02X %02X", *(BYTE*)functionAddr, *(BYTE*)(functionAddr+1), *(BYTE*)(functionAddr+2), *(BYTE*)(functionAddr+3), *(BYTE*)(functionAddr+4), *(BYTE*)(functionAddr+5));
 	saveFile << buffer << std::endl;
 	if(*(BYTE*)functionAddr == 0x8B && *(BYTE*)(functionAddr + 1) == 0xFF) {
+		//If the code gets here the function is valid to hook
+		//TODO here there will be the call to web scraping if enabled
+		if (isWebScrapingEnabled) {
+			std::string line;
+			bool foundOfflineScrape = false;
+			std::ifstream myfile(offlineScrapesFile);
+			if (myfile.is_open())
+			{
+				while (std::getline(myfile, line))
+				{
+					const size_t seperatorIdx = line.rfind('-');
+					if (line.substr(0,seperatorIdx) == (*functionName)) {
+						foundOfflineScrape = true;
+						nameToDocumantationString[functionName] = new std::string(line.substr(seperatorIdx + 1, line.length() - seperatorIdx - 1)); //get only the scraped string (after the -)
+					}
+				}
+				myfile.close();
+			}
+			else { std::cout << "Unable to open " << offlineScrapesFile << ", can't use offline scrape data" << std::endl; } //be wary that this prints in the inspected child program
+			if (foundOfflineScrape == false) {
+				//run and get data as string from python web scrape
+				//save string to the offlineScrapesFilefile
+				std::ofstream saveFile(offlineScrapesFile, std::ios::out | std::ios::app);
+			}
+		}
+		//Hook the function
+		addressToNameMap[functionAddr] = functionName;
+		VirtualProtect((void*)functionAddr, 5, PAGE_EXECUTE_READWRITE, &Old);
+		*(BYTE*)functionAddr = 0xE8; //call Opcode
+		*(DWORD*)(functionAddr + 1) = (DWORD)Hook - (DWORD)functionAddr - 5; //Calculate amount of bytes to jmp
+		VirtualProtect((void*)functionAddr, 5, Old, &n);
+		//That's it...hooked.
+		//it only required a bit of satanic worship, only a couple things were sacrificed
+		saveFile.close();
+		return true;
 
 	} else if(*(BYTE*)functionAddr == 0xE9) {
 		functionAddr += *(int*)(functionAddr + 1) + 5;
@@ -220,15 +255,6 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 	else {
 		return false;
 	}
-	addressToNameMap[functionAddr] = functionName;
-	VirtualProtect((void*)functionAddr, 5, PAGE_EXECUTE_READWRITE, &Old);
-	*(BYTE*)functionAddr = 0xE8; //call Opcode
-	*(DWORD*)(functionAddr + 1) = (DWORD)Hook - (DWORD)functionAddr - 5; //Calculate amount of bytes to jmp
-	VirtualProtect((void*)functionAddr, 5, Old, &n);
-	//That's it...hooked.
-	//it only required a bit of satanic worship, only a couple things were sacrificed
-	saveFile.close();
-	return true;
 }
 
 

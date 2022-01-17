@@ -19,6 +19,7 @@ bool inlineHookFunction(DWORD Function, std::string* functionName);
 void Hook();
 
 const char loggerFilePath[] = "C:\\Users\\Rudic\\source\\repos\\RonRud\\Monitorudich\\logger_output.txt";
+const char offlineScrapesFile[] = "MSDNScrapes.txt";
 
 DWORD originFuncAddr;
 std::map<DWORD, std::string*> addressToNameMap;
@@ -39,5 +40,8 @@ DWORD beforeFunctionEbp;
 
 bool IAThooking(HMODULE);
 PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE);
+
+bool isWebScrapingEnabled = true;
+std::map<std::string*, std::string*> nameToDocumantationString;
 
 #endif /* _DLL_H_ */
