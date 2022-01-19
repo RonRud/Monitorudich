@@ -4,13 +4,35 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 	switch (reason)
 	{
 	case DLL_PROCESS_ATTACH: {
-		//__debugbreak();
-		//DebugBreak();
 		//initialize an empty file
 		std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::trunc);
 		saveFile.close();
 
+		//Get info from the main program via info_to_dll.txt file
+		std::string dllRecievedInfo;
+		std::ifstream myfile("info_to_dll.txt");
+		if (myfile.is_open())
+		{
+			if(std::getline(myfile, dllRecievedInfo))
+			{
+				//const size_t seperatorIdx = dllRecievedInfo.rfind(',');
+				//HANDLE mainProgramHandle = std::strtoul(dllRecievedInfo.substr(0, seperatorIdx).c_str(), NULL, 16);
+				isWebScrapingEnabled = std::strtoul(dllRecievedInfo.c_str(), NULL, 16);
+			}
+			else {
+				std::cout << "Unable to read text from info_to_dll.txt, quitting injected dll..." << std::endl;
+				myfile.close();
+				break;
+			}
+		}
+		else { std::cout << "Unable to open info_to_dll.txt, quitting injected dll..." << std::endl; break; } //be wary that this prints in the inspected child program
+
 		IAThooking(GetModuleHandleA(NULL));
+		std::cout << "dllmain finished executing" << std::endl << std::endl << std::endl;
+		//resume main program by indicating it can continue to run
+		std::ofstream sendToMainFile("dll_to_main_program.txt", std::ios::out | std::ios::app);
+		sendToMainFile << "Main program can continue executing";
+		sendToMainFile.close();
 		break;
 	}
 	case DLL_PROCESS_DETACH:

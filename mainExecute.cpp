@@ -166,14 +166,39 @@ int main(int argc, char* argv[])
 		return 0;
 	} 
 	std::cout << "created process with pid " << pi.dwProcessId << std::endl;
-
-	//now hook the inspected child process
 	
+	//Send data to injected dll
+	bool isWebScrapingEnabled = false;
+	std::ofstream dllInfoFile("info_to_dll.txt", std::ios::out | std::ios::trunc);
+	dllInfoFile << isWebScrapingEnabled;
+	dllInfoFile.close();
+	//clean the recieving file
+	std::ofstream mainInfoFileFromDll("dll_to_main_program.txt", std::ios::out | std::ios::trunc);
+	//now hook the inspected child process
 	bool is_successful = InjectDLL(pi.dwProcessId);
 	if (is_successful == false) {
 		std::cout << "DLL injection failed" << std::endl;
 	}
-	//resumes (starts in this case) the child process
+	//freeze this thread until the injected DLL main() finishes running
+	while (true) {
+		std::string recievedInfo;
+		std::ifstream myfile("dll_to_main_program.txt");
+		if (myfile.is_open())
+		{
+			if (std::getline(myfile, recievedInfo))
+			{
+				if (recievedInfo == "Main program can continue executing") {break;}
+			}/*
+			else {
+				std::cout << "Unable to read text from dll_to_main_program.txt, quitting main program..." << std::endl;
+				myfile.close();
+				return 0; //exit program
+			}*/
+			myfile.close();
+		}
+		else { std::cout << "Unable to open dll_to_main_program, quitting main program..." << std::endl; return 0; }
+	}
+																											  //resumes (starts in this case) the child process
 	ResumeThread(pi.hThread);
 	try {
 		//Log processes system resources

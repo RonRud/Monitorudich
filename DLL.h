@@ -41,7 +41,7 @@ DWORD beforeFunctionEbp;
 bool IAThooking(HMODULE);
 PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE);
 
-bool isWebScrapingEnabled = true; //TODO swap this to a parameter in dllmain() that is called by the main program
+bool isWebScrapingEnabled;
 std::map<std::string*, std::string*> nameToDocumantationString;
 
 #endif /* _DLL_H_ */
