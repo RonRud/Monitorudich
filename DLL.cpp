@@ -220,7 +220,67 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 			else { std::cout << "Unable to open " << offlineScrapesFile << ", can't use offline scrape data" << std::endl; } //be wary that this prints in the inspected child program
 			if (foundOfflineScrape == false) {
 				//run and get data as string from python web scrape
-				//save string to the offlineScrapesFilefile
+				HANDLE hStdOutPipeRead = NULL;
+				HANDLE hStdOutPipeWrite = NULL;
+
+				// Create two pipes.
+				SECURITY_ATTRIBUTES sa = { sizeof(SECURITY_ATTRIBUTES), NULL, TRUE };
+				if (CreatePipe(&hStdOutPipeRead, &hStdOutPipeWrite, &sa, 0) == false) {
+					throw std::runtime_error("couldn't create output pipe for web scrape");
+				}
+
+				// Create the process.
+				STARTUPINFO si = { };
+				si.cb = sizeof(STARTUPINFO);
+				si.dwFlags = STARTF_USESTDHANDLES;
+				si.hStdError = hStdOutPipeWrite;
+				si.hStdOutput = hStdOutPipeWrite;
+				PROCESS_INFORMATION pi = { };
+				LPCWSTR lpApplicationName = L"C:\\Windows\\System32\\cmd.exe";
+				std::string stringCommandLine = "python webScrapperMSDN.py " + (*functionName);
+				std::wstring* windwosStringShit = new std::wstring(stringCommandLine.begin(), stringCommandLine.end());
+				const wchar_t* commandLineWchars = (*windwosStringShit).c_str();
+				LPWSTR lpCommandLine = const_cast<LPWSTR>(commandLineWchars);
+				LPSECURITY_ATTRIBUTES lpProcessAttributes = NULL;
+				LPSECURITY_ATTRIBUTES lpThreadAttribute = NULL;
+				BOOL bInheritHandles = TRUE;
+				DWORD dwCreationFlags = 0;
+				LPVOID lpEnvironment = NULL;
+				LPCWSTR lpCurrentDirectory = NULL;
+				if (!CreateProcessW(
+					NULL,
+					lpCommandLine,
+					lpProcessAttributes,
+					lpThreadAttribute,
+					bInheritHandles,
+					dwCreationFlags,
+					lpEnvironment,
+					lpCurrentDirectory,
+					LPSTARTUPINFOW(&si),
+					&pi)) {
+					throw std::runtime_error("couldn't create child process for web scrape");
+				}
+				WaitForSingleObject(pi.hProcess, INFINITE); //wait for process to finish
+
+				// Close pipes we do not need.
+				CloseHandle(hStdOutPipeWrite);
+
+				// The main loop for reading output from the DIR command.
+				char buf[1024 + 1] = { };
+				DWORD dwRead = 0;
+				DWORD dwAvail = 0;
+
+				while (ReadFile(hStdOutPipeRead, buf, 1024, &dwRead, NULL))
+				{
+					buf[dwRead] = '\0';
+					std::cout << buf;
+				}
+
+				// Clean up and exit.
+				CloseHandle(hStdOutPipeRead);
+				//TODO figure out what is wrong with GetFileSizeEx in webScraper, also figure out how to wait in main until dllmain() finishes running (might need to have main program pid for that)
+				//save string to the offlineScrapesFile
+				//TODO Start of DLL connection to web scaper, need python scraper and usage in runtime function call
 				std::ofstream saveFile(offlineScrapesFile, std::ios::out | std::ios::app);
 			}
 		}
