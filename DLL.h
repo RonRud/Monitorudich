@@ -38,6 +38,9 @@ DWORD beforeFunctionEsp;
 DWORD beforeFunctionEbp;
 
 bool IAThooking(HMODULE);
+void IAThookingCleanup();
+void inlineHookFunctionCleanup(DWORD functionAddr);
+
 PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE);
 
 #endif /* _DLL_H_ */

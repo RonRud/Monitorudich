@@ -1,100 +1,400 @@
 % Privileged Time: 0
 % Processor Time: 0
 % User time: 0
-Creating Process ID: 12452
-Elapsed Time: 0.507996
-Handle Count: 49
-ID Process: 12816
-IO Data Bytes/sec: 45825.3
-IO Data Operations/sec: 42041.5
+Creating Process ID: 16756
+Elapsed Time: 29.2738
+Handle Count: 50
+ID Process: 24404
+IO Data Bytes/sec: 0
+IO Data Operations/sec: 0
 IO Other Bytes/sec: 0
 IO Read Bytes/sec: 0
-IO Write Operations/sec: 42041.5
+IO Write Operations/sec: 0
 Page Faults/sec: 0
-Page File Bytes: 819200
-Page File Bytes Peak: 897024
-Pool Nonpaged Bytes: 4408
+Page File Bytes: 950272
+Page File Bytes Peak: 1.0281e+06
+Pool Nonpaged Bytes: 5904
 Priority Base: 8
-Private Bytes: 819200
-Thread Count: 1
-Virtual Bytes: 1.23535e+07
-Virtual Bytes Peak: 1.36643e+07
-Working Set: 4.08371e+06
-Working Set - Private: 573440
-Working Set Peak: 4.12467e+06
+Private Bytes: 950272
+Thread Count: 3
+Virtual Bytes: 1.65192e+07
+Virtual Bytes Peak: 1.78299e+07
+Working Set: 5.08723e+06
+Working Set - Private: 606208
+Working Set Peak: 5.12819e+06
 
-% Privileged Time: 13.85
-% Processor Time: 26.1612
-% User time: 12.3111
-Creating Process ID: 12452
-Elapsed Time: 1.52334
-Handle Count: 49
-ID Process: 12816
-IO Data Bytes/sec: 38660.8
-IO Data Operations/sec: 35443
+% Privileged Time: 0
+% Processor Time: 0
+% User time: 0
+Creating Process ID: 16756
+Elapsed Time: 30.2775
+Handle Count: 50
+ID Process: 24404
+IO Data Bytes/sec: 0
+IO Data Operations/sec: 0
 IO Other Bytes/sec: 0
 IO Read Bytes/sec: 0
-IO Write Operations/sec: 35443
+IO Write Operations/sec: 0
 Page Faults/sec: 0
-Page File Bytes: 819200
-Page File Bytes Peak: 897024
-Pool Nonpaged Bytes: 4408
+Page File Bytes: 950272
+Page File Bytes Peak: 1.0281e+06
+Pool Nonpaged Bytes: 5904
 Priority Base: 8
-Private Bytes: 819200
-Thread Count: 1
-Virtual Bytes: 1.23535e+07
-Virtual Bytes Peak: 1.36643e+07
-Working Set: 4.08371e+06
-Working Set - Private: 573440
-Working Set Peak: 4.12467e+06
+Private Bytes: 950272
+Thread Count: 3
+Virtual Bytes: 1.65192e+07
+Virtual Bytes Peak: 1.78299e+07
+Working Set: 5.08723e+06
+Working Set - Private: 606208
+Working Set Peak: 5.12819e+06
 
-% Privileged Time: 20.0335
-% Processor Time: 29.2797
-% User time: 9.24621
-Creating Process ID: 12452
-Elapsed Time: 2.53727
-Handle Count: 49
-ID Process: 12816
-IO Data Bytes/sec: 37120.1
-IO Data Operations/sec: 34025.2
+% Privileged Time: 0
+% Processor Time: 0
+% User time: 0
+Creating Process ID: 16756
+Elapsed Time: 31.2819
+Handle Count: 50
+ID Process: 24404
+IO Data Bytes/sec: 0
+IO Data Operations/sec: 0
 IO Other Bytes/sec: 0
 IO Read Bytes/sec: 0
-IO Write Operations/sec: 34025.2
+IO Write Operations/sec: 0
 Page Faults/sec: 0
-Page File Bytes: 819200
-Page File Bytes Peak: 897024
-Pool Nonpaged Bytes: 4408
+Page File Bytes: 950272
+Page File Bytes Peak: 1.0281e+06
+Pool Nonpaged Bytes: 5904
 Priority Base: 8
-Private Bytes: 819200
-Thread Count: 1
-Virtual Bytes: 1.23535e+07
-Virtual Bytes Peak: 1.36643e+07
-Working Set: 4.08371e+06
-Working Set - Private: 573440
-Working Set Peak: 4.12467e+06
+Private Bytes: 950272
+Thread Count: 3
+Virtual Bytes: 1.65192e+07
+Virtual Bytes Peak: 1.78299e+07
+Working Set: 5.08723e+06
+Working Set - Private: 606208
+Working Set Peak: 5.12819e+06
 
-% Privileged Time: 17.0212
-% Processor Time: 26.3055
-% User time: 9.28429
-Creating Process ID: 12452
-Elapsed Time: 3.54704
-Handle Count: 53
-ID Process: 12816
-IO Data Bytes/sec: 43733.7
-IO Data Operations/sec: 28045.6
-IO Other Bytes/sec: 10250.1
-IO Read Bytes/sec: 0
-IO Write Operations/sec: 28045.6
-Page Faults/sec: 135.677
-Page File Bytes: 1.07725e+06
-Page File Bytes Peak: 1.08134e+06
-Pool Nonpaged Bytes: 12216
+% Privileged Time: 1.54663
+% Processor Time: 1.54663
+% User time: 0
+Creating Process ID: 16756
+Elapsed Time: 32.2921
+Handle Count: 52
+ID Process: 24404
+IO Data Bytes/sec: 4594.53
+IO Data Operations/sec: 76.1961
+IO Other Bytes/sec: 4627.18
+IO Read Bytes/sec: 7.91648
+IO Write Operations/sec: 76.1961
+Page Faults/sec: 23.7494
+Page File Bytes: 954368
+Page File Bytes Peak: 1.0281e+06
+Pool Nonpaged Bytes: 6040
 Priority Base: 8
-Private Bytes: 1.07725e+06
-Thread Count: 1
-Virtual Bytes: 1.66625e+07
-Virtual Bytes Peak: 1.85631e+07
-Working Set: 4.62438e+06
-Working Set - Private: 20480
-Working Set Peak: 4.62848e+06
+Private Bytes: 954368
+Thread Count: 3
+Virtual Bytes: 1.98943e+07
+Virtual Bytes Peak: 1.98943e+07
+Working Set: 5.18144e+06
+Working Set - Private: 606208
+Working Set Peak: 5.18554e+06
+
+% Privileged Time: 0
+% Processor Time: 0
+% User time: 0
+Creating Process ID: 16756
+Elapsed Time: 33.3087
+Handle Count: 52
+ID Process: 24404
+IO Data Bytes/sec: 0
+IO Data Operations/sec: 0
+IO Other Bytes/sec: 0
+IO Read Bytes/sec: 0
+IO Write Operations/sec: 0
+Page Faults/sec: 0
+Page File Bytes: 954368
+Page File Bytes Peak: 1.0281e+06
+Pool Nonpaged Bytes: 6040
+Priority Base: 8
+Private Bytes: 954368
+Thread Count: 3
+Virtual Bytes: 1.98943e+07
+Virtual Bytes Peak: 1.98943e+07
+Working Set: 5.18144e+06
+Working Set - Private: 606208
+Working Set Peak: 5.18554e+06
+
+% Privileged Time: 0
+% Processor Time: 0
+% User time: 0
+Creating Process ID: 16756
+Elapsed Time: 34.3192
+Handle Count: 52
+ID Process: 24404
+IO Data Bytes/sec: 0
+IO Data Operations/sec: 0
+IO Other Bytes/sec: 0
+IO Read Bytes/sec: 0
+IO Write Operations/sec: 0
+Page Faults/sec: 0
+Page File Bytes: 954368
+Page File Bytes Peak: 1.0281e+06
+Pool Nonpaged Bytes: 6040
+Priority Base: 8
+Private Bytes: 954368
+Thread Count: 3
+Virtual Bytes: 1.98943e+07
+Virtual Bytes Peak: 1.98943e+07
+Working Set: 5.18144e+06
+Working Set - Private: 606208
+Working Set Peak: 5.18554e+06
+
+% Privileged Time: 0
+% Processor Time: 0
+% User time: 0
+Creating Process ID: 16756
+Elapsed Time: 35.3328
+Handle Count: 52
+ID Process: 24404
+IO Data Bytes/sec: 0
+IO Data Operations/sec: 0
+IO Other Bytes/sec: 0
+IO Read Bytes/sec: 0
+IO Write Operations/sec: 0
+Page Faults/sec: 0
+Page File Bytes: 954368
+Page File Bytes Peak: 1.0281e+06
+Pool Nonpaged Bytes: 6040
+Priority Base: 8
+Private Bytes: 954368
+Thread Count: 3
+Virtual Bytes: 1.98943e+07
+Virtual Bytes Peak: 1.98943e+07
+Working Set: 5.18144e+06
+Working Set - Private: 606208
+Working Set Peak: 5.18554e+06
+
+% Privileged Time: 0
+% Processor Time: 0
+% User time: 0
+Creating Process ID: 16756
+Elapsed Time: 36.3447
+Handle Count: 52
+ID Process: 24404
+IO Data Bytes/sec: 0
+IO Data Operations/sec: 0
+IO Other Bytes/sec: 0
+IO Read Bytes/sec: 0
+IO Write Operations/sec: 0
+Page Faults/sec: 0
+Page File Bytes: 954368
+Page File Bytes Peak: 1.0281e+06
+Pool Nonpaged Bytes: 6040
+Priority Base: 8
+Private Bytes: 954368
+Thread Count: 3
+Virtual Bytes: 1.98943e+07
+Virtual Bytes Peak: 1.98943e+07
+Working Set: 5.18144e+06
+Working Set - Private: 606208
+Working Set Peak: 5.18554e+06
+
+% Privileged Time: 0
+% Processor Time: 0
+% User time: 0
+Creating Process ID: 16756
+Elapsed Time: 37.3526
+Handle Count: 52
+ID Process: 24404
+IO Data Bytes/sec: 0
+IO Data Operations/sec: 0
+IO Other Bytes/sec: 0
+IO Read Bytes/sec: 0
+IO Write Operations/sec: 0
+Page Faults/sec: 0
+Page File Bytes: 954368
+Page File Bytes Peak: 1.0281e+06
+Pool Nonpaged Bytes: 6040
+Priority Base: 8
+Private Bytes: 954368
+Thread Count: 3
+Virtual Bytes: 1.98943e+07
+Virtual Bytes Peak: 1.98943e+07
+Working Set: 5.18144e+06
+Working Set - Private: 606208
+Working Set Peak: 5.18554e+06
+
+% Privileged Time: 1.54115
+% Processor Time: 1.54115
+% User time: 0
+Creating Process ID: 16756
+Elapsed Time: 38.3664
+Handle Count: 51
+ID Process: 24404
+IO Data Bytes/sec: 1734.89
+IO Data Operations/sec: 25.6436
+IO Other Bytes/sec: 1467.6
+IO Read Bytes/sec: 0
+IO Write Operations/sec: 24.6573
+Page Faults/sec: 0
+Page File Bytes: 954368
+Page File Bytes Peak: 1.0281e+06
+Pool Nonpaged Bytes: 6040
+Priority Base: 8
+Private Bytes: 954368
+Thread Count: 3
+Virtual Bytes: 1.98943e+07
+Virtual Bytes Peak: 1.98943e+07
+Working Set: 5.18144e+06
+Working Set - Private: 606208
+Working Set Peak: 5.18554e+06
+
+% Privileged Time: 0
+% Processor Time: 0
+% User time: 0
+Creating Process ID: 16756
+Elapsed Time: 39.3784
+Handle Count: 51
+ID Process: 24404
+IO Data Bytes/sec: 0
+IO Data Operations/sec: 0
+IO Other Bytes/sec: 0
+IO Read Bytes/sec: 0
+IO Write Operations/sec: 0
+Page Faults/sec: 0
+Page File Bytes: 954368
+Page File Bytes Peak: 1.0281e+06
+Pool Nonpaged Bytes: 6040
+Priority Base: 8
+Private Bytes: 954368
+Thread Count: 3
+Virtual Bytes: 1.98943e+07
+Virtual Bytes Peak: 1.98943e+07
+Working Set: 5.18144e+06
+Working Set - Private: 606208
+Working Set Peak: 5.18554e+06
+
+% Privileged Time: 0
+% Processor Time: 0
+% User time: 0
+Creating Process ID: 0
+Elapsed Time: 0
+Handle Count: 0
+ID Process: 0
+IO Data Bytes/sec: 0
+IO Data Operations/sec: 0
+IO Other Bytes/sec: 0
+IO Read Bytes/sec: 0
+IO Write Operations/sec: 0
+Page Faults/sec: 0
+Page File Bytes: 0
+Page File Bytes Peak: 0
+Pool Nonpaged Bytes: 0
+Priority Base: 0
+Private Bytes: 0
+Thread Count: 0
+Virtual Bytes: 0
+Virtual Bytes Peak: 0
+Working Set: 0
+Working Set - Private: 0
+Working Set Peak: 0
+
+% Privileged Time: 0
+% Processor Time: 0
+% User time: 0
+Creating Process ID: 0
+Elapsed Time: 0
+Handle Count: 0
+ID Process: 0
+IO Data Bytes/sec: 0
+IO Data Operations/sec: 0
+IO Other Bytes/sec: 0
+IO Read Bytes/sec: 0
+IO Write Operations/sec: 0
+Page Faults/sec: 0
+Page File Bytes: 0
+Page File Bytes Peak: 0
+Pool Nonpaged Bytes: 0
+Priority Base: 0
+Private Bytes: 0
+Thread Count: 0
+Virtual Bytes: 0
+Virtual Bytes Peak: 0
+Working Set: 0
+Working Set - Private: 0
+Working Set Peak: 0
+
+% Privileged Time: 0
+% Processor Time: 0
+% User time: 0
+Creating Process ID: 0
+Elapsed Time: 0
+Handle Count: 0
+ID Process: 0
+IO Data Bytes/sec: 0
+IO Data Operations/sec: 0
+IO Other Bytes/sec: 0
+IO Read Bytes/sec: 0
+IO Write Operations/sec: 0
+Page Faults/sec: 0
+Page File Bytes: 0
+Page File Bytes Peak: 0
+Pool Nonpaged Bytes: 0
+Priority Base: 0
+Private Bytes: 0
+Thread Count: 0
+Virtual Bytes: 0
+Virtual Bytes Peak: 0
+Working Set: 0
+Working Set - Private: 0
+Working Set Peak: 0
+
+% Privileged Time: 0
+% Processor Time: 0
+% User time: 0
+Creating Process ID: 0
+Elapsed Time: 0
+Handle Count: 0
+ID Process: 0
+IO Data Bytes/sec: 0
+IO Data Operations/sec: 0
+IO Other Bytes/sec: 0
+IO Read Bytes/sec: 0
+IO Write Operations/sec: 0
+Page Faults/sec: 0
+Page File Bytes: 0
+Page File Bytes Peak: 0
+Pool Nonpaged Bytes: 0
+Priority Base: 0
+Private Bytes: 0
+Thread Count: 0
+Virtual Bytes: 0
+Virtual Bytes Peak: 0
+Working Set: 0
+Working Set - Private: 0
+Working Set Peak: 0
+
+% Privileged Time: 0
+% Processor Time: 0
+% User time: 0
+Creating Process ID: 0
+Elapsed Time: 0
+Handle Count: 0
+ID Process: 0
+IO Data Bytes/sec: 0
+IO Data Operations/sec: 0
+IO Other Bytes/sec: 0
+IO Read Bytes/sec: 0
+IO Write Operations/sec: 0
+Page Faults/sec: 0
+Page File Bytes: 0
+Page File Bytes Peak: 0
+Pool Nonpaged Bytes: 0
+Priority Base: 0
+Private Bytes: 0
+Thread Count: 0
+Virtual Bytes: 0
+Virtual Bytes Peak: 0
+Working Set: 0
+Working Set - Private: 0
+Working Set Peak: 0
 
