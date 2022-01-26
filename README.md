@@ -22,5 +22,5 @@ Systems that are currently in work might not be clear on how to use them. in con
 
 ## Screenshots
 
-![App Screenshot](screenshots/cmd_mainExecute_Fibonacci.exe_screenshot.png)
+![alt text](screenshots/cmd_mainExecute_Fibonacci.exe_screenshot.png)
 
