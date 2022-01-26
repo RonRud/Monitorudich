@@ -21,6 +21,13 @@ Systems that are currently in work might not be clear on how to use them. in con
 •	Take the raw info gathered during runtime and display it in a friendly way.
 
 ## Screenshots
-
+The main execute, executing an example cmd program that it opens
 ![](/Screenshots/cmd_mainExecute_Fibonacci.exe_screenshot.jpg)
-
+The logger output information from the inspected program pe header
+![](/Screenshots/logger_output_pe_header_screenshot.jpg)
+The logger output about which imported functions have been hooked (shows the starting bytes that will be swaped)
+![](/Screenshots/logger_output_inline__hooking_info_screenshot.jpg)
+The logger output for the hooked functions that were called during the program's runtime
+![](/Screenshots/logger_output_runtime_hooked_function_display_screenshot.jpg)
+Info about the system resources that the program used (entry every second)
+![](/Screenshots/process_os_resources_log_screenshot.jpg)
