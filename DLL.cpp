@@ -77,7 +77,9 @@ bool IAThooking(HMODULE hInstance)
 			std::vector<const char*> blackList = { "EnterCriticalSection", "LeaveCriticalSection", "HeapFree", "HeapAlloc", //8B = mov function crushes
 				"GetLastError", "SetLastError", "WriteFile", "GetProcessHeap", //FF 25 = call function crushes
 			//from here these are excludes from runtime problems 	
-			"MultiByteToWideChar","FlushFileBuffers","SetFilePointerEx","CreateFileW","CloseHandle","TryEnterCriticalSection","GetFileType" };//, "free", "malloc"}; they might be broken still
+			"MultiByteToWideChar","FlushFileBuffers","SetFilePointerEx","CreateFileW","CloseHandle","TryEnterCriticalSection","GetFileType",
+			"ReadFile"}; //ReadFile breaks because it is used after hook is web scraper code, needs fixing
+			//, "free", "malloc"}; they might be broken still
 			bool shouldHook = true;
 			for (const char* name : blackList) {
 				if (strcmp(name, (char*)pFuncData->Name) == 0) {
@@ -224,22 +226,28 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 		//If the code gets here the function is valid to hook
 		//TODO here there will be the call to web scraping if enabled
 		if (isWebScrapingEnabled) {
+			std::cout << *functionName << std::endl;
 			std::string line;
 			bool foundOfflineScrape = false;
 			std::ifstream myfile(offlineScrapesFile);
 			if (myfile.is_open())
 			{
+				std::cout << "-4" << std::endl;
 				while (std::getline(myfile, line))
 				{
+					std::cout << "-3" << std::endl;
 					const size_t seperatorIdx = line.rfind('-');
-					if (line.substr(0,seperatorIdx) == (*functionName)) {
+					if (line.substr(0, seperatorIdx) == (*functionName)) {
 						foundOfflineScrape = true;
 						nameToDocumantationString[functionName] = new std::string(line.substr(seperatorIdx + 1, line.length() - seperatorIdx - 1)); //get only the scraped string (after the -)
 					}
+					std::cout << "-2" << std::endl;
 				}
+				std::cout << "wha" << std::endl;
 				myfile.close();
 			}
 			else { std::cout << "Unable to open " << offlineScrapesFile << ", can't use offline scrape data" << std::endl; } //be wary that this prints in the inspected child program
+			std::cout << "-1" << std::endl;
 			if (foundOfflineScrape == false) {
 				//run and get data as string from python web scrape
 				HANDLE hStdOutPipeRead = NULL;
@@ -250,7 +258,7 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 				if (CreatePipe(&hStdOutPipeRead, &hStdOutPipeWrite, &sa, 0) == false) {
 					throw std::runtime_error("couldn't create output pipe for web scrape");
 				}
-
+				std::cout << "0" << std::endl;
 				// Create the process.
 				STARTUPINFO si = { };
 				si.cb = sizeof(STARTUPINFO);
@@ -269,6 +277,7 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 				DWORD dwCreationFlags = 0;
 				LPVOID lpEnvironment = NULL;
 				LPCWSTR lpCurrentDirectory = NULL;
+				std::cout << "1" << std::endl;
 				if (!CreateProcessW(
 					NULL,
 					lpCommandLine,
@@ -288,18 +297,21 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 				CloseHandle(hStdOutPipeWrite);
 
 				// The main loop for reading output from the DIR command.
-				char buf[1024 + 1] = { };
+				std::cout << "2" << std::endl;
+				char buf[4048 + 1] = { };
 				DWORD dwRead = 0;
 				DWORD dwAvail = 0;
 
-				while (ReadFile(hStdOutPipeRead, buf, 1024, &dwRead, NULL))
+				while (ReadFile(hStdOutPipeRead, buf, 4048, &dwRead, NULL))
 				{
 					buf[dwRead] = '\0';
 					std::cout << buf;
 				}
-
+				std::cout << "3" << std::endl;
 				// Clean up and exit.
 				CloseHandle(hStdOutPipeRead);
+
+				std::cout << "4" << std::endl;
 				//TODO figure out what is wrong with GetFileSizeEx in webScraper, also figure out how to wait in main until dllmain() finishes running (might need to have main program pid for that)
 				//save string to the offlineScrapesFile
 				//TODO Start of DLL connection to web scaper, need python scraper and usage in runtime function call

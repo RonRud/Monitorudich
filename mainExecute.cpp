@@ -168,7 +168,7 @@ int main(int argc, char* argv[])
 	std::cout << "created process with pid " << pi.dwProcessId << std::endl;
 	
 	//Send data to injected dll
-	bool isWebScrapingEnabled = false;
+	bool isWebScrapingEnabled = true;
 	std::ofstream dllInfoFile("info_to_dll.txt", std::ios::out | std::ios::trunc);
 	dllInfoFile << isWebScrapingEnabled;
 	dllInfoFile.close();
