@@ -226,28 +226,22 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 		//If the code gets here the function is valid to hook
 		//TODO here there will be the call to web scraping if enabled
 		if (isWebScrapingEnabled) {
-			std::cout << *functionName << std::endl;
 			std::string line;
 			bool foundOfflineScrape = false;
 			std::ifstream myfile(offlineScrapesFile);
 			if (myfile.is_open())
 			{
-				std::cout << "-4" << std::endl;
 				while (std::getline(myfile, line))
 				{
-					std::cout << "-3" << std::endl;
 					const size_t seperatorIdx = line.rfind('-');
 					if (line.substr(0, seperatorIdx) == (*functionName)) {
 						foundOfflineScrape = true;
 						nameToDocumantationString[functionName] = new std::string(line.substr(seperatorIdx + 1, line.length() - seperatorIdx - 1)); //get only the scraped string (after the -)
 					}
-					std::cout << "-2" << std::endl;
 				}
-				std::cout << "wha" << std::endl;
 				myfile.close();
 			}
 			else { std::cout << "Unable to open " << offlineScrapesFile << ", can't use offline scrape data" << std::endl; } //be wary that this prints in the inspected child program
-			std::cout << "-1" << std::endl;
 			if (foundOfflineScrape == false) {
 				//run and get data as string from python web scrape
 				HANDLE hStdOutPipeRead = NULL;
@@ -258,7 +252,6 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 				if (CreatePipe(&hStdOutPipeRead, &hStdOutPipeWrite, &sa, 0) == false) {
 					throw std::runtime_error("couldn't create output pipe for web scrape");
 				}
-				std::cout << "0" << std::endl;
 				// Create the process.
 				STARTUPINFO si = { };
 				si.cb = sizeof(STARTUPINFO);
@@ -277,7 +270,6 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 				DWORD dwCreationFlags = 0;
 				LPVOID lpEnvironment = NULL;
 				LPCWSTR lpCurrentDirectory = NULL;
-				std::cout << "1" << std::endl;
 				if (!CreateProcessW(
 					NULL,
 					lpCommandLine,
@@ -297,25 +289,45 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 				CloseHandle(hStdOutPipeWrite);
 
 				// The main loop for reading output from the DIR command.
-				std::cout << "2" << std::endl;
-				char buf[4048 + 1] = { };
+				char buffer[1024 + 1] = { };
 				DWORD dwRead = 0;
 				DWORD dwAvail = 0;
 
-				while (ReadFile(hStdOutPipeRead, buf, 4048, &dwRead, NULL))
+				std::ofstream saveFile(offlineScrapesFile, std::ios::out | std::ios::app);
+				while (ReadFile(hStdOutPipeRead, buffer, 1024, &dwRead, NULL))
 				{
-					buf[dwRead] = '\0';
-					std::cout << buf;
+					std::string* modifiedBuffer = new std::string("");
+					buffer[dwRead] = '\0';
+					for (int i = 0; i < dwRead + 2; i++) {
+						if (buffer[i] != '\r' && buffer[i] != '\n' && !(buffer[i] == ' ' && buffer[i+1] == ' ')) {
+							modifiedBuffer->push_back(buffer[i]);
+						}
+					}
+					size_t index = 0;
+					while (true) {
+						/* Locate the substring to replace. */
+						size_t closeSquareIndex = modifiedBuffer->find(']', index);
+						size_t openSquareIndex = modifiedBuffer->find('[', index);
+						if (openSquareIndex == std::string::npos) break;
+						size_t commaInTheMiddle = modifiedBuffer->find(',', openSquareIndex);
+						if (commaInTheMiddle != std::string::npos && commaInTheMiddle < closeSquareIndex) {
+							/* Make the replacement. */
+							modifiedBuffer->replace(commaInTheMiddle, 2, "&&");
+							closeSquareIndex += 4;
+						}
+
+						/* Advance index forward so the next iteration doesn't pick it up as well. */
+						index = closeSquareIndex+1;
+					}
+					nameToDocumantationString[functionName] = modifiedBuffer;
+					saveFile << *functionName << "-" << *nameToDocumantationString[functionName] << std::endl;
 				}
-				std::cout << "3" << std::endl;
 				// Clean up and exit.
 				CloseHandle(hStdOutPipeRead);
 
-				std::cout << "4" << std::endl;
 				//TODO figure out what is wrong with GetFileSizeEx in webScraper, also figure out how to wait in main until dllmain() finishes running (might need to have main program pid for that)
 				//save string to the offlineScrapesFile
 				//TODO Start of DLL connection to web scaper, need python scraper and usage in runtime function call
-				std::ofstream saveFile(offlineScrapesFile, std::ios::out | std::ios::app);
 			}
 		}
 		//Hook the function
