@@ -1,0 +1,54 @@
+UINT, DWORD, _In_NLS_string_(cchWideChar)LPCWCH, int, LPSTR lpMultiByteStr, LPCCH lpDefaultChar, LPBOOL lpUsedDefaultChar
+LPCRITICAL_SECTION, PVOID, LPCWSTR, LPWSTR lpDestStr, LPNLSVERSIONINFO lpVersionInformation, LPARAM
+LPCPINFO lpCPInfo
+
+
+WideCharToMultiByte-int WideCharToMultiByte( [in] UINT CodePage, [in] DWORD dwFlags, [in] _In_NLS_string_(cchWideChar)LPCWCH lpWideCharStr, [in] int cchWideChar, [out&&optional] LPSTR lpMultiByteStr, [in] int cbMultiByte, [in&&optional] LPCCH lpDefaultChar, [out&&optional] LPBOOL lpUsedDefaultChar); 
+InitializeCriticalSectionEx-BOOL InitializeCriticalSectionEx( [out] LPCRITICAL_SECTION lpCriticalSection, [in] DWORD dwSpinCount, [in] DWORD Flags); 
+DeleteCriticalSection-void DeleteCriticalSection( [in&&out] LPCRITICAL_SECTION lpCriticalSection); 
+EncodePointer-PVOID EncodePointer( _In_ PVOID Ptr); 
+DecodePointer-PVOID DecodePointer(  PVOID Ptr); 
+LCMapStringEx-int LCMapStringEx( [in&&optional] LPCWSTR lpLocaleName, [in] DWORD dwMapFlags, [in] LPCWSTR lpSrcStr, [in] int cchSrc, [out&&optional] LPWSTR lpDestStr, [in] int cchDest, [in&&optional] LPNLSVERSIONINFO lpVersionInformation, [in&&optional] LPVOID lpReserved, [in&&optional] LPARAM sortHandle); 
+GetStringTypeW-BOOL GetStringTypeW( [in] DWORD dwInfoType, [in] _In_NLS_string_(cchSrc)LPCWCH lpSrcStr, [in] int cchSrc, [out] LPWORD lpCharType); 
+GetCPInfo-BOOL GetCPInfo( [in] UINT CodePage, [out] LPCPINFO lpCPInfo); 
+UnhandledExceptionFilter-LONG UnhandledExceptionFilter( [in] _EXCEPTION_POINTERS *ExceptionInfo); 
+SetUnhandledExceptionFilter-LPTOP_LEVEL_EXCEPTION_FILTER SetUnhandledExceptionFilter( [in] LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter); 
+TerminateProcess-BOOL TerminateProcess( [in] HANDLE hProcess, [in] UINT uExitCode); 
+IsProcessorFeaturePresent-BOOL IsProcessorFeaturePresent( [in] DWORD ProcessorFeature); 
+QueryPerformanceCounter-BOOL QueryPerformanceCounter( [out] LARGE_INTEGER *lpPerformanceCount); 
+GetSystemTimeAsFileTime-void GetSystemTimeAsFileTime( [out] LPFILETIME lpSystemTimeAsFileTime); 
+InitializeSListHead-void InitializeSListHead( [in&&out] PSLIST_HEADER ListHead); 
+GetStartupInfoW-void GetStartupInfoW( [out] LPSTARTUPINFOW lpStartupInfo); 
+GetModuleHandleW-HMODULE GetModuleHandleA( [in&&optional] LPCSTR lpModuleName); 
+RaiseException-void RaiseException( [in] DWORD dwExceptionCode, [in] DWORD dwExceptionFlags, [in] DWORD nNumberOfArguments, [in] const ULONG_PTR *lpArguments); 
+RtlUnwind-NTSYSAPI VOID RtlUnwind( [in&&optional] PVOID TargetFrame, [in&&optional] PVOID TargetIp, [in&&optional] PEXCEPTION_RECORD ExceptionRecord, [in] PVOID ReturnValue); 
+InitializeCriticalSectionAndSpinCount-BOOL InitializeCriticalSectionAndSpinCount( [out] LPCRITICAL_SECTION lpCriticalSection, [in] DWORD dwSpinCount); 
+TlsAlloc-DWORD TlsAlloc(); 
+TlsGetValue-LPVOID TlsGetValue( [in] DWORD dwTlsIndex); 
+TlsSetValue-BOOL TlsSetValue( [in] DWORD dwTlsIndex, [in&&optional] LPVOID lpTlsValue); 
+TlsFree-BOOL TlsFree( [in] DWORD dwTlsIndex); 
+FreeLibrary-BOOL FreeLibrary( [in] HMODULE hLibModule); 
+GetProcAddress-FARPROC GetProcAddress( [in] HMODULE hModule, [in] LPCSTR lpProcName); 
+LoadLibraryExW-HMODULE LoadLibraryExA( [in] LPCSTR lpLibFileName, HANDLE hFile, [in] DWORD dwFlags); 
+GetStdHandle-HANDLE WINAPI GetStdHandle( _In_ DWORD nStdHandle); 
+GetModuleFileNameW-DWORD GetModuleFileNameW( [in&&optional] HMODULE hModule, [out] LPWSTR lpFilename, [in] DWORD nSize); 
+GetModuleHandleExW-BOOL GetModuleHandleExA( [in] DWORD dwFlags, [in&&optional] LPCSTR lpModuleName, [out] HMODULE *phModule); 
+CompareStringW-int CompareStringW( [in] LCID Locale, [in] DWORD dwCmpFlags, [in] _In_NLS_string_(cchCount1)PCNZWCH lpString1, [in] int cchCount1, [in] _In_NLS_string_(cchCount2)PCNZWCH lpString2, [in] int cchCount2); 
+LCMapStringW-int LCMapStringA( [in] LCID Locale, [in] DWORD dwMapFlags, [in] LPCSTR lpSrcStr, [in] int cchSrc, [out&&optional] LPSTR lpDestStr, [in] int cchDest); 
+GetLocaleInfoW-int GetLocaleInfoW( [in] LCID Locale, [in] LCTYPE LCType, [out&&optional] LPWSTR lpLCData, [in] int cchData); 
+IsValidLocale-BOOL IsValidLocale( [in] LCID Locale, [in] DWORD dwFlags); 
+GetUserDefaultLCID-LCID GetUserDefaultLCID(); 
+EnumSystemLocalesW-BOOL EnumSystemLocalesA( [in] LOCALE_ENUMPROCA lpLocaleEnumProc, [in] DWORD dwFlags); 
+GetConsoleOutputCP-UINT WINAPI GetConsoleOutputCP(void); 
+GetConsoleMode-BOOL WINAPI GetConsoleMode( _In_  HANDLE  hConsoleHandle, _Out_ LPDWORD lpMode); 
+GetFileSizeEx-BOOL GetFileSizeEx( [in] HANDLE hFile, [out] PLARGE_INTEGER lpFileSize); 
+ReadConsoleW-BOOL WINAPI ReadConsole( _In_     HANDLE  hConsoleInput, _Out_    LPVOID  lpBuffer, _In_     DWORD   nNumberOfCharsToRead, _Out_    LPDWORD lpNumberOfCharsRead, _In_opt_ LPVOID  pInputControl); 
+HeapReAlloc-DECLSPEC_ALLOCATOR LPVOID HeapReAlloc( [in] HANDLE hHeap, [in] DWORD dwFlags, [in] _Frees_ptr_opt_ LPVOID lpMem, [in] SIZE_T dwBytes); 
+FindFirstFileExW-HANDLE FindFirstFileExA( [in] LPCSTR lpFileName, [in] FINDEX_INFO_LEVELS fInfoLevelId, [out] LPVOID lpFindFileData, [in] FINDEX_SEARCH_OPS fSearchOp, LPVOID lpSearchFilter, [in] DWORD dwAdditionalFlags); 
+FindNextFileW-BOOL FindNextFileW( [in] HANDLE hFindFile, [out] LPWIN32_FIND_DATAW lpFindFileData); 
+IsValidCodePage-BOOL IsValidCodePage( [in] UINT CodePage); 
+FreeEnvironmentStringsW-BOOL FreeEnvironmentStringsA( LPCH penv); 
+SetEnvironmentVariableW-BOOL SetEnvironmentVariable( [in] LPCTSTR lpName, [in&&optional] LPCTSTR lpValue); 
+SetStdHandle-BOOL WINAPI SetStdHandle( _In_ DWORD  nStdHandle, _In_ HANDLE hHandle); 
+HeapSize-SIZE_T HeapSize( [in] HANDLE hHeap, [in] DWORD dwFlags, [in] LPCVOID lpMem);	 
+WriteConsoleW-BOOL WINAPI WriteConsole( _In_             HANDLE  hConsoleOutput, _In_       const VOID    *lpBuffer, _In_             DWORD   nNumberOfCharsToWrite, _Out_opt_        LPDWORD lpNumberOfCharsWritten, _Reserved_       LPVOID  lpReserved); 
