@@ -1,100 +1,100 @@
 % Privileged Time: 0
 % Processor Time: 0
 % User time: 0
-Creating Process ID: 13788
-Elapsed Time: 70.2078
-Handle Count: 154
-ID Process: 2168
-IO Data Bytes/sec: 47853.2
-IO Data Operations/sec: 43902
+Creating Process ID: 1308
+Elapsed Time: 0.768788
+Handle Count: 138
+ID Process: 12748
+IO Data Bytes/sec: 34622.4
+IO Data Operations/sec: 31531.1
 IO Other Bytes/sec: 0
 IO Read Bytes/sec: 0
-IO Write Operations/sec: 43902
+IO Write Operations/sec: 31531.1
 Page Faults/sec: 0
-Page File Bytes: 905216
-Page File Bytes Peak: 1.11821e+06
-Pool Nonpaged Bytes: 5088
+Page File Bytes: 3.70278e+06
+Page File Bytes Peak: 3.74374e+06
+Pool Nonpaged Bytes: 8488
 Priority Base: 8
-Private Bytes: 905216
+Private Bytes: 3.70278e+06
 Thread Count: 1
-Virtual Bytes: 1.36397e+07
-Virtual Bytes Peak: 1.75718e+07
-Working Set: 4.49331e+06
-Working Set - Private: 651264
-Working Set Peak: 4.49741e+06
+Virtual Bytes: 6.16079e+07
+Virtual Bytes Peak: 6.35658e+07
+Working Set: 7.24173e+06
+Working Set - Private: 1.05677e+06
+Working Set Peak: 7.24992e+06
 
-% Privileged Time: 13.9347
-% Processor Time: 26.3212
-% User time: 12.3864
-Creating Process ID: 13788
-Elapsed Time: 71.2169
-Handle Count: 154
-ID Process: 2168
-IO Data Bytes/sec: 31793.3
-IO Data Operations/sec: 29145.3
+% Privileged Time: 13.7918
+% Processor Time: 21.4539
+% User time: 7.66209
+Creating Process ID: 1308
+Elapsed Time: 1.78842
+Handle Count: 138
+ID Process: 12748
+IO Data Bytes/sec: 38710.3
+IO Data Operations/sec: 35488.3
 IO Other Bytes/sec: 0
 IO Read Bytes/sec: 0
-IO Write Operations/sec: 29145.3
+IO Write Operations/sec: 35488.3
 Page Faults/sec: 0
-Page File Bytes: 905216
-Page File Bytes Peak: 1.11821e+06
-Pool Nonpaged Bytes: 5088
+Page File Bytes: 3.70278e+06
+Page File Bytes Peak: 3.74374e+06
+Pool Nonpaged Bytes: 8488
 Priority Base: 8
-Private Bytes: 905216
+Private Bytes: 3.70278e+06
 Thread Count: 1
-Virtual Bytes: 1.36397e+07
-Virtual Bytes Peak: 1.75718e+07
-Working Set: 4.49331e+06
-Working Set - Private: 651264
-Working Set Peak: 4.49741e+06
+Virtual Bytes: 6.16079e+07
+Virtual Bytes Peak: 6.35658e+07
+Working Set: 7.24173e+06
+Working Set - Private: 1.05677e+06
+Working Set Peak: 7.24992e+06
 
-% Privileged Time: 16.948
-% Processor Time: 24.6517
-% User time: 7.70365
-Creating Process ID: 13788
-Elapsed Time: 72.2311
-Handle Count: 154
-ID Process: 2168
-IO Data Bytes/sec: 36088.4
-IO Data Operations/sec: 33081.5
+% Privileged Time: 15.5589
+% Processor Time: 23.3384
+% User time: 7.77946
+Creating Process ID: 1308
+Elapsed Time: 2.79267
+Handle Count: 138
+ID Process: 12748
+IO Data Bytes/sec: 38480.5
+IO Data Operations/sec: 35274.3
 IO Other Bytes/sec: 0
 IO Read Bytes/sec: 0
-IO Write Operations/sec: 33081.5
+IO Write Operations/sec: 35274.3
 Page Faults/sec: 0
-Page File Bytes: 905216
-Page File Bytes Peak: 1.11821e+06
-Pool Nonpaged Bytes: 5088
+Page File Bytes: 3.70278e+06
+Page File Bytes Peak: 3.74374e+06
+Pool Nonpaged Bytes: 8488
 Priority Base: 8
-Private Bytes: 905216
+Private Bytes: 3.70278e+06
 Thread Count: 1
-Virtual Bytes: 1.36397e+07
-Virtual Bytes Peak: 1.75718e+07
-Working Set: 4.49331e+06
-Working Set - Private: 651264
-Working Set Peak: 4.49741e+06
+Virtual Bytes: 6.16079e+07
+Virtual Bytes Peak: 6.35658e+07
+Working Set: 7.24173e+06
+Working Set - Private: 1.05677e+06
+Working Set Peak: 7.24992e+06
 
-% Privileged Time: 12.3345
-% Processor Time: 24.6691
-% User time: 12.3345
-Creating Process ID: 13788
-Elapsed Time: 73.2445
-Handle Count: 154
-ID Process: 2168
-IO Data Bytes/sec: 35013.4
-IO Data Operations/sec: 32092.1
-IO Other Bytes/sec: 0
+% Privileged Time: 15.5586
+% Processor Time: 23.3379
+% User time: 7.77931
+Creating Process ID: 1308
+Elapsed Time: 3.79693
+Handle Count: 145
+ID Process: 12748
+IO Data Bytes/sec: 32524
+IO Data Operations/sec: 29332.7
+IO Other Bytes/sec: 532.036
 IO Read Bytes/sec: 0
-IO Write Operations/sec: 32092.1
-Page Faults/sec: 0
-Page File Bytes: 905216
-Page File Bytes Peak: 1.11821e+06
-Pool Nonpaged Bytes: 5088
+IO Write Operations/sec: 29332.7
+Page Faults/sec: 65.7573
+Page File Bytes: 3.70278e+06
+Page File Bytes Peak: 3.74374e+06
+Pool Nonpaged Bytes: 18672
 Priority Base: 8
-Private Bytes: 905216
+Private Bytes: 3.70278e+06
 Thread Count: 1
-Virtual Bytes: 1.36397e+07
-Virtual Bytes Peak: 1.75718e+07
-Working Set: 4.49331e+06
-Working Set - Private: 651264
-Working Set Peak: 4.49741e+06
+Virtual Bytes: 6.1612e+07
+Virtual Bytes Peak: 6.35658e+07
+Working Set: 7.50387e+06
+Working Set - Private: 49152
+Working Set Peak: 7.50797e+06
 

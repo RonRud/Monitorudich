@@ -163,10 +163,65 @@ void __declspec(naked) getStack() {
 }
 
 void logStack() {
+	std::string functionDocStr = *nameToDocumantationString[addressToNameMap[originFuncAddr - 5]];
 	std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::app);
 	saveFile << "presumed function bytes in hex: ";
 	for (int i = 0; i < functionParamsNum; i++) {
 		saveFile << std::hex << functionParameters[i] << "-";
+	}
+	saveFile << ", ";
+	saveFile.flush();
+	size_t index = functionDocStr.find('(');
+	saveFile << "presumed function parameters: ";
+	for (int i = 0; i < functionParamsNum; i++) {
+		if (functionDocStr.find(' ', index) >= functionDocStr.find(';')) { break; }
+		size_t firstSpace = functionDocStr.find(' ', index); // between the first and second space is the atrribute [in] for example
+		size_t secondSpace = functionDocStr.find(' ', firstSpace + 1); // between the second and third space is the data type
+		size_t thirdSpace = functionDocStr.find(' ', secondSpace + 1); // after the third space space is the documantation name for the variable
+		if (firstSpace == std::string::npos || thirdSpace == std::string::npos || secondSpace == std::string::npos) { break; }
+		std::string parameterType = functionDocStr.substr(secondSpace + 1, thirdSpace - secondSpace - 1);
+		index = thirdSpace + 1;
+
+		//saveFile << parameterType << " ";
+		//Desicion tree on how to treat data types
+		saveFile << parameterType << ",";
+		if (parameterType == "LPARAM" || parameterType == "long") { 
+			saveFile << "long" << (LPARAM)functionParameters[i]; //basically long
+		}
+		else if (parameterType == "LPBOOL") {
+			saveFile << "boolean " << *(LPBOOL)functionParameters[i];
+		}
+		else if (parameterType == "LPCCH") {
+			saveFile << "char " << *(LPCCH)functionParameters[i];
+		}
+		else if (parameterType == "LPCSTR") {
+			saveFile << "string " << (LPCSTR)functionParameters[i];
+		}
+		else if (parameterType == "LPCTSTR") {
+			saveFile << "string " << (LPCTSTR)functionParameters[i];
+		}
+		else if (parameterType == "LPCWSTR") {
+			saveFile << "string " << (LPCWSTR)functionParameters[i];
+		}
+		else if (parameterType == "LPWSTR") {
+			saveFile << "string " << (LPWSTR)functionParameters[i];
+		}
+		else if (parameterType == "LPSTR") {
+			saveFile << "string " << (LPSTR)functionParameters[i];
+		}
+		else if (parameterType == "LPWORD") {
+			saveFile << "WORD " << *(LPWORD)functionParameters[i];
+		}
+		else if (parameterType == "WPARAM" || parameterType == "UINT") {
+			saveFile << "UINT " << (UINT)functionParameters[i];
+		}
+		else if (parameterType == "int") {
+			saveFile << "int " << (int)functionParameters[i];
+			}
+		else {
+			//just display hex
+			saveFile << "hex value " << functionParameters[i];
+		}
 	}
 	saveFile << ", ";
 	saveFile << std::endl;
@@ -297,8 +352,8 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 				while (ReadFile(hStdOutPipeRead, buffer, 1024, &dwRead, NULL))
 				{
 					std::string* modifiedBuffer = new std::string("");
-					buffer[dwRead] = '\0';
-					for (int i = 0; i < dwRead + 2; i++) {
+					//buffer[dwRead] = '\0';
+					for (int i = 0; i < dwRead+1; i++) {
 						if (buffer[i] != '\r' && buffer[i] != '\n' && !(buffer[i] == ' ' && buffer[i+1] == ' ')) {
 							modifiedBuffer->push_back(buffer[i]);
 						}
@@ -320,13 +375,12 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 						index = closeSquareIndex+1;
 					}
 					nameToDocumantationString[functionName] = modifiedBuffer;
+					//save string to the offlineScrapesFile
 					saveFile << *functionName << "-" << *nameToDocumantationString[functionName] << std::endl;
 				}
 				// Clean up and exit.
 				CloseHandle(hStdOutPipeRead);
 
-				//TODO figure out what is wrong with GetFileSizeEx in webScraper, also figure out how to wait in main until dllmain() finishes running (might need to have main program pid for that)
-				//save string to the offlineScrapesFile
 				//TODO Start of DLL connection to web scaper, need python scraper and usage in runtime function call
 			}
 		}
