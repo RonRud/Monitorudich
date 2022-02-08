@@ -184,7 +184,7 @@ void logStack() {
 
 		//saveFile << parameterType << " ";
 		//Desicion tree on how to treat data types
-		saveFile << parameterType << ",";
+		saveFile << parameterType << "=";
 		if (parameterType == "LPARAM" || parameterType == "long") { 
 			saveFile << "long" << (LPARAM)functionParameters[i]; //basically long
 		}
@@ -195,19 +195,19 @@ void logStack() {
 			saveFile << "char " << *(LPCCH)functionParameters[i];
 		}
 		else if (parameterType == "LPCSTR") {
-			saveFile << "string " << (LPCSTR)functionParameters[i];
+			saveFile << "\"" << (LPCSTR)functionParameters[i] << "\"";
 		}
 		else if (parameterType == "LPCTSTR") {
-			saveFile << "string " << (LPCTSTR)functionParameters[i];
+			saveFile << "\"" << (LPCTSTR)functionParameters[i] << "\"";
 		}
 		else if (parameterType == "LPCWSTR") {
-			saveFile << "string " << (LPCWSTR)functionParameters[i];
+			saveFile << "\"" << (LPCWSTR)functionParameters[i] << "\"";
 		}
 		else if (parameterType == "LPWSTR") {
-			saveFile << "string " << (LPWSTR)functionParameters[i];
+			saveFile << "\"" << (LPWSTR)functionParameters[i] << "\"";
 		}
 		else if (parameterType == "LPSTR") {
-			saveFile << "string " << (LPSTR)functionParameters[i];
+			saveFile << "\"" << (LPSTR)functionParameters[i] << "\"";
 		}
 		else if (parameterType == "LPWORD") {
 			saveFile << "WORD " << *(LPWORD)functionParameters[i];
@@ -220,8 +220,9 @@ void logStack() {
 			}
 		else {
 			//just display hex
-			saveFile << "hex value " << functionParameters[i];
+			saveFile << "0x" << functionParameters[i];
 		}
+		saveFile << ",";
 	}
 	saveFile << ", ";
 	saveFile << std::endl;
