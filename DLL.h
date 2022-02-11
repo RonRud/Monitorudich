@@ -18,10 +18,11 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved);
 bool inlineHookFunction(DWORD Function, std::string* functionName);
 void Hook();
 
-const char loggerFilePath[] = "C:\\Users\\u101040.DESHALIT\\Downloads\\Monitorudich-webScraping\\logger_output.txt";
-//const char loggerFilePath[] = "C:\\Users\\Rudic\\source\\repos\\RonRud\\Monitorudich\\logger_output.txt";
+//const char loggerFilePath[] = "C:\\Users\\u101040.DESHALIT\\Downloads\\Monitorudich-webScraping\\logger_output.txt";
+const char loggerFilePath[] = "C:\\Users\\Rudic\\source\\repos\\RonRud\\Monitorudich\\logger_output.txt";
 const char offlineScrapesFile[] = "MSDNScrapes.txt";
 
+int MAX_STACK_TO_SHOW = 8;
 DWORD originFuncAddr;
 std::map<DWORD, std::string*> addressToNameMap;
 

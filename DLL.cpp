@@ -77,7 +77,8 @@ bool IAThooking(HMODULE hInstance)
 			std::vector<const char*> blackList = { "EnterCriticalSection", "LeaveCriticalSection", "HeapFree", "HeapAlloc", //8B = mov function crushes
 				"GetLastError", "SetLastError", "WriteFile", "GetProcessHeap", //FF 25 = call function crushes
 			//from here these are excludes from runtime problems 	
-			"MultiByteToWideChar","FlushFileBuffers","SetFilePointerEx","CreateFileW","CloseHandle","TryEnterCriticalSection","GetFileType",
+			"MultiByteToWideChar","FlushFileBuffers","SetFilePointerEx","CreateFileW","CloseHandle","TryEnterCriticalSection","GetFileType","DecodePointer","WideCharToMultiByte","GetModuleHandleW",
+				//maybe the GetModuleHandleW is unneccery
 			"ReadFile"}; //ReadFile breaks because it is used after hook is web scraper code, needs fixing
 			//, "free", "malloc"}; they might be broken still
 			bool shouldHook = true;
@@ -113,21 +114,26 @@ void logHookName() {
 	std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::app);
 	saveFile << "name: " << *addressToNameMap[originFuncAddr-5] << ", "; //gets the function's name from the table. The function address which is gathered from the stack 
 																		 //has 5 more so it points to the instruction after the jmp in the function and not the function starting point.
-	saveFile << "address: " << originFuncAddr - 5 << ", ";
+	saveFile << "address: 0x" << std::hex << originFuncAddr - 5 << ", ";
 	saveFile.close();
 }
 
 void logAdditionalVariables() {
 	DWORD funcAddrPtr = originFuncAddr;
 	std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::app);
-	saveFile << "eax: " << savedEax << ", ";
-	saveFile << "ebx: " << savedEbx << ", ";
-	saveFile << "ecx: " << savedEcx << ", ";
-	saveFile << "edx: " << savedEdx << ", ";
+	saveFile << "eax: 0x" << std::hex << savedEax << ", ";
+	saveFile << "ebx: 0x" << std::hex << savedEbx << ", ";
+	saveFile << "ecx: 0x" << std::hex << savedEcx << ", ";
+	saveFile << "edx: 0x" << std::hex << savedEdx << ", ";
 
 	foundWINAPICleanup = false;
-	while (*(BYTE*)(funcAddrPtr) != 0xC3 && *(BYTE*)(funcAddrPtr) != 0xCB) {
-		if (*(BYTE*)(funcAddrPtr) == 0xC2) { //&& *(BYTE*)(funcAddrPtr+2)==0x00) { add this if the parameters of winapi bug
+	while ((*(BYTE*)(funcAddrPtr) != 0xC3 && *(BYTE*)(funcAddrPtr) != 0xCB) && !(*(BYTE*)(funcAddrPtr) == 0xCC && *(BYTE*)(funcAddrPtr+1) == 0xCC)) { //checks while still in function, stop checking if it reaches opcodes
+																																					//that indicate that the function is not in the WINAPI format or if it reaches CC CC
+		//if (*(BYTE*)(funcAddrPtr) == 0xCC && *(BYTE*)(funcAddrPtr + 1) == 0xCC) {
+		//	std::cout << "wha!!!!!" << std::endl;
+		//	break;
+		//}
+		if (*(BYTE*)(funcAddrPtr) == 0xC2) { //get number of bytes from the corresponding ret opcodes acccording to the WINAPI function call //&& *(BYTE*)(funcAddrPtr+2)==0x00) { add this if the parameters of winapi bug
 			functionParamsNum = (int)*(BYTE*)(funcAddrPtr + 1);
 			saveFile << "params bytes: " << functionParamsNum << ", ";
 			functionParamsNum = (functionParamsNum + (functionParamsNum % 4)) / 4; // every stack entry is 4 bytes, makes sure all bytes are included by adding to a number divided by 4
@@ -140,6 +146,9 @@ void logAdditionalVariables() {
 		functionParamsNum = (beforeFunctionEbp - beforeFunctionEsp) / 4; // gets all the stack between ebp of last function (before api function call) to the api function return address
 																		 // this includes the stack parameters for the function and the local variables of the last function. 
 		functionParamsNum--; // removes the two extra stack entries caused by the push of the return address of the api function and the hook function.
+		if (functionParamsNum > MAX_STACK_TO_SHOW) {
+			functionParamsNum = MAX_STACK_TO_SHOW; //Max of MAX_STACK_TO_SHOW hex so it doesn't save a ton of memory and looks bad
+		}
 	}
 	saveFile.close();
 }
@@ -224,7 +233,7 @@ void logStack() {
 		}
 		saveFile << ",";
 	}
-	saveFile << ", ";
+	//saveFile << ", ";
 	saveFile << std::endl;
 	saveFile.close();
 }
