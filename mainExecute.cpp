@@ -168,9 +168,18 @@ int main(int argc, char* argv[])
 	std::cout << "created process with pid " << pi.dwProcessId << std::endl;
 	
 	//Send data to injected dll
+	char thisFilePath[100] = { 0 };
+
+	GetModuleFileName(NULL, thisFilePath, 100);
+	std::string loggerFilePath = std::string(thisFilePath);
+	const size_t last_slash_idx = loggerFilePath.rfind('\\'); //Get the last occurareance of \\ (before the exe name)
+	if (std::string::npos != last_slash_idx) {
+		loggerFilePath = loggerFilePath.substr(0, last_slash_idx + 1) + "logger_output.txt"; // Than add the logger file name to it
+	};
+
 	bool isWebScrapingEnabled = true;
 	std::ofstream dllInfoFile("info_to_dll.txt", std::ios::out | std::ios::trunc);
-	dllInfoFile << isWebScrapingEnabled;
+	dllInfoFile << isWebScrapingEnabled << "," << loggerFilePath;
 	dllInfoFile.close();
 	//clean the recieving file
 	std::ofstream mainInfoFileFromDll("dll_to_main_program.txt", std::ios::out | std::ios::trunc);

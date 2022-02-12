@@ -4,10 +4,6 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 	switch (reason)
 	{
 	case DLL_PROCESS_ATTACH: {
-		//initialize an empty file
-		std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::trunc);
-		saveFile.close();
-
 		//Get info from the main program via info_to_dll.txt file
 		std::string dllRecievedInfo;
 		std::ifstream myfile("info_to_dll.txt");
@@ -15,9 +11,9 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 		{
 			if(std::getline(myfile, dllRecievedInfo))
 			{
-				//const size_t seperatorIdx = dllRecievedInfo.rfind(',');
-				//HANDLE mainProgramHandle = std::strtoul(dllRecievedInfo.substr(0, seperatorIdx).c_str(), NULL, 16);
-				isWebScrapingEnabled = std::strtoul(dllRecievedInfo.c_str(), NULL, 16);
+				const size_t seperatorIdx = dllRecievedInfo.rfind(',');
+				strcpy(loggerFilePath,dllRecievedInfo.substr(seperatorIdx+1,dllRecievedInfo.length()-seperatorIdx).c_str());
+				isWebScrapingEnabled = std::strtoul(dllRecievedInfo.substr(0,seperatorIdx).c_str(), NULL, 16);
 			}
 			else {
 				std::cout << "Unable to read text from info_to_dll.txt, quitting injected dll..." << std::endl;
@@ -26,6 +22,11 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 			}
 		}
 		else { std::cout << "Unable to open info_to_dll.txt, quitting injected dll..." << std::endl; break; } //be wary that this prints in the inspected child program
+		
+		//initialize an empty file
+		std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::trunc);
+		saveFile.close();
+
 
 		IAThooking(GetModuleHandleA(NULL));
 		std::cout << "dllmain finished executing" << std::endl << std::endl << std::endl;
@@ -77,7 +78,8 @@ bool IAThooking(HMODULE hInstance)
 			std::vector<const char*> blackList = { "EnterCriticalSection", "LeaveCriticalSection", "HeapFree", "HeapAlloc", //8B = mov function crushes
 				"GetLastError", "SetLastError", "WriteFile", "GetProcessHeap", //FF 25 = call function crushes
 			//from here these are excludes from runtime problems 	
-			"MultiByteToWideChar","FlushFileBuffers","SetFilePointerEx","CreateFileW","CloseHandle","TryEnterCriticalSection","GetFileType","DecodePointer","WideCharToMultiByte","GetModuleHandleW",
+			"MultiByteToWideChar","FlushFileBuffers","SetFilePointerEx","CreateFileW","CloseHandle","TryEnterCriticalSection","GetFileType","DecodePointer",
+				"WideCharToMultiByte","GetModuleHandleW","EncodePointer","IsProcessorFeaturePresent","RtlUnwind",
 				//maybe the GetModuleHandleW is unneccery
 			"ReadFile"}; //ReadFile breaks because it is used after hook is web scraper code, needs fixing
 			//, "free", "malloc"}; they might be broken still
@@ -154,8 +156,8 @@ void logAdditionalVariables() {
 }
 
 void __declspec(naked) getStack() {
-
 	for (i = 0; i < functionParamsNum * 4; i += 4) {
+		std::cout << i;
 		__asm {
 			lea ecx, functionParameters
 			add ecx, i
@@ -172,7 +174,6 @@ void __declspec(naked) getStack() {
 }
 
 void logStack() {
-	std::string functionDocStr = *nameToDocumantationString[addressToNameMap[originFuncAddr - 5]];
 	std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::app);
 	saveFile << "presumed function bytes in hex: ";
 	for (int i = 0; i < functionParamsNum; i++) {
@@ -180,60 +181,63 @@ void logStack() {
 	}
 	saveFile << ", ";
 	saveFile.flush();
-	size_t index = functionDocStr.find('(');
-	saveFile << "presumed function parameters: ";
-	for (int i = 0; i < functionParamsNum; i++) {
-		if (functionDocStr.find(' ', index) >= functionDocStr.find(';')) { break; }
-		size_t firstSpace = functionDocStr.find(' ', index); // between the first and second space is the atrribute [in] for example
-		size_t secondSpace = functionDocStr.find(' ', firstSpace + 1); // between the second and third space is the data type
-		size_t thirdSpace = functionDocStr.find(' ', secondSpace + 1); // after the third space space is the documantation name for the variable
-		if (firstSpace == std::string::npos || thirdSpace == std::string::npos || secondSpace == std::string::npos) { break; }
-		std::string parameterType = functionDocStr.substr(secondSpace + 1, thirdSpace - secondSpace - 1);
-		index = thirdSpace + 1;
+	if (isWebScrapingEnabled) {
+		std::string functionDocStr = *nameToDocumantationString[addressToNameMap[originFuncAddr - 5]];
+		size_t index = functionDocStr.find('(');
+		saveFile << "presumed function parameters: ";
+		for (int i = 0; i < functionParamsNum; i++) {
+			if (functionDocStr.find(' ', index) >= functionDocStr.find(';')) { break; }
+			size_t firstSpace = functionDocStr.find(' ', index); // between the first and second space is the atrribute [in] for example
+			size_t secondSpace = functionDocStr.find(' ', firstSpace + 1); // between the second and third space is the data type
+			size_t thirdSpace = functionDocStr.find(' ', secondSpace + 1); // after the third space space is the documantation name for the variable
+			if (firstSpace == std::string::npos || thirdSpace == std::string::npos || secondSpace == std::string::npos) { break; }
+			std::string parameterType = functionDocStr.substr(secondSpace + 1, thirdSpace - secondSpace - 1);
+			index = thirdSpace + 1;
 
-		//saveFile << parameterType << " ";
-		//Desicion tree on how to treat data types
-		saveFile << parameterType << "=";
-		if (parameterType == "LPARAM" || parameterType == "long") { 
-			saveFile << "long" << (LPARAM)functionParameters[i]; //basically long
-		}
-		else if (parameterType == "LPBOOL") {
-			saveFile << "boolean " << *(LPBOOL)functionParameters[i];
-		}
-		else if (parameterType == "LPCCH") {
-			saveFile << "char " << *(LPCCH)functionParameters[i];
-		}
-		else if (parameterType == "LPCSTR") {
-			saveFile << "\"" << (LPCSTR)functionParameters[i] << "\"";
-		}
-		else if (parameterType == "LPCTSTR") {
-			saveFile << "\"" << (LPCTSTR)functionParameters[i] << "\"";
-		}
-		else if (parameterType == "LPCWSTR") {
-			saveFile << "\"" << (LPCWSTR)functionParameters[i] << "\"";
-		}
-		else if (parameterType == "LPWSTR") {
-			saveFile << "\"" << (LPWSTR)functionParameters[i] << "\"";
-		}
-		else if (parameterType == "LPSTR") {
-			saveFile << "\"" << (LPSTR)functionParameters[i] << "\"";
-		}
-		else if (parameterType == "LPWORD") {
-			saveFile << "WORD " << *(LPWORD)functionParameters[i];
-		}
-		else if (parameterType == "WPARAM" || parameterType == "UINT") {
-			saveFile << "UINT " << (UINT)functionParameters[i];
-		}
-		else if (parameterType == "int") {
-			saveFile << "int " << (int)functionParameters[i];
+			//saveFile << parameterType << " ";
+			//Desicion tree on how to treat data types
+			saveFile << parameterType << "=";
+			if (parameterType == "LPARAM" || parameterType == "long") {
+				saveFile << "long" << (LPARAM)functionParameters[i]; //basically long
 			}
-		else {
-			//just display hex
-			saveFile << "0x" << functionParameters[i];
+			else if (parameterType == "LPBOOL") {
+				saveFile << "boolean " << *(LPBOOL)functionParameters[i];
+			}
+			else if (parameterType == "LPCCH") {
+				saveFile << "char " << *(LPCCH)functionParameters[i];
+			}
+			else if (parameterType == "LPCSTR") {
+				saveFile << "\"" << (LPCSTR)functionParameters[i] << "\"";
+			}
+			else if (parameterType == "LPCTSTR") {
+				saveFile << "\"" << (LPCTSTR)functionParameters[i] << "\"";
+			}
+			else if (parameterType == "LPCWSTR") {
+				saveFile << "\"" << (LPCWSTR)functionParameters[i] << "\"";
+			}
+			else if (parameterType == "LPWSTR") {
+				saveFile << "\"" << (LPWSTR)functionParameters[i] << "\"";
+			}
+			else if (parameterType == "LPSTR") {
+				saveFile << "\"" << (LPSTR)functionParameters[i] << "\"";
+			}
+			else if (parameterType == "LPWORD") {
+				saveFile << "WORD " << *(LPWORD)functionParameters[i];
+			}
+			else if (parameterType == "WPARAM" || parameterType == "UINT") {
+				saveFile << "UINT " << (UINT)functionParameters[i];
+			}
+			else if (parameterType == "int") {
+				saveFile << "int " << (int)functionParameters[i];
+			}
+			else {
+				//just display hex
+				saveFile << "0x" << functionParameters[i];
+			}
+			saveFile << ",";
 		}
-		saveFile << ",";
 	}
-	//saveFile << ", ";
+	else { saveFile << ", "; }
 	saveFile << std::endl;
 	saveFile.close();
 }
@@ -364,7 +368,13 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 					std::string* modifiedBuffer = new std::string("");
 					//buffer[dwRead] = '\0';
 					for (int i = 0; i < dwRead+1; i++) {
-						if (buffer[i] != '\r' && buffer[i] != '\n' && !(buffer[i] == ' ' && buffer[i+1] == ' ')) {
+						if (buffer[i] == ')') {
+							modifiedBuffer->push_back(' ');
+							modifiedBuffer->push_back(')');
+							modifiedBuffer->push_back(';');
+							break;
+						}
+						else if (buffer[i] != '\r' && buffer[i] != '\n' && !(buffer[i] == ' ' && buffer[i+1] == ' ')) {
 							modifiedBuffer->push_back(buffer[i]);
 						}
 					}
