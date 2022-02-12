@@ -16,6 +16,9 @@
 BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved);
 
 bool inlineHookFunction(DWORD Function, std::string* functionName);
+void IAThookingCleanup();
+void inlineHookFunctionCleanup(DWORD functionAddr);
+
 void Hook();
 
 char loggerFilePath[100];

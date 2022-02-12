@@ -37,6 +37,7 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 		break;
 	}
 	case DLL_PROCESS_DETACH:
+		IAThookingCleanup();
 		break;
 	case DLL_THREAD_ATTACH:
 		break;
@@ -111,6 +112,50 @@ bool IAThooking(HMODULE hInstance)
 	saveFile.close();
 	return false;
 }
+
+void inlineHookFunctionCleanup(DWORD functionAddr) {
+	if (*(BYTE*)functionAddr == 0xE9) {
+		functionAddr += *(int*)(functionAddr + 1) + 5;
+		return inlineHookFunctionCleanup(functionAddr);
+	}
+	else if (*(BYTE*)functionAddr == 0xFF && *(BYTE*)(functionAddr + 1) == 0x25) {
+		DWORD dsOffsetOfFunction = *(DWORD*)(functionAddr + 2);
+
+		__asm {
+			push eax
+			push ebx
+			mov ebx, dsOffsetOfFunction
+			mov eax, ds: [ebx]
+			mov functionAddr, eax
+			pop ebx
+			pop eax
+		}
+		return inlineHookFunctionCleanup(functionAddr);
+	}
+	else {
+		DWORD Old;
+		DWORD n;
+		//got to function and not function call trampolines
+		VirtualProtect((void*)functionAddr, 5, PAGE_EXECUTE_READWRITE, &Old);
+		//Set back to original opcodes mov edi,edi
+		//							   push ebp
+		//							   mov ebp,esp
+		*(BYTE*)functionAddr = 0x8B;
+		*(BYTE*)(functionAddr + 1) = 0xFF;
+		*(BYTE*)(functionAddr + 2) = 0x55;
+		*(BYTE*)(functionAddr + 3) = 0x8B;
+		*(BYTE*)(functionAddr + 4) = 0xEC;
+		VirtualProtect((void*)functionAddr, 5, Old, &n);
+	}
+}
+
+void IAThookingCleanup() {
+	for (auto& iterator : addressToNameMap) {
+		inlineHookFunctionCleanup(iterator.first);
+		delete iterator.second;
+	}
+}
+
 
 void logHookName() {
 	std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::app);
