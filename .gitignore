@@ -14,5 +14,6 @@
 *.txt
 *.exe
 *.dll
+*.obj
 !MSDNScrapes.txt
 !Natural_selector.txt
