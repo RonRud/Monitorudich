@@ -7,13 +7,16 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 		//Get info from the main program via info_to_dll.txt file
 		std::string dllRecievedInfo;
 		std::ifstream myfile("info_to_dll.txt");
+		int attamptToHookNumFunctions;
 		if (myfile.is_open())
 		{
-			if(std::getline(myfile, dllRecievedInfo))
+			if (std::getline(myfile, dllRecievedInfo))
 			{
-				const size_t seperatorIdx = dllRecievedInfo.rfind(',');
-				strcpy(loggerFilePath,dllRecievedInfo.substr(seperatorIdx+1,dllRecievedInfo.length()-seperatorIdx).c_str());
-				isWebScrapingEnabled = std::strtoul(dllRecievedInfo.substr(0,seperatorIdx).c_str(), NULL, 16);
+				const size_t seperatorIdx = dllRecievedInfo.find(",");
+				const size_t secondSeperaorIdx = dllRecievedInfo.find(",", seperatorIdx+1);
+				strcpy(loggerFilePath, dllRecievedInfo.substr(seperatorIdx + 1, secondSeperaorIdx - seperatorIdx-1).c_str());
+				isWebScrapingEnabled = std::strtoul(dllRecievedInfo.substr(0, seperatorIdx).c_str(), NULL, 16);
+				attamptToHookNumFunctions = std::strtoul(dllRecievedInfo.substr(secondSeperaorIdx + 1, dllRecievedInfo.length() - secondSeperaorIdx-1).c_str(), NULL, 10);
 			}
 			else {
 				std::cout << "Unable to read text from info_to_dll.txt, quitting injected dll..." << std::endl;
@@ -22,13 +25,13 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 			}
 		}
 		else { std::cout << "Unable to open info_to_dll.txt, quitting injected dll..." << std::endl; break; } //be wary that this prints in the inspected child program
-		
+
 		//initialize an empty file
 		std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::trunc);
 		saveFile.close();
 
 
-		IAThooking(GetModuleHandleA(NULL));
+		IAThooking(GetModuleHandleA(NULL), attamptToHookNumFunctions);
 		std::cout << "dllmain finished executing" << std::endl << std::endl << std::endl;
 		//resume main program by indicating it can continue to run
 		std::ofstream sendToMainFile("dll_to_main_program.txt", std::ios::out | std::ios::app);
@@ -46,7 +49,7 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 	}
 	return true;
 }
-bool IAThooking(HMODULE hInstance)
+bool IAThooking(HMODULE hInstance, int attamptToHookNumFunctions)
 {
 	bool flag = false;
 
@@ -56,13 +59,33 @@ bool IAThooking(HMODULE hInstance)
 
 	importedModule = getImportTable(hInstance);
 	//pImportDesc = (PIMAGE_IMPORT_DESCRIPTOR)ImageDirectoryEntryToData(hInstance, TRUE, IMAGE_DIRECTORY_ENTRY_IMPORT, &ulSize); - You can just call this function to get the Import Table
-	
+
 	//log file 
 	std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::app);
 
+	int functionAttamptedToHookCounter = 0;
+	std::vector<const char*> blackList;
+	std::ifstream blacklistFile("Natural_selector.txt");
+	if (blacklistFile.is_open()) {
+		std::string blacklistedFunctionName;
+		while (std::getline(blacklistFile, blacklistedFunctionName)) {
+			const char* entry = (new std::string(blacklistedFunctionName))->c_str();
+			blackList.push_back(entry);
+			std::cout << "Added: " << blacklistedFunctionName << " to blacklist vector" << std::endl;
+		}
+		for (const char* name: blackList) {
+			std::cout << name << ",";
+		}
+		std::cout << std::endl;
+		blacklistFile.close();
+	}
+	else {
+		std::cout << "can't access Black list file" << std::endl;
+	}
+
 	while (*(WORD*)importedModule != 0) //over on the modules (DLLs)
 	{
-		if (strcmp((char*)((PBYTE)hInstance + importedModule->Name), (char*)"COMCTL32.dll") == 0 || strcmp((char*)((PBYTE)hInstance + importedModule->Name), (char*)"SHELL32.dll") == 0 
+		if (strcmp((char*)((PBYTE)hInstance + importedModule->Name), (char*)"COMCTL32.dll") == 0 || strcmp((char*)((PBYTE)hInstance + importedModule->Name), (char*)"SHELL32.dll") == 0
 			|| strcmp((char*)((PBYTE)hInstance + importedModule->Name), (char*)"OLEAUT32.dll") == 0) {
 			std::cout << (char*)((PBYTE)hInstance + importedModule->Name) << "skipped" << std::endl;
 			importedModule++;
@@ -72,26 +95,38 @@ bool IAThooking(HMODULE hInstance)
 		pFirstThunk = (PIMAGE_THUNK_DATA)((PBYTE)hInstance + importedModule->FirstThunk);//pointing to its IAT
 		pOriginalFirstThunk = (PIMAGE_THUNK_DATA)((PBYTE)hInstance + importedModule->OriginalFirstThunk);//pointing to OriginalThunk
 		pFuncData = (PIMAGE_IMPORT_BY_NAME)((PBYTE)hInstance + pOriginalFirstThunk->u1.AddressOfData);// and to IMAGE_IMPORT_BY_NAME
+
 		while (*(WORD*)pFirstThunk != 0 && *(WORD*)pOriginalFirstThunk != 0) //moving over IAT and over names' table
 		{
 			saveFile << "0x" << std::hex << pFirstThunk->u1.Function << "\t\t" << pFuncData->Name << std::endl;//printing function's name and addr
-			
+			/*
 			std::vector<const char*> blackList = { "EnterCriticalSection", "LeaveCriticalSection", "HeapFree", "HeapAlloc", //8B = mov function crushes
 				"GetLastError", "SetLastError", "WriteFile", "GetProcessHeap", //FF 25 = call function crushes
-			//from here these are excludes from runtime problems 	
+			//from here these are excludes from runtime problems
 			"MultiByteToWideChar","FlushFileBuffers","SetFilePointerEx","CreateFileW","CloseHandle","TryEnterCriticalSection","GetFileType","DecodePointer",
 				"WideCharToMultiByte","GetModuleHandleW","EncodePointer","IsProcessorFeaturePresent","RtlUnwind",
 				//maybe the GetModuleHandleW is unneccery
 			"ReadFile"}; //ReadFile breaks because it is used after hook is web scraper code, needs fixing
 			//, "free", "malloc"}; they might be broken still
+			*/
+			std::cout << "0" << std::endl;
+			if (attamptToHookNumFunctions <= functionAttamptedToHookCounter) {
+				saveFile << "function hooking skipped as part of the dynamic blacklist creation functionality" << std::endl;
+				break; // only hook a certain amount of functions, this is used for creating a dynamic blacklist
+			}
+
+			std::cout << "1" << std::endl;
 			bool shouldHook = true;
 			for (const char* name : blackList) {
+				//std::cout << "names: " << name << std::endl;
 				if (strcmp(name, (char*)pFuncData->Name) == 0) {
 					shouldHook = false;
 					saveFile << "Blacklisted, not hooked" << std::endl << std::endl;
 					break;
 				}
 			}
+
+			std::cout << "2" << std::endl;
 
 			if (shouldHook) {
 				bool isHooked = inlineHookFunction(pFirstThunk->u1.Function, new std::string(pFuncData->Name));
@@ -106,6 +141,7 @@ bool IAThooking(HMODULE hInstance)
 			pOriginalFirstThunk++; // next node (function) in the array
 			pFuncData = (PIMAGE_IMPORT_BY_NAME)((PBYTE)hInstance + pOriginalFirstThunk->u1.AddressOfData);
 			pFirstThunk++;// next node (function) in the array
+			functionAttamptedToHookCounter++;
 		}
 		importedModule++; //next module (DLL)
 	}
@@ -159,7 +195,7 @@ void IAThookingCleanup() {
 
 void logHookName() {
 	std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::app);
-	saveFile << "name: " << *addressToNameMap[originFuncAddr-5] << ", "; //gets the function's name from the table. The function address which is gathered from the stack 
+	saveFile << "name: " << *addressToNameMap[originFuncAddr - 5] << ", "; //gets the function's name from the table. The function address which is gathered from the stack 
 																		 //has 5 more so it points to the instruction after the jmp in the function and not the function starting point.
 	saveFile << "address: 0x" << std::hex << originFuncAddr - 5 << ", ";
 	saveFile.close();
@@ -174,7 +210,7 @@ void logAdditionalVariables() {
 	saveFile << "edx: 0x" << std::hex << savedEdx << ", ";
 
 	foundWINAPICleanup = false;
-	while ((*(BYTE*)(funcAddrPtr) != 0xC3 && *(BYTE*)(funcAddrPtr) != 0xCB) && !(*(BYTE*)(funcAddrPtr) == 0xCC && *(BYTE*)(funcAddrPtr+1) == 0xCC)) { //checks while still in function, stop checking if it reaches opcodes
+	while ((*(BYTE*)(funcAddrPtr) != 0xC3 && *(BYTE*)(funcAddrPtr) != 0xCB) && !(*(BYTE*)(funcAddrPtr) == 0xCC && *(BYTE*)(funcAddrPtr + 1) == 0xCC)) { //checks while still in function, stop checking if it reaches opcodes
 																																					//that indicate that the function is not in the WINAPI format or if it reaches CC CC
 		//if (*(BYTE*)(funcAddrPtr) == 0xCC && *(BYTE*)(funcAddrPtr + 1) == 0xCC) {
 		//	std::cout << "wha!!!!!" << std::endl;
@@ -206,14 +242,14 @@ void __declspec(naked) getStack() {
 		__asm {
 			lea ecx, functionParameters
 			add ecx, i
-				
+
 			add esp, 8 //adds an offset of 8 because the top of the stack is the return addr from this function, than the return address which called the api function
 			add esp, i
 			mov ebx, dword ptr[esp];
 			mov[ecx], ebx
-				
-			mov esp, beforeFunctionEsp // reset esp to it's original value
-		}	
+
+				mov esp, beforeFunctionEsp // reset esp to it's original value
+		}
 	}
 	__asm ret
 }
@@ -297,10 +333,10 @@ void __declspec(naked) Hook() { // this means compiler doesn't go here
 		mov savedEbx, ebx
 		mov savedEcx, ecx
 		mov savedEdx, edx
-		
+
 		mov beforeFunctionEbp, ebp
 		mov beforeFunctionEsp, esp
-		
+
 		POP EAX
 		MOV originFuncAddr, EAX
 	};
@@ -334,9 +370,9 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 	saveFile << "function addr: " << std::hex << functionAddr << std::endl;
 	saveFile << "The first bytes of the function are: ";
 	char buffer[100];
-	sprintf(buffer, "%02X %02X %02X %02X %02X %02X", *(BYTE*)functionAddr, *(BYTE*)(functionAddr+1), *(BYTE*)(functionAddr+2), *(BYTE*)(functionAddr+3), *(BYTE*)(functionAddr+4), *(BYTE*)(functionAddr+5));
+	sprintf(buffer, "%02X %02X %02X %02X %02X %02X", *(BYTE*)functionAddr, *(BYTE*)(functionAddr + 1), *(BYTE*)(functionAddr + 2), *(BYTE*)(functionAddr + 3), *(BYTE*)(functionAddr + 4), *(BYTE*)(functionAddr + 5));
 	saveFile << buffer << std::endl;
-	if(*(BYTE*)functionAddr == 0x8B && *(BYTE*)(functionAddr + 1) == 0xFF) {
+	if (*(BYTE*)functionAddr == 0x8B && *(BYTE*)(functionAddr + 1) == 0xFF) {
 		//If the code gets here the function is valid to hook
 		//TODO here there will be the call to web scraping if enabled
 		if (isWebScrapingEnabled) {
@@ -412,14 +448,14 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 				{
 					std::string* modifiedBuffer = new std::string("");
 					//buffer[dwRead] = '\0';
-					for (int i = 0; i < dwRead+1; i++) {
+					for (int i = 0; i < dwRead + 1; i++) {
 						if (buffer[i] == ')') {
 							modifiedBuffer->push_back(' ');
 							modifiedBuffer->push_back(')');
 							modifiedBuffer->push_back(';');
 							break;
 						}
-						else if (buffer[i] != '\r' && buffer[i] != '\n' && !(buffer[i] == ' ' && buffer[i+1] == ' ')) {
+						else if (buffer[i] != '\r' && buffer[i] != '\n' && !(buffer[i] == ' ' && buffer[i + 1] == ' ')) {
 							modifiedBuffer->push_back(buffer[i]);
 						}
 					}
@@ -437,7 +473,7 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 						}
 
 						/* Advance index forward so the next iteration doesn't pick it up as well. */
-						index = closeSquareIndex+1;
+						index = closeSquareIndex + 1;
 					}
 					nameToDocumantationString[functionName] = modifiedBuffer;
 					//save string to the offlineScrapesFile
@@ -460,22 +496,24 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 		saveFile.close();
 		return true;
 
-	} else if(*(BYTE*)functionAddr == 0xE9) {
+	}
+	else if (*(BYTE*)functionAddr == 0xE9) {
 		functionAddr += *(int*)(functionAddr + 1) + 5;
-		return inlineHookFunction(functionAddr,functionName);
-	} else if (*(BYTE*)functionAddr == 0xFF && *(BYTE*)(functionAddr + 1) == 0x25) {
+		return inlineHookFunction(functionAddr, functionName);
+	}
+	else if (*(BYTE*)functionAddr == 0xFF && *(BYTE*)(functionAddr + 1) == 0x25) {
 		DWORD dsOffsetOfFunction = *(DWORD*)(functionAddr + 2);
 
 		__asm {
 			push eax
 			push ebx
 			mov ebx, dsOffsetOfFunction
-			mov eax, ds:[ebx]
+			mov eax, ds: [ebx]
 			mov functionAddr, eax
 			pop ebx
 			pop eax
 		}
-		return inlineHookFunction(functionAddr,functionName);
+		return inlineHookFunction(functionAddr, functionName);
 	}
 	else {
 		return false;
@@ -497,7 +535,7 @@ PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE hInstance)
 	if (dosHeader->e_magic != 0x5a4d) { //check if MZ (signature of DOS)
 		throw std::invalid_argument("received non DOS file");
 	}
-	saveFile << "\t0x" << std::hex << dosHeader->e_magic << "\t\tMagic number" << std::endl; 
+	saveFile << "\t0x" << std::hex << dosHeader->e_magic << "\t\tMagic number" << std::endl;
 	saveFile << "\t0x" << std::hex << dosHeader->e_cblp << "\t\tBytes on last page of file" << std::endl;
 	saveFile << "\t0x" << std::hex << dosHeader->e_cp << "\t\tPages in file" << std::endl;
 	saveFile << "\t0x" << std::hex << dosHeader->e_crlc << "\t\tRelocations" << std::endl;
@@ -556,9 +594,10 @@ PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE hInstance)
 	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.SizeOfImage << "\t\tSize Of Image" << std::endl;
 	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.SizeOfHeaders << "\t\tSize Of Headers" << std::endl;
 	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.CheckSum << "\t\tCheckSum" << std::endl;
-	if(subsystemsDict.find(imageNTHeaders->OptionalHeader.Subsystem) != subsystemsDict.end()) { //this means it found the subsystem therefore adding translation (cui/gui/...)
+	if (subsystemsDict.find(imageNTHeaders->OptionalHeader.Subsystem) != subsystemsDict.end()) { //this means it found the subsystem therefore adding translation (cui/gui/...)
 		saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.Subsystem << " (speculated): " << subsystemsDict[imageNTHeaders->OptionalHeader.Subsystem] << "\t\tSubsystem" << std::endl;
-	} else {
+	}
+	else {
 		saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.Subsystem << "\t\tSubsystem" << std::endl;
 	}
 	saveFile << "\t0x" << std::hex << imageNTHeaders->OptionalHeader.DllCharacteristics << "\t\tDllCharacteristics" << std::endl;
@@ -572,10 +611,10 @@ PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE hInstance)
 
 	// DATA_DIRECTORIES
 	saveFile << "--DATA DIRECTORIES--" << std::endl;
-	saveFile << "\tExport Directory Address: 0x" << std::hex << imageNTHeaders->OptionalHeader.DataDirectory[0].VirtualAddress << "; Size: 0x" << std::hex <<  imageNTHeaders->OptionalHeader.DataDirectory[0].Size << std::endl;
+	saveFile << "\tExport Directory Address: 0x" << std::hex << imageNTHeaders->OptionalHeader.DataDirectory[0].VirtualAddress << "; Size: 0x" << std::hex << imageNTHeaders->OptionalHeader.DataDirectory[0].Size << std::endl;
 	saveFile << "\tImport Directory Address: 0x" << std::hex << imageNTHeaders->OptionalHeader.DataDirectory[1].VirtualAddress << "; Size: 0x" << std::hex << imageNTHeaders->OptionalHeader.DataDirectory[1].Size << std::endl;
 	// TODO consider adding more data directories information
-	
+
 	// SECTION_HEADERS
 	saveFile << "--SECTION HEADERS--" << std::endl;
 	// get offset to first section header
@@ -600,12 +639,12 @@ PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE hInstance)
 		saveFile << "\t\t0x" << std::hex << sectionHeader->Characteristics << "\tCharacteristics" << std::endl;
 
 		// save section that contains import directory table
-		if (importDirectoryRVA >= sectionHeader->VirtualAddress && importDirectoryRVA < sectionHeader->VirtualAddress + sectionHeader->Misc.VirtualSize){
+		if (importDirectoryRVA >= sectionHeader->VirtualAddress && importDirectoryRVA < sectionHeader->VirtualAddress + sectionHeader->Misc.VirtualSize) {
 			PIMAGE_SECTION_HEADER importSection = sectionHeader;
-			}
+		}
 		sectionLocation += sectionSize;
 	}
-	
+
 	IMAGE_OPTIONAL_HEADER optionalHeader;
 	PIMAGE_NT_HEADERS ntHeader;
 	IMAGE_DATA_DIRECTORY dataDirectory;
@@ -614,7 +653,7 @@ PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE hInstance)
 	ntHeader = (PIMAGE_NT_HEADERS)((PBYTE)dosHeader + dosHeader->e_lfanew);//The PE Header begin after the MZ Header (which has size of e_lfanew)
 	optionalHeader = (IMAGE_OPTIONAL_HEADER)(ntHeader->OptionalHeader); //Getting OptionalHeader
 	dataDirectory = (IMAGE_DATA_DIRECTORY)(optionalHeader.DataDirectory[IMPORT_TABLE_OFFSET]);//Getting the import table of DataDirectory
-	
+
 	saveFile.close();
 	return (PIMAGE_IMPORT_DESCRIPTOR)((PBYTE)hInstance + dataDirectory.VirtualAddress);//ImageBase+RVA to import table
 

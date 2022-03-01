@@ -44,3 +44,5 @@ SetEnvironmentVariableW-BOOL SetEnvironmentVariable( [in] LPCTSTR lpName, [in&&o
 SetStdHandle-BOOL WINAPI SetStdHandle( _In_ DWORD  nStdHandle, _In_ HANDLE hHandle );
 HeapSize-SIZE_T HeapSize( [in] HANDLE hHeap, [in] DWORD dwFlags, [in] LPCVOID lpMem );
 WriteConsoleW-BOOL WINAPI WriteConsole( _In_             HANDLE  hConsoleOutput, _In_       const VOID    *lpBuffer, _In_             DWORD   nNumberOfCharsToWrite, _Out_opt_        LPDWORD lpNumberOfCharsWritten, _Reserved_       LPVOID  lpReserved );
+WideCharToMultiByte-int WideCharToMultiByte( [in] UINT CodePage, [in] DWORD dwFlags, [in] _In_NLS_string_(cchWideChar );
+EnterCriticalSection-void EnterCriticalSection( [in&&out] LPCRITICAL_SECTION lpCriticalSection );

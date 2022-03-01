@@ -135,7 +135,7 @@ int main(int argc, char* argv[])
 {
 	std::string inspectedProcessPath;
 	std::cout << "Enter the full path of the executable you wish to inspect: " << std::endl;
-	std::cin >> inspectedProcessPath; 
+	std::cin >> inspectedProcessPath;
 	replaceSubstrInString(inspectedProcessPath, "\\\\", "\\");
 	replaceSubstrInString(inspectedProcessPath, "\\", "\\\\");
 	//opening the executable
@@ -164,9 +164,9 @@ int main(int argc, char* argv[])
 	{
 		std::cout << "CreateProcess failed, error: " << GetLastError() << std::endl;
 		return 0;
-	} 
+	}
 	std::cout << "created process with pid " << pi.dwProcessId << std::endl;
-	
+
 	//Send data to injected dll
 	char thisFilePath[100] = { 0 };
 
@@ -178,8 +178,10 @@ int main(int argc, char* argv[])
 	};
 
 	bool isWebScrapingEnabled = true;
+	int numberOfFunctionsToPossiblyHook = 55555;
 	std::ofstream dllInfoFile("info_to_dll.txt", std::ios::out | std::ios::trunc);
 	dllInfoFile << isWebScrapingEnabled << "," << loggerFilePath;
+	dllInfoFile << "," << numberOfFunctionsToPossiblyHook;
 	dllInfoFile.close();
 	//clean the recieving file
 	std::ofstream mainInfoFileFromDll("dll_to_main_program.txt", std::ios::out | std::ios::trunc);
@@ -196,7 +198,7 @@ int main(int argc, char* argv[])
 		{
 			if (std::getline(myfile, recievedInfo))
 			{
-				if (recievedInfo == "Main program can continue executing") {break;}
+				if (recievedInfo == "Main program can continue executing") { break; }
 			}/*
 			else {
 				std::cout << "Unable to read text from dll_to_main_program.txt, quitting main program..." << std::endl;
@@ -207,14 +209,14 @@ int main(int argc, char* argv[])
 		}
 		else { std::cout << "Unable to open dll_to_main_program, quitting main program..." << std::endl; return 0; }
 	}
-																											  //resumes (starts in this case) the child process
+	//resumes (starts in this case) the child process
 	ResumeThread(pi.hThread);
 	try {
 		//Log processes system resources
 		keepLoggingSystemResources = true;
 		const size_t last_slash_idx = inspectedProcessPath.rfind('\\');
 		//TODO add with threading
-		std::thread threadThing(LogSystemResourcesForProcess, inspectedProcessPath.substr(last_slash_idx + 1, inspectedProcessPath.length()-5-last_slash_idx)); //makes sure to pass the name without .exe
+		std::thread threadThing(LogSystemResourcesForProcess, inspectedProcessPath.substr(last_slash_idx + 1, inspectedProcessPath.length() - 5 - last_slash_idx)); //makes sure to pass the name without .exe
 
 		// Wait until child process exits.
 		std::cout << "before process terminate check" << std::endl;

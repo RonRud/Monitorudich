@@ -2,7 +2,7 @@
 #define _DLL_H_
 
 #pragma comment(lib,"user32.lib")
- 
+
 #include <windows.h>
 #include <conio.h> //check if this header is needed
 #include <iostream>
@@ -42,7 +42,7 @@ DWORD savedEdx;
 DWORD beforeFunctionEsp;
 DWORD beforeFunctionEbp;
 
-bool IAThooking(HMODULE);
+bool IAThooking(HMODULE, int attamptToHookNumFunctions);
 void IAThookingCleanup();
 void inlineHookFunctionCleanup(DWORD functionAddr);
 
