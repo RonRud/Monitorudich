@@ -12,4 +12,7 @@
 /.vs/slnx.sqlite
 /.vs/VSWorkspaceState.json
 *.txt
+*.exe
+*.dll
 !MSDNScrapes.txt
+!Natural_selector.txt
