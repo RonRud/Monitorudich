@@ -16,10 +16,15 @@
 BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved);
 
 bool inlineHookFunction(DWORD Function, std::string* functionName);
+void IAThookingCleanup();
+void inlineHookFunctionCleanup(DWORD functionAddr);
+
 void Hook();
 
-const char loggerFilePath[] = "C:\\Users\\Rudic\\source\\repos\\RonRud\\Monitorudich\\logger_output.txt";
+char loggerFilePath[100];
+const char offlineScrapesFile[] = "MSDNScrapes.txt";
 
+int MAX_STACK_TO_SHOW = 8;
 DWORD originFuncAddr;
 std::map<DWORD, std::string*> addressToNameMap;
 
@@ -42,5 +47,8 @@ void IAThookingCleanup();
 void inlineHookFunctionCleanup(DWORD functionAddr);
 
 PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE);
+
+bool isWebScrapingEnabled;
+std::map<std::string*, std::string*> nameToDocumantationString;
 
 #endif /* _DLL_H_ */

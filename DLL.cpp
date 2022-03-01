@@ -4,17 +4,41 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 	switch (reason)
 	{
 	case DLL_PROCESS_ATTACH: {
-		//__debugbreak();
-		//DebugBreak();
+		//Get info from the main program via info_to_dll.txt file
+		std::string dllRecievedInfo;
+		std::ifstream myfile("info_to_dll.txt");
+		if (myfile.is_open())
+		{
+			if(std::getline(myfile, dllRecievedInfo))
+			{
+				const size_t seperatorIdx = dllRecievedInfo.rfind(',');
+				strcpy(loggerFilePath,dllRecievedInfo.substr(seperatorIdx+1,dllRecievedInfo.length()-seperatorIdx).c_str());
+				isWebScrapingEnabled = std::strtoul(dllRecievedInfo.substr(0,seperatorIdx).c_str(), NULL, 16);
+			}
+			else {
+				std::cout << "Unable to read text from info_to_dll.txt, quitting injected dll..." << std::endl;
+				myfile.close();
+				break;
+			}
+		}
+		else { std::cout << "Unable to open info_to_dll.txt, quitting injected dll..." << std::endl; break; } //be wary that this prints in the inspected child program
+		
 		//initialize an empty file
 		std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::trunc);
 		saveFile.close();
 
+
 		IAThooking(GetModuleHandleA(NULL));
+		std::cout << "dllmain finished executing" << std::endl << std::endl << std::endl;
+		//resume main program by indicating it can continue to run
+		std::ofstream sendToMainFile("dll_to_main_program.txt", std::ios::out | std::ios::app);
+		sendToMainFile << "Main program can continue executing";
+		sendToMainFile.close();
 		break;
 	}
 	case DLL_PROCESS_DETACH:
 		IAThookingCleanup();
+		break;
 	case DLL_THREAD_ATTACH:
 		break;
 	case DLL_THREAD_DETACH:
@@ -55,7 +79,11 @@ bool IAThooking(HMODULE hInstance)
 			std::vector<const char*> blackList = { "EnterCriticalSection", "LeaveCriticalSection", "HeapFree", "HeapAlloc", //8B = mov function crushes
 				"GetLastError", "SetLastError", "WriteFile", "GetProcessHeap", //FF 25 = call function crushes
 			//from here these are excludes from runtime problems 	
-			"MultiByteToWideChar","FlushFileBuffers","SetFilePointerEx","CreateFileW","CloseHandle","TryEnterCriticalSection","GetFileType" };//, "free", "malloc"}; they might be broken still
+			"MultiByteToWideChar","FlushFileBuffers","SetFilePointerEx","CreateFileW","CloseHandle","TryEnterCriticalSection","GetFileType","DecodePointer",
+				"WideCharToMultiByte","GetModuleHandleW","EncodePointer","IsProcessorFeaturePresent","RtlUnwind",
+				//maybe the GetModuleHandleW is unneccery
+			"ReadFile"}; //ReadFile breaks because it is used after hook is web scraper code, needs fixing
+			//, "free", "malloc"}; they might be broken still
 			bool shouldHook = true;
 			for (const char* name : blackList) {
 				if (strcmp(name, (char*)pFuncData->Name) == 0) {
@@ -113,10 +141,10 @@ void inlineHookFunctionCleanup(DWORD functionAddr) {
 		//							   push ebp
 		//							   mov ebp,esp
 		*(BYTE*)functionAddr = 0x8B;
-		*(BYTE*)(functionAddr+1) = 0xFF;
-		*(BYTE*)(functionAddr+2) = 0x55;
-		*(BYTE*)(functionAddr+3) = 0x8B;
-		*(BYTE*)(functionAddr+4) = 0xEC;
+		*(BYTE*)(functionAddr + 1) = 0xFF;
+		*(BYTE*)(functionAddr + 2) = 0x55;
+		*(BYTE*)(functionAddr + 3) = 0x8B;
+		*(BYTE*)(functionAddr + 4) = 0xEC;
 		VirtualProtect((void*)functionAddr, 5, Old, &n);
 	}
 }
@@ -128,25 +156,31 @@ void IAThookingCleanup() {
 	}
 }
 
+
 void logHookName() {
 	std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::app);
 	saveFile << "name: " << *addressToNameMap[originFuncAddr-5] << ", "; //gets the function's name from the table. The function address which is gathered from the stack 
 																		 //has 5 more so it points to the instruction after the jmp in the function and not the function starting point.
-	saveFile << "address: " << originFuncAddr - 5 << ", ";
+	saveFile << "address: 0x" << std::hex << originFuncAddr - 5 << ", ";
 	saveFile.close();
 }
 
 void logAdditionalVariables() {
 	DWORD funcAddrPtr = originFuncAddr;
 	std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::app);
-	saveFile << "eax: " << savedEax << ", ";
-	saveFile << "ebx: " << savedEbx << ", ";
-	saveFile << "ecx: " << savedEcx << ", ";
-	saveFile << "edx: " << savedEdx << ", ";
+	saveFile << "eax: 0x" << std::hex << savedEax << ", ";
+	saveFile << "ebx: 0x" << std::hex << savedEbx << ", ";
+	saveFile << "ecx: 0x" << std::hex << savedEcx << ", ";
+	saveFile << "edx: 0x" << std::hex << savedEdx << ", ";
 
 	foundWINAPICleanup = false;
-	while (*(BYTE*)(funcAddrPtr) != 0xC3 && *(BYTE*)(funcAddrPtr) != 0xCB) {
-		if (*(BYTE*)(funcAddrPtr) == 0xC2) { //&& *(BYTE*)(funcAddrPtr+2)==0x00) { add this if the parameters of winapi bug
+	while ((*(BYTE*)(funcAddrPtr) != 0xC3 && *(BYTE*)(funcAddrPtr) != 0xCB) && !(*(BYTE*)(funcAddrPtr) == 0xCC && *(BYTE*)(funcAddrPtr+1) == 0xCC)) { //checks while still in function, stop checking if it reaches opcodes
+																																					//that indicate that the function is not in the WINAPI format or if it reaches CC CC
+		//if (*(BYTE*)(funcAddrPtr) == 0xCC && *(BYTE*)(funcAddrPtr + 1) == 0xCC) {
+		//	std::cout << "wha!!!!!" << std::endl;
+		//	break;
+		//}
+		if (*(BYTE*)(funcAddrPtr) == 0xC2) { //get number of bytes from the corresponding ret opcodes acccording to the WINAPI function call //&& *(BYTE*)(funcAddrPtr+2)==0x00) { add this if the parameters of winapi bug
 			functionParamsNum = (int)*(BYTE*)(funcAddrPtr + 1);
 			saveFile << "params bytes: " << functionParamsNum << ", ";
 			functionParamsNum = (functionParamsNum + (functionParamsNum % 4)) / 4; // every stack entry is 4 bytes, makes sure all bytes are included by adding to a number divided by 4
@@ -159,13 +193,16 @@ void logAdditionalVariables() {
 		functionParamsNum = (beforeFunctionEbp - beforeFunctionEsp) / 4; // gets all the stack between ebp of last function (before api function call) to the api function return address
 																		 // this includes the stack parameters for the function and the local variables of the last function. 
 		functionParamsNum--; // removes the two extra stack entries caused by the push of the return address of the api function and the hook function.
+		if (functionParamsNum > MAX_STACK_TO_SHOW) {
+			functionParamsNum = MAX_STACK_TO_SHOW; //Max of MAX_STACK_TO_SHOW hex so it doesn't save a ton of memory and looks bad
+		}
 	}
 	saveFile.close();
 }
 
 void __declspec(naked) getStack() {
-
 	for (i = 0; i < functionParamsNum * 4; i += 4) {
+		std::cout << i;
 		__asm {
 			lea ecx, functionParameters
 			add ecx, i
@@ -188,6 +225,64 @@ void logStack() {
 		saveFile << std::hex << functionParameters[i] << "-";
 	}
 	saveFile << ", ";
+	saveFile.flush();
+	if (isWebScrapingEnabled) {
+		std::string functionDocStr = *nameToDocumantationString[addressToNameMap[originFuncAddr - 5]];
+		size_t index = functionDocStr.find('(');
+		saveFile << "presumed function parameters: ";
+		for (int i = 0; i < functionParamsNum; i++) {
+			if (functionDocStr.find(' ', index) >= functionDocStr.find(';')) { break; }
+			size_t firstSpace = functionDocStr.find(' ', index); // between the first and second space is the atrribute [in] for example
+			size_t secondSpace = functionDocStr.find(' ', firstSpace + 1); // between the second and third space is the data type
+			size_t thirdSpace = functionDocStr.find(' ', secondSpace + 1); // after the third space space is the documantation name for the variable
+			if (firstSpace == std::string::npos || thirdSpace == std::string::npos || secondSpace == std::string::npos) { break; }
+			std::string parameterType = functionDocStr.substr(secondSpace + 1, thirdSpace - secondSpace - 1);
+			index = thirdSpace + 1;
+
+			//saveFile << parameterType << " ";
+			//Desicion tree on how to treat data types
+			saveFile << parameterType << "=";
+			if (parameterType == "LPARAM" || parameterType == "long") {
+				saveFile << "long" << (LPARAM)functionParameters[i]; //basically long
+			}
+			else if (parameterType == "LPBOOL") {
+				saveFile << "boolean " << *(LPBOOL)functionParameters[i];
+			}
+			else if (parameterType == "LPCCH") {
+				saveFile << "char " << *(LPCCH)functionParameters[i];
+			}
+			else if (parameterType == "LPCSTR") {
+				saveFile << "\"" << (LPCSTR)functionParameters[i] << "\"";
+			}
+			else if (parameterType == "LPCTSTR") {
+				saveFile << "\"" << (LPCTSTR)functionParameters[i] << "\"";
+			}
+			else if (parameterType == "LPCWSTR") {
+				saveFile << "\"" << (LPCWSTR)functionParameters[i] << "\"";
+			}
+			else if (parameterType == "LPWSTR") {
+				saveFile << "\"" << (LPWSTR)functionParameters[i] << "\"";
+			}
+			else if (parameterType == "LPSTR") {
+				saveFile << "\"" << (LPSTR)functionParameters[i] << "\"";
+			}
+			else if (parameterType == "LPWORD") {
+				saveFile << "WORD " << *(LPWORD)functionParameters[i];
+			}
+			else if (parameterType == "WPARAM" || parameterType == "UINT") {
+				saveFile << "UINT " << (UINT)functionParameters[i];
+			}
+			else if (parameterType == "int") {
+				saveFile << "int " << (int)functionParameters[i];
+			}
+			else {
+				//just display hex
+				saveFile << "0x" << functionParameters[i];
+			}
+			saveFile << ",";
+		}
+	}
+	else { saveFile << ", "; }
 	saveFile << std::endl;
 	saveFile.close();
 }
@@ -242,6 +337,128 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 	sprintf(buffer, "%02X %02X %02X %02X %02X %02X", *(BYTE*)functionAddr, *(BYTE*)(functionAddr+1), *(BYTE*)(functionAddr+2), *(BYTE*)(functionAddr+3), *(BYTE*)(functionAddr+4), *(BYTE*)(functionAddr+5));
 	saveFile << buffer << std::endl;
 	if(*(BYTE*)functionAddr == 0x8B && *(BYTE*)(functionAddr + 1) == 0xFF) {
+		//If the code gets here the function is valid to hook
+		//TODO here there will be the call to web scraping if enabled
+		if (isWebScrapingEnabled) {
+			std::string line;
+			bool foundOfflineScrape = false;
+			std::ifstream myfile(offlineScrapesFile);
+			if (myfile.is_open())
+			{
+				while (std::getline(myfile, line))
+				{
+					const size_t seperatorIdx = line.rfind('-');
+					if (line.substr(0, seperatorIdx) == (*functionName)) {
+						foundOfflineScrape = true;
+						nameToDocumantationString[functionName] = new std::string(line.substr(seperatorIdx + 1, line.length() - seperatorIdx - 1)); //get only the scraped string (after the -)
+					}
+				}
+				myfile.close();
+			}
+			else { std::cout << "Unable to open " << offlineScrapesFile << ", can't use offline scrape data" << std::endl; } //be wary that this prints in the inspected child program
+			if (foundOfflineScrape == false) {
+				//run and get data as string from python web scrape
+				HANDLE hStdOutPipeRead = NULL;
+				HANDLE hStdOutPipeWrite = NULL;
+
+				// Create two pipes.
+				SECURITY_ATTRIBUTES sa = { sizeof(SECURITY_ATTRIBUTES), NULL, TRUE };
+				if (CreatePipe(&hStdOutPipeRead, &hStdOutPipeWrite, &sa, 0) == false) {
+					throw std::runtime_error("couldn't create output pipe for web scrape");
+				}
+				// Create the process.
+				STARTUPINFO si = { };
+				si.cb = sizeof(STARTUPINFO);
+				si.dwFlags = STARTF_USESTDHANDLES;
+				si.hStdError = hStdOutPipeWrite;
+				si.hStdOutput = hStdOutPipeWrite;
+				PROCESS_INFORMATION pi = { };
+				LPCWSTR lpApplicationName = L"C:\\Windows\\System32\\cmd.exe";
+				std::string stringCommandLine = "python webScrapperMSDN.py " + (*functionName);
+				std::wstring* windwosStringShit = new std::wstring(stringCommandLine.begin(), stringCommandLine.end());
+				const wchar_t* commandLineWchars = (*windwosStringShit).c_str();
+				LPWSTR lpCommandLine = const_cast<LPWSTR>(commandLineWchars);
+				LPSECURITY_ATTRIBUTES lpProcessAttributes = NULL;
+				LPSECURITY_ATTRIBUTES lpThreadAttribute = NULL;
+				BOOL bInheritHandles = TRUE;
+				DWORD dwCreationFlags = 0;
+				LPVOID lpEnvironment = NULL;
+				LPCWSTR lpCurrentDirectory = NULL;
+				if (!CreateProcessW(
+					NULL,
+					lpCommandLine,
+					lpProcessAttributes,
+					lpThreadAttribute,
+					bInheritHandles,
+					dwCreationFlags,
+					lpEnvironment,
+					lpCurrentDirectory,
+					LPSTARTUPINFOW(&si),
+					&pi)) {
+					throw std::runtime_error("couldn't create child process for web scrape");
+				}
+				WaitForSingleObject(pi.hProcess, INFINITE); //wait for process to finish
+
+				// Close pipes we do not need.
+				CloseHandle(hStdOutPipeWrite);
+
+				// The main loop for reading output from the DIR command.
+				char buffer[1024 + 1] = { };
+				DWORD dwRead = 0;
+				DWORD dwAvail = 0;
+
+				std::ofstream saveFile(offlineScrapesFile, std::ios::out | std::ios::app);
+				while (ReadFile(hStdOutPipeRead, buffer, 1024, &dwRead, NULL))
+				{
+					std::string* modifiedBuffer = new std::string("");
+					//buffer[dwRead] = '\0';
+					for (int i = 0; i < dwRead+1; i++) {
+						if (buffer[i] == ')') {
+							modifiedBuffer->push_back(' ');
+							modifiedBuffer->push_back(')');
+							modifiedBuffer->push_back(';');
+							break;
+						}
+						else if (buffer[i] != '\r' && buffer[i] != '\n' && !(buffer[i] == ' ' && buffer[i+1] == ' ')) {
+							modifiedBuffer->push_back(buffer[i]);
+						}
+					}
+					size_t index = 0;
+					while (true) {
+						/* Locate the substring to replace. */
+						size_t closeSquareIndex = modifiedBuffer->find(']', index);
+						size_t openSquareIndex = modifiedBuffer->find('[', index);
+						if (openSquareIndex == std::string::npos) break;
+						size_t commaInTheMiddle = modifiedBuffer->find(',', openSquareIndex);
+						if (commaInTheMiddle != std::string::npos && commaInTheMiddle < closeSquareIndex) {
+							/* Make the replacement. */
+							modifiedBuffer->replace(commaInTheMiddle, 2, "&&");
+							closeSquareIndex += 4;
+						}
+
+						/* Advance index forward so the next iteration doesn't pick it up as well. */
+						index = closeSquareIndex+1;
+					}
+					nameToDocumantationString[functionName] = modifiedBuffer;
+					//save string to the offlineScrapesFile
+					saveFile << *functionName << "-" << *nameToDocumantationString[functionName] << std::endl;
+				}
+				// Clean up and exit.
+				CloseHandle(hStdOutPipeRead);
+
+				//TODO Start of DLL connection to web scaper, need python scraper and usage in runtime function call
+			}
+		}
+		//Hook the function
+		addressToNameMap[functionAddr] = functionName;
+		VirtualProtect((void*)functionAddr, 5, PAGE_EXECUTE_READWRITE, &Old);
+		*(BYTE*)functionAddr = 0xE8; //call Opcode
+		*(DWORD*)(functionAddr + 1) = (DWORD)Hook - (DWORD)functionAddr - 5; //Calculate amount of bytes to jmp
+		VirtualProtect((void*)functionAddr, 5, Old, &n);
+		//That's it...hooked.
+		//it only required a bit of satanic worship, only a couple things were sacrificed
+		saveFile.close();
+		return true;
 
 	} else if(*(BYTE*)functionAddr == 0xE9) {
 		functionAddr += *(int*)(functionAddr + 1) + 5;
@@ -263,15 +480,6 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 	else {
 		return false;
 	}
-	addressToNameMap[functionAddr] = functionName;
-	VirtualProtect((void*)functionAddr, 5, PAGE_EXECUTE_READWRITE, &Old);
-	*(BYTE*)functionAddr = 0xE8; //call Opcode
-	*(DWORD*)(functionAddr + 1) = (DWORD)Hook - (DWORD)functionAddr - 5; //Calculate amount of bytes to jmp
-	VirtualProtect((void*)functionAddr, 5, Old, &n);
-	//That's it...hooked.
-	//it only required a bit of satanic worship, only a couple things were sacrificed
-	saveFile.close();
-	return true;
 }
 
 

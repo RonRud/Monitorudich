@@ -12,3 +12,4 @@
 /.vs/slnx.sqlite
 /.vs/VSWorkspaceState.json
 *.txt
+!MSDNScrapes.txt
