@@ -46,3 +46,10 @@ HeapSize-SIZE_T HeapSize( [in] HANDLE hHeap, [in] DWORD dwFlags, [in] LPCVOID lp
 WriteConsoleW-BOOL WINAPI WriteConsole( _In_             HANDLE  hConsoleOutput, _In_       const VOID    *lpBuffer, _In_             DWORD   nNumberOfCharsToWrite, _Out_opt_        LPDWORD lpNumberOfCharsWritten, _Reserved_       LPVOID  lpReserved );
 WideCharToMultiByte-int WideCharToMultiByte( [in] UINT CodePage, [in] DWORD dwFlags, [in] _In_NLS_string_(cchWideChar );
 EnterCriticalSection-void EnterCriticalSection( [in&&out] LPCRITICAL_SECTION lpCriticalSection );
+GetFileType-DWORD GetFileType( [in] HANDLE hFile );
+HeapAlloc-DECLSPEC_ALLOCATOR LPVOID HeapAlloc( [in] HANDLE hHeap, [in] DWORD dwFlags, [in] SIZE_T dwBytes );
+lstrcmpA-int lstrcmpA( [in] LPCSTR lpString1, [in] LPCSTR lpString2 );
+SetEndOfFile-BOOL SetEndOfFile( [in] HANDLE hFile );
+SetFilePointerEx-BOOL SetFilePointerEx( [in] HANDLE hFile, [in] LARGE_INTEGER liDistanceToMove, [out&&optional] PLARGE_INTEGER lpNewFilePointer, [in] DWORD dwMoveMethod );
+DecodePointer-PVOID DecodePointer(  PVOID Ptr );
+MultiByteToWideChar-int MultiByteToWideChar( [in] UINT CodePage, [in] DWORD dwFlags, [in] _In_NLS_string_(cbMultiByte );

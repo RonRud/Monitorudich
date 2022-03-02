@@ -193,6 +193,11 @@ void logHookName() {
 																		 //has 5 more so it points to the instruction after the jmp in the function and not the function starting point.
 	saveFile << "address: 0x" << std::hex << originFuncAddr - 5 << ", ";
 	saveFile.close();
+
+	std::ofstream infoToMainFile("dll_to_main_program.txt", std::ios::out | std::ios::trunc); // TODO fix this, this is a shortcut to get the last function called to main program 
+																							  // so the main program will know the last function that ran in case it crashes (for blacklist)
+	infoToMainFile << *addressToNameMap[originFuncAddr - 5];
+	infoToMainFile.close();
 }
 
 void logAdditionalVariables() {

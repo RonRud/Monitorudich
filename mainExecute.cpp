@@ -272,16 +272,17 @@ int main(int argc, char* argv[])
 			std::cout << "DLL injection failed" << std::endl;
 		}
 
-		Sleep(2000);
+		Sleep(3000);
 
 		DWORD childProcessExitCode = getProcessExitCode(pi.hProcess);
 		if (childProcessExitCode == STILL_ACTIVE) {
 			std::cout << "still active" << std::endl;
 		}
 		else if (childProcessExitCode == 0) {
-			std::cout << "ran succesfully" << std::endl;
+			throw std::runtime_error("ran succesfully, this should never happen"); // should never get here, program main thread didn't run at this point
 		}
-		else {
+		else { //This is the crush test for the injected dll loading, therefore the suspected function
+			   //is recieved from the hooking code in the dll
 			std::cout << "crushed with error code: " << childProcessExitCode << std::endl;
 			std::string recievedInfo;
 			std::ifstream infoFromInjectedDllFile("dll_to_main_program.txt");
