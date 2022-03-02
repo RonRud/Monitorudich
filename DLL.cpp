@@ -71,12 +71,7 @@ bool IAThooking(HMODULE hInstance, int attamptToHookNumFunctions)
 		while (std::getline(blacklistFile, blacklistedFunctionName)) {
 			const char* entry = (new std::string(blacklistedFunctionName))->c_str();
 			blackList.push_back(entry);
-			std::cout << "Added: " << blacklistedFunctionName << " to blacklist vector" << std::endl;
 		}
-		for (const char* name: blackList) {
-			std::cout << name << ",";
-		}
-		std::cout << std::endl;
 		blacklistFile.close();
 	}
 	else {
@@ -109,24 +104,19 @@ bool IAThooking(HMODULE hInstance, int attamptToHookNumFunctions)
 			"ReadFile"}; //ReadFile breaks because it is used after hook is web scraper code, needs fixing
 			//, "free", "malloc"}; they might be broken still
 			*/
-			std::cout << "0" << std::endl;
 			if (attamptToHookNumFunctions <= functionAttamptedToHookCounter) {
 				saveFile << "function hooking skipped as part of the dynamic blacklist creation functionality" << std::endl;
 				break; // only hook a certain amount of functions, this is used for creating a dynamic blacklist
 			}
 
-			std::cout << "1" << std::endl;
 			bool shouldHook = true;
 			for (const char* name : blackList) {
-				//std::cout << "names: " << name << std::endl;
 				if (strcmp(name, (char*)pFuncData->Name) == 0) {
 					shouldHook = false;
 					saveFile << "Blacklisted, not hooked" << std::endl << std::endl;
 					break;
 				}
 			}
-
-			std::cout << "2" << std::endl;
 
 			if (shouldHook) {
 				bool isHooked = inlineHookFunction(pFirstThunk->u1.Function, new std::string(pFuncData->Name));
@@ -213,7 +203,6 @@ void logAdditionalVariables() {
 	while ((*(BYTE*)(funcAddrPtr) != 0xC3 && *(BYTE*)(funcAddrPtr) != 0xCB) && !(*(BYTE*)(funcAddrPtr) == 0xCC && *(BYTE*)(funcAddrPtr + 1) == 0xCC)) { //checks while still in function, stop checking if it reaches opcodes
 																																					//that indicate that the function is not in the WINAPI format or if it reaches CC CC
 		//if (*(BYTE*)(funcAddrPtr) == 0xCC && *(BYTE*)(funcAddrPtr + 1) == 0xCC) {
-		//	std::cout << "wha!!!!!" << std::endl;
 		//	break;
 		//}
 		if (*(BYTE*)(funcAddrPtr) == 0xC2) { //get number of bytes from the corresponding ret opcodes acccording to the WINAPI function call //&& *(BYTE*)(funcAddrPtr+2)==0x00) { add this if the parameters of winapi bug
@@ -238,7 +227,6 @@ void logAdditionalVariables() {
 
 void __declspec(naked) getStack() {
 	for (i = 0; i < functionParamsNum * 4; i += 4) {
-		std::cout << i;
 		__asm {
 			lea ecx, functionParameters
 			add ecx, i
