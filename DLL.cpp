@@ -4,6 +4,7 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 	switch (reason)
 	{
 	case DLL_PROCESS_ATTACH: {
+		std::cout << "Got to dll main" << std::endl;
 		//Get info from the main program via info_to_dll.txt file
 		std::string dllRecievedInfo;
 		std::ifstream myfile("info_to_dll.txt");

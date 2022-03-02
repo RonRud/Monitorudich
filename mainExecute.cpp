@@ -10,6 +10,8 @@
 
 #pragma comment(lib,"pdh.lib")
 #include <Pdh.h>
+#include <excpt.h>
+#include <stdio.h>
 
 bool keepLoggingSystemResources;
 
@@ -131,6 +133,24 @@ std::string replaceSubstrInString(std::string str, std::string replaceStr, std::
 	return str;
 }
 
+DWORD getProcessExitCode(HANDLE processHandle) {
+	DWORD childProcessExitCode;
+	__try {
+		if (!GetExitCodeProcess(processHandle, &childProcessExitCode)) {
+			std::cout << "GetExitCodeProcess failed" << std::endl;
+		}
+		else {
+			std::cout << "childProcessExitCode: " << childProcessExitCode << std::endl;
+		}
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+		std::cout << "caught exeption in return exit code" << std::endl;
+		std::cout << GetExceptionCode();
+		std::cout << "last error: " << GetLastError() << std::endl;
+	}
+	return childProcessExitCode;
+}
+
 int main(int argc, char* argv[])
 {
 	std::string inspectedProcessPath;
@@ -149,68 +169,176 @@ int main(int argc, char* argv[])
 	const wchar_t* exePathWchars = (*windwosStringShit).c_str();
 	LPCWSTR exePath = const_cast<LPCWSTR>(exePathWchars);
 
+	bool blacklistIterate = true;
+
+	if (blacklistIterate == false) { //Run normally, assumes blacklist is precalculated (this is unadvised)
+
 	// Start the child process suspended. 
-	if (!CreateProcessW(exePath,   // No module name (use command line)
-		NULL,        // 
-		NULL,           // Process handle not inheritable
-		NULL,           // Thread handle not inheritable
-		FALSE,          // Set handle inheritance to FALSE
-		CREATE_SUSPENDED | CREATE_NEW_CONSOLE,              // No creation flags
-		NULL,           // Use parent's environment block
-		NULL,           // Use parent's starting directory 
-		LPSTARTUPINFOW(&si),            // Pointer to STARTUPINFO structure
-		&pi)           // Pointer to PROCESS_INFORMATION structure
-		)
-	{
-		std::cout << "CreateProcess failed, error: " << GetLastError() << std::endl;
-		return 0;
-	}
-	std::cout << "created process with pid " << pi.dwProcessId << std::endl;
-
-	//Send data to injected dll
-	char thisFilePath[100] = { 0 };
-
-	GetModuleFileName(NULL, thisFilePath, 100);
-	std::string loggerFilePath = std::string(thisFilePath);
-	const size_t last_slash_idx = loggerFilePath.rfind('\\'); //Get the last occurareance of \\ (before the exe name)
-	if (std::string::npos != last_slash_idx) {
-		loggerFilePath = loggerFilePath.substr(0, last_slash_idx + 1) + "logger_output.txt"; // Than add the logger file name to it
-	};
-
-	bool isWebScrapingEnabled = true;
-	int numberOfFunctionsToPossiblyHook = 55555;
-	std::ofstream dllInfoFile("info_to_dll.txt", std::ios::out | std::ios::trunc);
-	dllInfoFile << isWebScrapingEnabled << "," << loggerFilePath;
-	dllInfoFile << "," << numberOfFunctionsToPossiblyHook;
-	dllInfoFile.close();
-	//clean the recieving file
-	std::ofstream mainInfoFileFromDll("dll_to_main_program.txt", std::ios::out | std::ios::trunc);
-	//now hook the inspected child process
-	bool is_successful = InjectDLL(pi.dwProcessId);
-	if (is_successful == false) {
-		std::cout << "DLL injection failed" << std::endl;
-	}
-	//freeze this thread until the injected DLL main() finishes running
-	while (true) {
-		std::string recievedInfo;
-		std::ifstream myfile("dll_to_main_program.txt");
-		if (myfile.is_open())
+		if (!CreateProcessW(exePath,   // No module name (use command line)
+			NULL,        // 
+			NULL,           // Process handle not inheritable
+			NULL,           // Thread handle not inheritable
+			FALSE,          // Set handle inheritance to FALSE
+			CREATE_SUSPENDED | CREATE_NEW_CONSOLE | DEBUG_PROCESS,              // No creation flags
+			NULL,           // Use parent's environment block
+			NULL,           // Use parent's starting directory 
+			LPSTARTUPINFOW(&si),            // Pointer to STARTUPINFO structure
+			&pi)           // Pointer to PROCESS_INFORMATION structure
+			)
 		{
-			if (std::getline(myfile, recievedInfo))
-			{
-				if (recievedInfo == "Main program can continue executing") { break; }
-			}/*
-			else {
-				std::cout << "Unable to read text from dll_to_main_program.txt, quitting main program..." << std::endl;
-				myfile.close();
-				return 0; //exit program
-			}*/
-			myfile.close();
+			std::cout << "CreateProcess failed, error: " << GetLastError() << std::endl;
+			return 0;
 		}
-		else { std::cout << "Unable to open dll_to_main_program, quitting main program..." << std::endl; return 0; }
+		std::cout << "created process with pid " << pi.dwProcessId << std::endl;
+
+		//Send data to injected dll
+		char thisFilePath[100] = { 0 };
+
+		GetModuleFileName(NULL, thisFilePath, 100);
+		std::string loggerFilePath = std::string(thisFilePath);
+		const size_t last_slash_idx = loggerFilePath.rfind('\\'); //Get the last occurareance of \\ (before the exe name)
+		if (std::string::npos != last_slash_idx) {
+			loggerFilePath = loggerFilePath.substr(0, last_slash_idx + 1) + "logger_output.txt"; // Than add the logger file name to it
+		};
+
+		bool isWebScrapingEnabled = true;
+		int numberOfFunctionsToPossiblyHook = 55555;
+		std::ofstream dllInfoFile("info_to_dll.txt", std::ios::out | std::ios::trunc);
+		dllInfoFile << isWebScrapingEnabled << "," << loggerFilePath;
+		dllInfoFile << "," << numberOfFunctionsToPossiblyHook;
+		dllInfoFile.close();
+		//clean the recieving file
+		std::ofstream mainInfoFileFromDll("dll_to_main_program.txt", std::ios::out | std::ios::trunc);
+		//now hook the inspected child process
+		bool is_successful = InjectDLL(pi.dwProcessId);
+		if (is_successful == false) {
+			std::cout << "DLL injection failed" << std::endl;
+		}
+		//freeze this thread until the injected DLL main() finishes running
+		while (true) {
+			std::string recievedInfo;
+			std::ifstream myfile("dll_to_main_program.txt");
+			if (myfile.is_open())
+			{
+				if (std::getline(myfile, recievedInfo))
+				{
+					if (recievedInfo == "Main program can continue executing") { break; }
+				}/*
+				else {
+					std::cout << "Unable to read text from dll_to_main_program.txt, quitting main program..." << std::endl;
+					myfile.close();
+					return 0; //exit program
+				}*/
+				myfile.close();
+			}
+			else { std::cout << "Unable to open dll_to_main_program, quitting main program..." << std::endl; return 0; }
+		}
+		//resumes (starts in this case) the child process
+		ResumeThread(pi.hThread);
 	}
-	//resumes (starts in this case) the child process
-	ResumeThread(pi.hThread);
+	else {
+		/*
+		HANDLE hStdOutPipeRead = NULL;
+		HANDLE hStdOutPipeWrite = NULL;
+
+		// Create two pipes.
+		SECURITY_ATTRIBUTES sa = { sizeof(SECURITY_ATTRIBUTES), NULL, TRUE };
+		if (CreatePipe(&hStdOutPipeRead, &hStdOutPipeWrite, &sa, 0) == false) {
+			throw std::runtime_error("couldn't create output pipe for error catching in main");
+		}
+		si.dwFlags = STARTF_USESTDHANDLES;
+		si.hStdError = hStdOutPipeWrite;
+		si.hStdOutput = hStdOutPipeWrite;
+		*/
+		if (!CreateProcessW(exePath,   // No module name (use command line)
+			NULL,        // 
+			NULL,           // Process handle not inheritable
+			NULL,           // Thread handle not inheritable
+			TRUE,          // Set handle inheritance to FALSE
+			CREATE_SUSPENDED | CREATE_NEW_CONSOLE,              // No creation flags
+			NULL,           // Use parent's environment block
+			NULL,           // Use parent's starting directory 
+			LPSTARTUPINFOW(&si),            // Pointer to STARTUPINFO structure
+			&pi)           // Pointer to PROCESS_INFORMATION structure
+			)
+		{
+			std::cout << "CreateProcess failed, error: " << GetLastError() << std::endl;
+			return 0;
+		}
+		std::cout << "created process with pid " << pi.dwProcessId << std::endl;
+
+		//Send data to injected dll
+		char thisFilePath[100] = { 0 };
+
+		GetModuleFileName(NULL, thisFilePath, 100);
+		std::string loggerFilePath = std::string(thisFilePath);
+		const size_t last_slash_idx = loggerFilePath.rfind('\\'); //Get the last occurareance of \\ (before the exe name)
+		if (std::string::npos != last_slash_idx) {
+			loggerFilePath = loggerFilePath.substr(0, last_slash_idx + 1) + "logger_output.txt"; // Than add the logger file name to it
+		};
+
+		bool isWebScrapingEnabled = true;
+		int numberOfFunctionsToPossiblyHook = 55555;
+		std::ofstream dllInfoFile("info_to_dll.txt", std::ios::out | std::ios::trunc);
+		dllInfoFile << isWebScrapingEnabled << "," << loggerFilePath;
+		dllInfoFile << "," << numberOfFunctionsToPossiblyHook;
+		dllInfoFile.close();
+		//clean the recieving file
+		std::ofstream mainInfoFileFromDll("dll_to_main_program.txt", std::ios::out | std::ios::trunc);
+		//now hook the inspected child process
+		bool is_successful = InjectDLL(pi.dwProcessId);
+		if (is_successful == false) {
+			std::cout << "DLL injection failed" << std::endl;
+		}
+
+		Sleep(10000);
+
+		//CloseHandle(hStdOutPipeWrite);
+
+		DWORD childProcessExitCode = getProcessExitCode(pi.hProcess);
+		if (childProcessExitCode == STILL_ACTIVE) {
+			std::cout << "still active" << std::endl;
+		}
+
+		std::cout << "0" << std::endl;
+		/*
+		// The main loop for reading output from the DIR command.
+		char buffer[1024 + 1] = { };
+		DWORD dwRead = 0;
+		DWORD dwAvail = 0;
+
+		while (ReadFile(hStdOutPipeRead, buffer, 1024, &dwRead, NULL))
+		{
+			std::cout << "Errors recieved in main from injected dll: " << buffer << std::endl;
+		}
+		// Clean up and exit.
+		CloseHandle(hStdOutPipeRead);
+		*/
+
+		//freeze this thread until the injected DLL main() finishes running
+		while (true) {
+			std::string recievedInfo;
+			std::ifstream myfile("dll_to_main_program.txt");
+			if (myfile.is_open())
+			{
+				if (std::getline(myfile, recievedInfo))
+				{
+					if (recievedInfo == "Main program can continue executing") { break; }
+				}/*
+				else {
+					std::cout << "Unable to read text from dll_to_main_program.txt, quitting main program..." << std::endl;
+					myfile.close();
+					return 0; //exit program
+				}*/
+				myfile.close();
+			}
+			else { std::cout << "Unable to open dll_to_main_program, quitting main program..." << std::endl; return 0; }
+		}
+		//resumes (starts in this case) the child process
+		ResumeThread(pi.hThread);
+	}
+
+
 	try {
 		//Log processes system resources
 		keepLoggingSystemResources = true;
