@@ -139,14 +139,13 @@ DWORD getProcessExitCode(HANDLE processHandle) {
 		if (!GetExitCodeProcess(processHandle, &childProcessExitCode)) {
 			std::cout << "GetExitCodeProcess failed" << std::endl;
 		}
-		else {
-			std::cout << "childProcessExitCode: " << childProcessExitCode << std::endl;
-		}
+		//else {
+		//	std::cout << "childProcessExitCode: " << childProcessExitCode << std::endl;
+		//}
 	}
 	__except (EXCEPTION_EXECUTE_HANDLER) {
 		std::cout << "caught exeption in return exit code" << std::endl;
 		std::cout << GetExceptionCode();
-		std::cout << "last error: " << GetLastError() << std::endl;
 	}
 	return childProcessExitCode;
 }
@@ -169,7 +168,18 @@ int main(int argc, char* argv[])
 	const wchar_t* exePathWchars = (*windwosStringShit).c_str();
 	LPCWSTR exePath = const_cast<LPCWSTR>(exePathWchars);
 
+	//Get file path of logger_output.txt (with the additional path to where this program runs)
+	char thisFilePath[100] = { 0 };
+
+	GetModuleFileName(NULL, thisFilePath, 100);
+	std::string loggerFilePath = std::string(thisFilePath);
+	const size_t last_slash_idx = loggerFilePath.rfind('\\'); //Get the last occurareance of \\ (before the exe name)
+	if (std::string::npos != last_slash_idx) {
+		loggerFilePath = loggerFilePath.substr(0, last_slash_idx + 1) + "logger_output.txt"; // Than add the logger file name to it
+	};
+
 	bool blacklistIterate = true;
+	int runProgramForBeforeCheck = 10000; //in miliseconds
 
 	if (blacklistIterate == false) { //Run normally, assumes blacklist is precalculated (this is unadvised)
 
@@ -192,14 +202,6 @@ int main(int argc, char* argv[])
 		std::cout << "created process with pid " << pi.dwProcessId << std::endl;
 
 		//Send data to injected dll
-		char thisFilePath[100] = { 0 };
-
-		GetModuleFileName(NULL, thisFilePath, 100);
-		std::string loggerFilePath = std::string(thisFilePath);
-		const size_t last_slash_idx = loggerFilePath.rfind('\\'); //Get the last occurareance of \\ (before the exe name)
-		if (std::string::npos != last_slash_idx) {
-			loggerFilePath = loggerFilePath.substr(0, last_slash_idx + 1) + "logger_output.txt"; // Than add the logger file name to it
-		};
 
 		bool isWebScrapingEnabled = true;
 		int numberOfFunctionsToPossiblyHook = 55555;
@@ -255,14 +257,6 @@ int main(int argc, char* argv[])
 		std::cout << "created process with pid " << pi.dwProcessId << std::endl;
 
 		//Send data to injected dll
-		char thisFilePath[100] = { 0 };
-
-		GetModuleFileName(NULL, thisFilePath, 100);
-		std::string loggerFilePath = std::string(thisFilePath);
-		const size_t last_slash_idx = loggerFilePath.rfind('\\'); //Get the last occurareance of \\ (before the exe name)
-		if (std::string::npos != last_slash_idx) {
-			loggerFilePath = loggerFilePath.substr(0, last_slash_idx + 1) + "logger_output.txt"; // Than add the logger file name to it
-		};
 
 		bool isWebScrapingEnabled = true;
 		int numberOfFunctionsToPossiblyHook = 55555;
@@ -278,12 +272,32 @@ int main(int argc, char* argv[])
 			std::cout << "DLL injection failed" << std::endl;
 		}
 
-		Sleep(5000);
-
+		Sleep(2000);
 
 		DWORD childProcessExitCode = getProcessExitCode(pi.hProcess);
 		if (childProcessExitCode == STILL_ACTIVE) {
 			std::cout << "still active" << std::endl;
+		}
+		else if (childProcessExitCode == 0) {
+			std::cout << "ran succesfully" << std::endl;
+		}
+		else {
+			std::cout << "crushed with error code: " << childProcessExitCode << std::endl;
+			std::string recievedInfo;
+			std::ifstream infoFromInjectedDllFile("dll_to_main_program.txt");
+			if (infoFromInjectedDllFile.is_open())
+			{
+				if (std::getline(infoFromInjectedDllFile, recievedInfo)) {
+
+				}
+				else {
+					std::cout << "Couldn't read from dll_to_main_program, quitting main program..." << std::endl;
+					return 0;
+				}
+				infoFromInjectedDllFile.close();
+			}
+			else { std::cout << "Unable to open dll_to_main_program, quitting main program..." << std::endl; return 0; }
+			std::cout << "Suspected function is: " << recievedInfo << std::endl;
 		}
 
 		//freeze this thread until the injected DLL main() finishes running
@@ -307,11 +321,36 @@ int main(int argc, char* argv[])
 		}
 		//resumes (starts in this case) the child process
 		ResumeThread(pi.hThread);
+		Sleep(runProgramForBeforeCheck);
+		childProcessExitCode = getProcessExitCode(pi.hProcess);
+		if (childProcessExitCode == STILL_ACTIVE) {
+			std::cout << "still active" << std::endl;
+		}
+		else if (childProcessExitCode == 0) {
+			std::cout << "ran succesfully" << std::endl;
+		}
+		else {
+			std::cout << "crushed with error code: " << childProcessExitCode << std::endl;
+			std::string recievedInfo;
+			std::ifstream infoFromInjectedDllFile("dll_to_main_program.txt");
+			if (infoFromInjectedDllFile.is_open())
+			{
+				if (std::getline(infoFromInjectedDllFile, recievedInfo)) {
+
+				}
+				else {
+					std::cout << "Couldn't read from dll_to_main_program, quitting main program..." << std::endl; 
+					return 0;
+				}
+				infoFromInjectedDllFile.close();
+			}
+			else { std::cout << "Unable to open dll_to_main_program, quitting main program..." << std::endl; return 0; }
+			std::cout << "Suspected function is: " << recievedInfo << std::endl;
+		}
 	}
 
-
+	//Log processes system resources
 	try {
-		//Log processes system resources
 		keepLoggingSystemResources = true;
 		const size_t last_slash_idx = inspectedProcessPath.rfind('\\');
 		//TODO add with threading

@@ -35,7 +35,7 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 		IAThooking(GetModuleHandleA(NULL), attamptToHookNumFunctions);
 		std::cout << "dllmain finished executing" << std::endl << std::endl << std::endl;
 		//resume main program by indicating it can continue to run
-		std::ofstream sendToMainFile("dll_to_main_program.txt", std::ios::out | std::ios::app);
+		std::ofstream sendToMainFile("dll_to_main_program.txt", std::ios::out | std::ios::trunc);
 		sendToMainFile << "Main program can continue executing";
 		sendToMainFile.close();
 		break;
@@ -95,6 +95,9 @@ bool IAThooking(HMODULE hInstance, int attamptToHookNumFunctions)
 		while (*(WORD*)pFirstThunk != 0 && *(WORD*)pOriginalFirstThunk != 0) //moving over IAT and over names' table
 		{
 			saveFile << "0x" << std::hex << pFirstThunk->u1.Function << "\t\t" << pFuncData->Name << std::endl;//printing function's name and addr
+			std::ofstream infoToMainFile("dll_to_main_program.txt", std::ios::out | std::ios::trunc);
+			infoToMainFile << pFuncData->Name;
+			infoToMainFile.close();
 			/*
 			std::vector<const char*> blackList = { "EnterCriticalSection", "LeaveCriticalSection", "HeapFree", "HeapAlloc", //8B = mov function crushes
 				"GetLastError", "SetLastError", "WriteFile", "GetProcessHeap", //FF 25 = call function crushes
