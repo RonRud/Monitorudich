@@ -237,19 +237,6 @@ int main(int argc, char* argv[])
 		ResumeThread(pi.hThread);
 	}
 	else {
-		/*
-		HANDLE hStdOutPipeRead = NULL;
-		HANDLE hStdOutPipeWrite = NULL;
-
-		// Create two pipes.
-		SECURITY_ATTRIBUTES sa = { sizeof(SECURITY_ATTRIBUTES), NULL, TRUE };
-		if (CreatePipe(&hStdOutPipeRead, &hStdOutPipeWrite, &sa, 0) == false) {
-			throw std::runtime_error("couldn't create output pipe for error catching in main");
-		}
-		si.dwFlags = STARTF_USESTDHANDLES;
-		si.hStdError = hStdOutPipeWrite;
-		si.hStdOutput = hStdOutPipeWrite;
-		*/
 		if (!CreateProcessW(exePath,   // No module name (use command line)
 			NULL,        // 
 			NULL,           // Process handle not inheritable
@@ -291,29 +278,13 @@ int main(int argc, char* argv[])
 			std::cout << "DLL injection failed" << std::endl;
 		}
 
-		Sleep(10000);
+		Sleep(5000);
 
-		//CloseHandle(hStdOutPipeWrite);
 
 		DWORD childProcessExitCode = getProcessExitCode(pi.hProcess);
 		if (childProcessExitCode == STILL_ACTIVE) {
 			std::cout << "still active" << std::endl;
 		}
-
-		std::cout << "0" << std::endl;
-		/*
-		// The main loop for reading output from the DIR command.
-		char buffer[1024 + 1] = { };
-		DWORD dwRead = 0;
-		DWORD dwAvail = 0;
-
-		while (ReadFile(hStdOutPipeRead, buffer, 1024, &dwRead, NULL))
-		{
-			std::cout << "Errors recieved in main from injected dll: " << buffer << std::endl;
-		}
-		// Clean up and exit.
-		CloseHandle(hStdOutPipeRead);
-		*/
 
 		//freeze this thread until the injected DLL main() finishes running
 		while (true) {
