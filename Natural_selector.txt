@@ -4,7 +4,6 @@ HeapFree
 HeapAlloc
 GetLastError
 SetLastError
-
 SetFilePointerEx
 CreateFileW
 CloseHandle
@@ -19,3 +18,4 @@ RtlUnwind
 ReadFile
 InitializeCriticalSectionExMultiByteToWideChar
 MultiByteToWideChar
+VirtualProtect
