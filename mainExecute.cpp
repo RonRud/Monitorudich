@@ -180,6 +180,8 @@ int main(int argc, char* argv[])
 
 	bool blacklistIterate = true;
 	int runProgramForBeforeCheck = 10000; //in miliseconds
+	bool isWebScrapingEnabled = true;
+	int numberOfFunctionsToPossiblyHook = 55555;
 
 	if (blacklistIterate == false) { //Run normally, assumes blacklist is precalculated (this is unadvised)
 
@@ -203,8 +205,6 @@ int main(int argc, char* argv[])
 
 		//Send data to injected dll
 
-		bool isWebScrapingEnabled = true;
-		int numberOfFunctionsToPossiblyHook = 55555;
 		std::ofstream dllInfoFile("info_to_dll.txt", std::ios::out | std::ios::trunc);
 		dllInfoFile << isWebScrapingEnabled << "," << loggerFilePath;
 		dllInfoFile << "," << numberOfFunctionsToPossiblyHook;
@@ -239,114 +239,124 @@ int main(int argc, char* argv[])
 		ResumeThread(pi.hThread);
 	}
 	else {
-		if (!CreateProcessW(exePath,   // No module name (use command line)
-			NULL,        // 
-			NULL,           // Process handle not inheritable
-			NULL,           // Thread handle not inheritable
-			TRUE,          // Set handle inheritance to FALSE
-			CREATE_SUSPENDED | CREATE_NEW_CONSOLE,              // No creation flags
-			NULL,           // Use parent's environment block
-			NULL,           // Use parent's starting directory 
-			LPSTARTUPINFOW(&si),            // Pointer to STARTUPINFO structure
-			&pi)           // Pointer to PROCESS_INFORMATION structure
-			)
-		{
-			std::cout << "CreateProcess failed, error: " << GetLastError() << std::endl;
-			return 0;
-		}
-		std::cout << "created process with pid " << pi.dwProcessId << std::endl;
-
-		//Send data to injected dll
-
-		bool isWebScrapingEnabled = true;
-		int numberOfFunctionsToPossiblyHook = 55555;
-		std::ofstream dllInfoFile("info_to_dll.txt", std::ios::out | std::ios::trunc);
-		dllInfoFile << isWebScrapingEnabled << "," << loggerFilePath;
-		dllInfoFile << "," << numberOfFunctionsToPossiblyHook;
-		dllInfoFile.close();
-		//clean the recieving file
-		std::ofstream mainInfoFileFromDll("dll_to_main_program.txt", std::ios::out | std::ios::trunc);
-		//now hook the inspected child process
-		bool is_successful = InjectDLL(pi.dwProcessId);
-		if (is_successful == false) {
-			std::cout << "DLL injection failed" << std::endl;
-		}
-
-		Sleep(3000);
-
-		DWORD childProcessExitCode = getProcessExitCode(pi.hProcess);
-		if (childProcessExitCode == STILL_ACTIVE) {
-			std::cout << "still active" << std::endl;
-		}
-		else if (childProcessExitCode == 0) {
-			throw std::runtime_error("ran succesfully, this should never happen"); // should never get here, program main thread didn't run at this point
-		}
-		else { //This is the crush test for the injected dll loading, therefore the suspected function
-			   //is recieved from the hooking code in the dll
-			std::cout << "crushed with error code: " << childProcessExitCode << std::endl;
-			std::string recievedInfo;
-			std::ifstream infoFromInjectedDllFile("dll_to_main_program.txt");
-			if (infoFromInjectedDllFile.is_open())
+		bool programSuccesfullyRunsWithHooks = false;
+		while (programSuccesfullyRunsWithHooks == false) {
+			if (!CreateProcessW(exePath,   // No module name (use command line)
+				NULL,        // 
+				NULL,           // Process handle not inheritable
+				NULL,           // Thread handle not inheritable
+				TRUE,          // Set handle inheritance to FALSE
+				CREATE_SUSPENDED | CREATE_NEW_CONSOLE,              // No creation flags
+				NULL,           // Use parent's environment block
+				NULL,           // Use parent's starting directory 
+				LPSTARTUPINFOW(&si),            // Pointer to STARTUPINFO structure
+				&pi)           // Pointer to PROCESS_INFORMATION structure
+				)
 			{
-				if (std::getline(infoFromInjectedDllFile, recievedInfo)) {
-
-				}
-				else {
-					std::cout << "Couldn't read from dll_to_main_program, quitting main program..." << std::endl;
-					return 0;
-				}
-				infoFromInjectedDllFile.close();
+				std::cout << "CreateProcess failed, error: " << GetLastError() << std::endl;
+				return 0;
 			}
-			else { std::cout << "Unable to open dll_to_main_program, quitting main program..." << std::endl; return 0; }
-			std::cout << "Suspected function is: " << recievedInfo << std::endl;
-		}
+			std::cout << "created process with pid " << pi.dwProcessId << std::endl;
 
-		//freeze this thread until the injected DLL main() finishes running
-		while (true) {
-			std::string recievedInfo;
-			std::ifstream myfile("dll_to_main_program.txt");
-			if (myfile.is_open())
-			{
-				if (std::getline(myfile, recievedInfo))
+			//Send data to injected dll
+
+			std::ofstream dllInfoFile("info_to_dll.txt", std::ios::out | std::ios::trunc);
+			dllInfoFile << isWebScrapingEnabled << "," << loggerFilePath;
+			dllInfoFile << "," << numberOfFunctionsToPossiblyHook;
+			dllInfoFile.close();
+			//clean the recieving file
+			std::ofstream mainInfoFileFromDll("dll_to_main_program.txt", std::ios::out | std::ios::trunc);
+			//now hook the inspected child process
+			bool is_successful = InjectDLL(pi.dwProcessId);
+			if (is_successful == false) {
+				std::cout << "DLL injection failed" << std::endl;
+			}
+
+			Sleep(10000);
+
+			DWORD childProcessExitCode = getProcessExitCode(pi.hProcess);
+			if (childProcessExitCode == STILL_ACTIVE) {
+				std::cout << "child process still active after the dll main" << std::endl;
+			}
+			else if (childProcessExitCode == 0) {
+				throw std::runtime_error("ran succesfully, this should never happen"); // should never get here, program main thread didn't run at this point
+			}
+			else { //This is the crush test for the injected dll loading, therefore the suspected function
+				   //is recieved from the hooking code in the dll
+				std::cout << "crushed in dll main, crushed with error code: " << childProcessExitCode << std::endl;
+				std::string recievedInfo;
+				std::ifstream infoFromInjectedDllFile("dll_to_main_program.txt");
+				if (infoFromInjectedDllFile.is_open())
 				{
-					if (recievedInfo == "Main program can continue executing") { break; }
-				}/*
-				else {
-					std::cout << "Unable to read text from dll_to_main_program.txt, quitting main program..." << std::endl;
-					myfile.close();
-					return 0; //exit program
-				}*/
-				myfile.close();
-			}
-			else { std::cout << "Unable to open dll_to_main_program, quitting main program..." << std::endl; return 0; }
-		}
-		//resumes (starts in this case) the child process
-		ResumeThread(pi.hThread);
-		Sleep(runProgramForBeforeCheck);
-		childProcessExitCode = getProcessExitCode(pi.hProcess);
-		if (childProcessExitCode == STILL_ACTIVE) {
-			std::cout << "still active" << std::endl;
-		}
-		else if (childProcessExitCode == 0) {
-			std::cout << "ran succesfully" << std::endl;
-		}
-		else {
-			std::cout << "crushed with error code: " << childProcessExitCode << std::endl;
-			std::string recievedInfo;
-			std::ifstream infoFromInjectedDllFile("dll_to_main_program.txt");
-			if (infoFromInjectedDllFile.is_open())
-			{
-				if (std::getline(infoFromInjectedDllFile, recievedInfo)) {
+					if (std::getline(infoFromInjectedDllFile, recievedInfo)) {
 
+					}
+					else {
+						std::cout << "Couldn't read from dll_to_main_program, quitting main program..." << std::endl;
+						return 0;
+					}
+					infoFromInjectedDllFile.close();
 				}
-				else {
-					std::cout << "Couldn't read from dll_to_main_program, quitting main program..." << std::endl; 
-					return 0;
-				}
-				infoFromInjectedDllFile.close();
+				else { std::cout << "Unable to open dll_to_main_program, quitting main program..." << std::endl; return 0; }
+				std::cout << "Blacklisting Suspected function named: " << recievedInfo << std::endl;
+				std::ofstream blacklistFile("Natural_selector.txt", std::ios::out | std::ios::app);
+				blacklistFile << recievedInfo << std::endl;
+				blacklistFile.close();
+				continue;
 			}
-			else { std::cout << "Unable to open dll_to_main_program, quitting main program..." << std::endl; return 0; }
-			std::cout << "Suspected function is: " << recievedInfo << std::endl;
+
+			//freeze this thread until the injected DLL main() finishes running
+			while (true) {
+				std::string recievedInfo;
+				std::ifstream myfile("dll_to_main_program.txt");
+				if (myfile.is_open())
+				{
+					if (std::getline(myfile, recievedInfo))
+					{
+						if (recievedInfo == "Main program can continue executing") { break; }
+					}/*
+					else {
+						std::cout << "Unable to read text from dll_to_main_program.txt, quitting main program..." << std::endl;
+						myfile.close();
+						return 0; //exit program
+					}*/
+					myfile.close();
+				}
+				else { std::cout << "Unable to open dll_to_main_program, quitting main program..." << std::endl; return 0; }
+			}
+			//resumes (starts in this case) the child process
+			ResumeThread(pi.hThread);
+			Sleep(runProgramForBeforeCheck);
+			childProcessExitCode = getProcessExitCode(pi.hProcess);
+			if (childProcessExitCode == STILL_ACTIVE) {
+				std::cout << "still active after " << runProgramForBeforeCheck/1000 << " seconds of the program's main" << std::endl;
+				programSuccesfullyRunsWithHooks = true;
+			}
+			else if (childProcessExitCode == 0) {
+				std::cout << "child process finished succesfully" << std::endl;
+				programSuccesfullyRunsWithHooks = true;
+			}
+			else {
+				std::cout << "crushed while executing the program's main thread, crush with error code: " << childProcessExitCode << std::endl;
+				std::string recievedInfo;
+				std::ifstream infoFromInjectedDllFile("dll_to_main_program.txt");
+				if (infoFromInjectedDllFile.is_open())
+				{
+					if (std::getline(infoFromInjectedDllFile, recievedInfo)) {
+
+					}
+					else {
+						std::cout << "Couldn't read from dll_to_main_program, quitting main program..." << std::endl;
+						return 0;
+					}
+					infoFromInjectedDllFile.close();
+				}
+				else { std::cout << "Unable to open dll_to_main_program, quitting main program..." << std::endl; return 0; }
+				std::cout << "Blacklisting Suspected function named: " << recievedInfo << std::endl;
+				std::ofstream blacklistFile("Natural_selector.txt", std::ios::out | std::ios::app);
+				blacklistFile << recievedInfo << std::endl;
+				blacklistFile.close();
+			}
 		}
 	}
 

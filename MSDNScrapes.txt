@@ -53,3 +53,8 @@ SetEndOfFile-BOOL SetEndOfFile( [in] HANDLE hFile );
 SetFilePointerEx-BOOL SetFilePointerEx( [in] HANDLE hFile, [in] LARGE_INTEGER liDistanceToMove, [out&&optional] PLARGE_INTEGER lpNewFilePointer, [in] DWORD dwMoveMethod );
 DecodePointer-PVOID DecodePointer(  PVOID Ptr );
 MultiByteToWideChar-int MultiByteToWideChar( [in] UINT CodePage, [in] DWORD dwFlags, [in] _In_NLS_string_(cbMultiByte );
+FlushFileBuffers-BOOL FlushFileBuffers( [in] HANDLE hFile );
+LeaveCriticalSection-void LeaveCriticalSection( [in&&out] LPCRITICAL_SECTION lpCriticalSection );
+GetModuleHandleW-HMODULE GetModuleHandleA( [in&&optional] LPCSTR lpModuleName );
+SetLastError-void SetLastError( [in] DWORD dwErrCode );
+HeapFree-BOOL HeapFree( [in] HANDLE hHeap, [in] DWORD dwFlags, [in] _Frees_ptr_opt_ LPVOID lpMem );

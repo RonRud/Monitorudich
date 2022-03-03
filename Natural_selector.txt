@@ -4,10 +4,7 @@ HeapFree
 HeapAlloc
 GetLastError
 SetLastError
-WriteFile
-GetProcessHeap
-MultiByteToWideChar
-FlushFileBuffers
+
 SetFilePointerEx
 CreateFileW
 CloseHandle
@@ -20,4 +17,5 @@ EncodePointer
 IsProcessorFeaturePresent
 RtlUnwind
 ReadFile
-InitializeCriticalSectionEx
+InitializeCriticalSectionExMultiByteToWideChar
+MultiByteToWideChar
