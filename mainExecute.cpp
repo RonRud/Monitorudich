@@ -222,7 +222,7 @@ int main(int argc, char* argv[])
 			std::ifstream myfile("dll_to_main_program.txt");
 			if (myfile.is_open())
 			{
-				if (std::getline(myfile, recievedInfo))
+				while (std::getline(myfile, recievedInfo))
 				{
 					if (recievedInfo == "Main program can continue executing") { break; }
 				}/*
@@ -272,7 +272,7 @@ int main(int argc, char* argv[])
 				std::cout << "DLL injection failed" << std::endl;
 			}
 
-			Sleep(10000);
+			Sleep(3000);
 
 			DWORD childProcessExitCode = getProcessExitCode(pi.hProcess);
 			if (childProcessExitCode == STILL_ACTIVE) {
@@ -290,6 +290,9 @@ int main(int argc, char* argv[])
 				{
 					if (std::getline(infoFromInjectedDllFile, recievedInfo)) {
 
+						while (std::getline(infoFromInjectedDllFile, recievedInfo)) {
+							//Make sure to continue with the read of the last line
+						}
 					}
 					else {
 						std::cout << "Couldn't read from dll_to_main_program, quitting main program..." << std::endl;
@@ -306,15 +309,21 @@ int main(int argc, char* argv[])
 			}
 
 			//freeze this thread until the injected DLL main() finishes running
-			while (true) {
+			bool dllmainFinished = false;
+			while (dllmainFinished == false) {
 				std::string recievedInfo;
 				std::ifstream myfile("dll_to_main_program.txt");
 				if (myfile.is_open())
 				{
-					if (std::getline(myfile, recievedInfo))
+					while (std::getline(myfile, recievedInfo))
 					{
-						if (recievedInfo == "Main program can continue executing") { break; }
-					}/*
+						if (recievedInfo == "Main program can continue executing") {
+							dllmainFinished = true;
+							break; 
+						}
+						//if (lstrcmp(recievedInfo.c_str(), TEXT("Main program can continue executing"))==0) { break; }
+						recievedInfo = "";
+					}/* 
 					else {
 						std::cout << "Unable to read text from dll_to_main_program.txt, quitting main program..." << std::endl;
 						myfile.close();
@@ -343,7 +352,9 @@ int main(int argc, char* argv[])
 				if (infoFromInjectedDllFile.is_open())
 				{
 					if (std::getline(infoFromInjectedDllFile, recievedInfo)) {
-
+						while (std::getline(infoFromInjectedDllFile, recievedInfo)) {
+							//Make sure to continue with the read of the last line
+						}
 					}
 					else {
 						std::cout << "Couldn't read from dll_to_main_program, quitting main program..." << std::endl;

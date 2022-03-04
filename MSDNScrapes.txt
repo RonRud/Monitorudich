@@ -419,3 +419,5 @@ CertFindCertificateInStore-PCCERT_CONTEXT CertFindCertificateInStore( [in] HCERT
 CertCloseStore-BOOL CertCloseStore( [in] HCERTSTORE hCertStore, [in] DWORD dwFlags );
 CryptMsgClose-BOOL CryptMsgClose( [in] HCRYPTMSG hCryptMsg );
 DestroyAcceleratorTable-BOOL DestroyAcceleratorTable( [in] HACCEL hAccel );
+DestroyCursor-BOOL DestroyCursor( [in] HCURSOR hCursor );
+CloseThemeData-HRESULT CloseThemeData( [in] HTHEME hTheme );

@@ -30,13 +30,15 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 		//initialize an empty file
 		std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::trunc);
 		saveFile.close();
+		std::ofstream infoFromDllToMain("dll_to_main_program.txt", std::ios::out | std::ios::trunc);
+		infoFromDllToMain.close();
 
 
 		IAThooking(GetModuleHandleA(NULL), attamptToHookNumFunctions);
 		std::cout << "dllmain finished executing" << std::endl << std::endl << std::endl;
 		//resume main program by indicating it can continue to run
-		std::ofstream sendToMainFile("dll_to_main_program.txt", std::ios::out | std::ios::trunc);
-		sendToMainFile << "Main program can continue executing";
+		std::ofstream sendToMainFile("dll_to_main_program.txt", std::ios::out | std::ios::app);
+		sendToMainFile << "Main program can continue executing" << std::endl;
 		sendToMainFile.close();
 		break;
 	}
@@ -95,8 +97,8 @@ bool IAThooking(HMODULE hInstance, int attamptToHookNumFunctions)
 		while (*(WORD*)pFirstThunk != 0 && *(WORD*)pOriginalFirstThunk != 0) //moving over IAT and over names' table
 		{
 			saveFile << "0x" << std::hex << pFirstThunk->u1.Function << "\t\t" << pFuncData->Name << std::endl;//printing function's name and addr
-			std::ofstream infoToMainFile("dll_to_main_program.txt", std::ios::out | std::ios::trunc);
-			infoToMainFile << pFuncData->Name;
+			std::ofstream infoToMainFile("dll_to_main_program.txt", std::ios::out | std::ios::app);
+			infoToMainFile << pFuncData->Name << std::endl;
 			infoToMainFile.close();
 			/*
 			std::vector<const char*> blackList = { "EnterCriticalSection", "LeaveCriticalSection", "HeapFree", "HeapAlloc", //8B = mov function crushes
@@ -194,9 +196,9 @@ void logHookName() {
 	saveFile << "address: 0x" << std::hex << originFuncAddr - 5 << ", ";
 	saveFile.close();
 
-	std::ofstream infoToMainFile("dll_to_main_program.txt", std::ios::out | std::ios::trunc); // TODO fix this, this is a shortcut to get the last function called to main program 
+	std::ofstream infoToMainFile("dll_to_main_program.txt", std::ios::out | std::ios::app); // TODO fix this, this is a shortcut to get the last function called to main program 
 																							  // so the main program will know the last function that ran in case it crashes (for blacklist)
-	infoToMainFile << *addressToNameMap[originFuncAddr - 5];
+	infoToMainFile << *addressToNameMap[originFuncAddr - 5] << std::endl;
 	infoToMainFile.close();
 }
 
