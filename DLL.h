@@ -22,6 +22,8 @@ void inlineHookFunctionCleanup(DWORD functionAddr);
 void Hook();
 
 char loggerFilePath[100];
+char infoToMainFilePath[100];
+char infoFromMainFilePath[100];
 const char offlineScrapesFile[] = "MSDNScrapes.txt";
 
 int MAX_STACK_TO_SHOW = 8;

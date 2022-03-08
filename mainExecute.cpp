@@ -177,6 +177,8 @@ int main(int argc, char* argv[])
 	if (std::string::npos != last_slash_idx) {
 		loggerFilePath = loggerFilePath.substr(0, last_slash_idx + 1) + "logger_output.txt"; // Than add the logger file name to it
 	};
+	std::string pathOfFileToDll = loggerFilePath.substr(0, last_slash_idx + 1) + "info_to_dll.txt";
+	std::string pathOfFileFromDll = loggerFilePath.substr(0, last_slash_idx + 1) + "dll_to_main_program.txt";
 
 	bool blacklistIterate = true;
 	int runProgramForBeforeCheck = 10000; //in miliseconds
@@ -203,12 +205,16 @@ int main(int argc, char* argv[])
 		}
 		std::cout << "created process with pid " << pi.dwProcessId << std::endl;
 
-		//Send data to injected dll
 
-		std::ofstream dllInfoFile("info_to_dll.txt", std::ios::out | std::ios::trunc);
-		dllInfoFile << isWebScrapingEnabled << "," << loggerFilePath;
-		dllInfoFile << "," << numberOfFunctionsToPossiblyHook;
+		//Send data to injected dll
+		std::ofstream dllInfoFile("D:\\info_to_dll.txt", std::ios::out | std::ios::trunc);
+		dllInfoFile << loggerFilePath << std::endl;
+		dllInfoFile << pathOfFileToDll << std::endl;
+		dllInfoFile << pathOfFileFromDll << std::endl;
+		dllInfoFile << isWebScrapingEnabled << std::endl;
+		dllInfoFile << numberOfFunctionsToPossiblyHook << std::endl;
 		dllInfoFile.close();
+
 		//clean the recieving file
 		std::ofstream mainInfoFileFromDll("dll_to_main_program.txt", std::ios::out | std::ios::trunc);
 		//now hook the inspected child process
@@ -258,14 +264,18 @@ int main(int argc, char* argv[])
 			}
 			std::cout << "created process with pid " << pi.dwProcessId << std::endl;
 
-			//Send data to injected dll
 
-			std::ofstream dllInfoFile("info_to_dll.txt", std::ios::out | std::ios::trunc);
-			dllInfoFile << isWebScrapingEnabled << "," << loggerFilePath;
-			dllInfoFile << "," << numberOfFunctionsToPossiblyHook;
+			//Send data to injected dll
+			std::ofstream dllInfoFile("D:\\info_to_dll.txt", std::ios::out | std::ios::trunc);
+			dllInfoFile << loggerFilePath << std::endl;
+			dllInfoFile << pathOfFileToDll << std::endl;
+			dllInfoFile << pathOfFileFromDll << std::endl;
+			dllInfoFile << isWebScrapingEnabled << std::endl;
+			dllInfoFile << numberOfFunctionsToPossiblyHook << std::endl;
 			dllInfoFile.close();
 			//clean the recieving file
 			std::ofstream mainInfoFileFromDll("dll_to_main_program.txt", std::ios::out | std::ios::trunc);
+			
 			//now hook the inspected child process
 			bool is_successful = InjectDLL(pi.dwProcessId);
 			if (is_successful == false) {

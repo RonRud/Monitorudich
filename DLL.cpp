@@ -7,17 +7,21 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 		std::cout << "Got to dll main" << std::endl;
 		//Get info from the main program via info_to_dll.txt file
 		std::string dllRecievedInfo;
-		std::ifstream myfile("info_to_dll.txt");
+		std::ifstream myfile("D:\\info_to_dll.txt");
 		int attamptToHookNumFunctions;
 		if (myfile.is_open())
 		{
 			if (std::getline(myfile, dllRecievedInfo))
 			{
-				const size_t seperatorIdx = dllRecievedInfo.find(",");
-				const size_t secondSeperaorIdx = dllRecievedInfo.find(",", seperatorIdx+1);
-				strcpy(loggerFilePath, dllRecievedInfo.substr(seperatorIdx + 1, secondSeperaorIdx - seperatorIdx-1).c_str());
-				isWebScrapingEnabled = std::strtoul(dllRecievedInfo.substr(0, seperatorIdx).c_str(), NULL, 16);
-				attamptToHookNumFunctions = std::strtoul(dllRecievedInfo.substr(secondSeperaorIdx + 1, dllRecievedInfo.length() - secondSeperaorIdx-1).c_str(), NULL, 10);
+				strcpy(loggerFilePath, dllRecievedInfo.c_str());
+				std::getline(myfile, dllRecievedInfo);
+				strcpy(infoFromMainFilePath, dllRecievedInfo.c_str());
+				std::getline(myfile, dllRecievedInfo);
+				strcpy(infoToMainFilePath, dllRecievedInfo.c_str());
+				std::getline(myfile, dllRecievedInfo);
+				isWebScrapingEnabled = std::strtoul(dllRecievedInfo.c_str(), NULL, 10); // read from the forth line the boolean of isWebScrapingEnabled
+				std::getline(myfile, dllRecievedInfo);
+				attamptToHookNumFunctions = std::strtoul(dllRecievedInfo.c_str(), NULL, 10);// read from the fifth line the number of functions to hook
 			}
 			else {
 				std::cout << "Unable to read text from info_to_dll.txt, quitting injected dll..." << std::endl;
