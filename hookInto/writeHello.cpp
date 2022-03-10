@@ -7,9 +7,9 @@ int main() {
     std::string input;
     std::cin >> input;
 
-    LPSTR x = "shnitzel";
-    LPSTR y = "shnitzel";
-    if(0 == lstrcmpA(x,y)) {std::cout << "wha a shnitzel" << std::endl;}
+    //LPSTR x = TEXT("shnitzel");
+    //LPSTR y = L"shnitzel";
+    if(0 == lstrcmpA("shnitzel", "shnitzel")) {std::cout << "wha a shnitzel" << std::endl;}
     std::ofstream writeFile("out.txt");
     writeFile << input;
     writeFile.close();

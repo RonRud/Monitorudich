@@ -7,7 +7,7 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 		std::cout << "Got to dll main" << std::endl;
 		//Get info from the main program via info_to_dll.txt file
 		std::string dllRecievedInfo;
-		std::ifstream myfile("D:\\info_to_dll.txt");
+		std::ifstream myfile("C:\\Windows\\Temp\\info_to_dll.txt");
 		int attamptToHookNumFunctions;
 		if (myfile.is_open())
 		{
