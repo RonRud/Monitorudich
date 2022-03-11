@@ -186,7 +186,7 @@ int main(int argc, char* argv[])
 
 	bool blacklistIterate = true;
 	int runProgramForBeforeCheck = 35000; //in miliseconds
-	bool isWebScrapingEnabled = true;
+	bool isWebScrapingEnabled = false;
 	int numberOfFunctionsToPossiblyHook = 55555;
 
 	if (blacklistIterate == false) { //Run normally, assumes blacklist is precalculated (this is unadvised)

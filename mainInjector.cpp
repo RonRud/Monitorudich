@@ -35,7 +35,7 @@ bool InjectDLL(DWORD ProcessID)
 
 	bool blacklistIterate = true;
 	int runProgramForBeforeCheck = 10000; //in miliseconds
-	bool isWebScrapingEnabled = true;
+	bool isWebScrapingEnabled = false;
 	int numberOfFunctionsToPossiblyHook = 55555;
 
 	//Send data to injected dll

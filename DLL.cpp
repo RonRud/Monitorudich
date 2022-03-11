@@ -332,6 +332,39 @@ void logStack() {
 	saveFile.close();
 }
 
+/* This function was created to decide whether to return "normally" to where the function was called
+* aka the location pushed onto the stack by the call instruction.
+* or return to the actual function and not where the function was called because the hook was on a trampoline
+* and the execution of code needs to continue from the actual function and not the assembly after the trampoline jmp
+*/
+void accountForTrampolineHookInOriginFuncAddr() {
+	auto actualFunctionAddr = trampolineLocationToFunctionLocation.find(originFuncAddr-5);
+	if (actualFunctionAddr == trampolineLocationToFunctionLocation.end()) {
+		//the function was not called from a trampoline hook so do nothing
+	}
+	else {
+		originFuncAddr = actualFunctionAddr->second;
+		// if we hook the trampoline we don't want to do the stack setup as it wasn't replaced and will still happen (doesn't have to be the winapi setup)
+		// therefore we will return from this function
+		__asm {
+			//compiler did shit so this is the reversing of it
+			pop ebx
+			mov esp,ebp
+			pop ebp
+
+			pop eax // first we will get rid of the return address to the inline hook
+			PUSH originFuncAddr
+
+			mov eax, savedEax
+			mov ebx, savedEbx
+			mov ecx, savedEcx
+			mov edx, savedEdx
+			
+			retn
+		}
+	}
+}
+
 
 void __declspec(naked) Hook() { // this means compiler doesn't go here
 								// this function definition tells the compiler not to touch the stack
@@ -353,6 +386,7 @@ void __declspec(naked) Hook() { // this means compiler doesn't go here
 	logAdditionalVariables();
 	getStack();
 	logStack();
+	accountForTrampolineHookInOriginFuncAddr();
 
 	__asm {
 		PUSH EBP
@@ -493,6 +527,7 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 
 				//TODO Start of DLL connection to web scaper, need python scraper and usage in runtime function call
 			}
+			saveFile.close();
 		}
 		//Hook the function
 		addressToNameMap[functionAddr] = functionName;
@@ -511,7 +546,18 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 		return inlineHookFunction(functionAddr, functionName);
 	}
 	else if (*(BYTE*)functionAddr == 0xFF && *(BYTE*)(functionAddr + 1) == 0x25) {
+		std::cout << "Trampoline hooking function: " << *functionName << std::endl;
 		DWORD dsOffsetOfFunction = *(DWORD*)(functionAddr + 2);
+		DWORD trampolineLocation = functionAddr;
+		addressToNameMap[trampolineLocation] = functionName; //save the calling address to the hook (in this case it will be called from the trampoline location)
+		
+		//Hook the trampoline
+		VirtualProtect((void*)trampolineLocation, 6, PAGE_EXECUTE_READWRITE, &Old);
+		*(BYTE*)trampolineLocation = 0xE8; //call Opcode
+		*(DWORD*)(trampolineLocation + 1) = (DWORD)Hook - (DWORD)trampolineLocation - 5; //Calculate amount of bytes to jmp
+		*(BYTE*)(trampolineLocation + 5) = 0xAA; //change the last byte to unique identifier (shouldn't really matter because it will never execute anyway)
+		VirtualProtect((void*)trampolineLocation, 6, Old, &n);
+
 
 		__asm {
 			push eax
@@ -522,9 +568,13 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 			pop ebx
 			pop eax
 		}
-		return inlineHookFunction(functionAddr, functionName);
+		trampolineLocationToFunctionLocation[trampolineLocation] = functionAddr;
+		//TODO need to connect to web scrapper
+		saveFile.close();
+		return true;
 	}
 	else {
+		saveFile.close();
 		return false;
 	}
 }
