@@ -182,6 +182,7 @@ int main(int argc, char* argv[])
 	std::string pathOfFileFromDll = loggerFilePath.substr(0, last_slash_idx + 1) + "dll_to_main_program.txt";
 	std::string pathOfOfflineScrapes = loggerFilePath.substr(0, last_slash_idx + 1) + "MSDNScrapes.txt";
 	std::string pathOfBlacklist = loggerFilePath.substr(0, last_slash_idx + 1) + "Natural_selector.txt";
+	std::string pathOfWebScrapper = loggerFilePath.substr(0, last_slash_idx + 1) + "webScrapperMSDN.py";
 
 	bool blacklistIterate = true;
 	int runProgramForBeforeCheck = 35000; //in miliseconds
@@ -216,6 +217,7 @@ int main(int argc, char* argv[])
 		dllInfoFile << pathOfFileFromDll << std::endl;
 		dllInfoFile << pathOfOfflineScrapes << std::endl;
 		dllInfoFile << pathOfBlacklist << std::endl;
+		dllInfoFile << pathOfWebScrapper << std::endl;
 		dllInfoFile << isWebScrapingEnabled << std::endl;
 		dllInfoFile << numberOfFunctionsToPossiblyHook << std::endl;
 		dllInfoFile.close();
@@ -277,6 +279,7 @@ int main(int argc, char* argv[])
 			dllInfoFile << pathOfFileFromDll << std::endl;
 			dllInfoFile << pathOfOfflineScrapes << std::endl;
 			dllInfoFile << pathOfBlacklist << std::endl;
+			dllInfoFile << pathOfWebScrapper << std::endl;
 			dllInfoFile << isWebScrapingEnabled << std::endl;
 			dllInfoFile << numberOfFunctionsToPossiblyHook << std::endl;
 			dllInfoFile.close();

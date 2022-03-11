@@ -23,9 +23,11 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 				std::getline(myfile, dllRecievedInfo);
 				strcpy(blacklistFilePath, dllRecievedInfo.c_str());
 				std::getline(myfile, dllRecievedInfo);
-				isWebScrapingEnabled = std::strtoul(dllRecievedInfo.c_str(), NULL, 10); // read from the sixth line the boolean of isWebScrapingEnabled
+				strcpy(webScrapperPythonFilePath, dllRecievedInfo.c_str());
 				std::getline(myfile, dllRecievedInfo);
-				attamptToHookNumFunctions = std::strtoul(dllRecievedInfo.c_str(), NULL, 10);// read from the seventh line the number of functions to hook
+				isWebScrapingEnabled = std::strtoul(dllRecievedInfo.c_str(), NULL, 10); // read from the seventh line the boolean of isWebScrapingEnabled
+				std::getline(myfile, dllRecievedInfo);
+				attamptToHookNumFunctions = std::strtoul(dllRecievedInfo.c_str(), NULL, 10);// read from the eighth line the number of functions to hook
 			}
 			else {
 				std::cout << "Unable to read text from info_to_dll.txt, quitting injected dll..." << std::endl;
@@ -417,7 +419,7 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 				si.hStdOutput = hStdOutPipeWrite;
 				PROCESS_INFORMATION pi = { };
 				LPCWSTR lpApplicationName = L"C:\\Windows\\System32\\cmd.exe";
-				std::string stringCommandLine = "python webScrapperMSDN.py " + (*functionName);
+				std::string stringCommandLine = "python " + std::string(webScrapperPythonFilePath) + " " + (*functionName);
 				std::wstring* windwosStringShit = new std::wstring(stringCommandLine.begin(), stringCommandLine.end());
 				const wchar_t* commandLineWchars = (*windwosStringShit).c_str();
 				LPWSTR lpCommandLine = const_cast<LPWSTR>(commandLineWchars);

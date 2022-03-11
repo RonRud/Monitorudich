@@ -26,6 +26,7 @@ char infoToMainFilePath[100];
 char infoFromMainFilePath[100];
 char offlineScrapesFile[100];
 char blacklistFilePath[100];
+char webScrapperPythonFilePath[100];
 
 int MAX_STACK_TO_SHOW = 8;
 DWORD originFuncAddr;
