@@ -421,65 +421,13 @@ CryptMsgClose-BOOL CryptMsgClose( [in] HCRYPTMSG hCryptMsg );
 DestroyAcceleratorTable-BOOL DestroyAcceleratorTable( [in] HACCEL hAccel );
 DestroyCursor-BOOL DestroyCursor( [in] HCURSOR hCursor );
 CloseThemeData-HRESULT CloseThemeData( [in] HTHEME hTheme );
-_initialize_onexit_table-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_register_onexit_function-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_controlfp_s-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_initialize_narrow_environment-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_exit-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_register_thread_local_exe_atexit_callback-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_configure_narrow_argv-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_set_app_type-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_seh_filter_exe-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
-exit-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_initterm_e-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_initterm-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_crt_atexit-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
-__setusermatherr-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_set_fmode-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_configthreadlocale-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_set_new_mode-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_get_stream_buffer_pointers-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-fread-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-fsetpos-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-setvbuf-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-fgetpos-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-fwrite-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-fgetc-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-fflush-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_fseeki64-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_lock_file-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_unlock_file-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_callnewh-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-free-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-malloc-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-VirtualQuery-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-__p___argc-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-__p___argv-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_cexit-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_c_exit-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-__p__commode-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_seh_filter_dll-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_execute_onexit_table-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_crt_at_quick_exit-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-strcpy_s-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-strcat_s-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-__stdio_common_vsprintf_s-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-terminate-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_wmakepath_s-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_wsplitpath_s-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-wcscpy_s-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_CrtDbgReportW-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_malloc_dbg-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_free_dbg-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-ungetc-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-fputc-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-fclose-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_CrtDbgReport-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-_invalid_parameter-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
-ImmSetCompositionWindow-python: can't open file 'C:\Program Files (x86 );
-OffsetWindowOrgEx-python: can't open file 'C:\Program Files (x86 );
-SetBrushOrgEx-python: can't open file 'C:\Program Files (x86 );
-EnumFontFamiliesExW-python: can't open file 'C:\Program Files (x86 );
-ExcludeClipRect-python: can't open file 'C:\Program Files (x86 );
-GetThemeBackgroundContentRect-python: can't open file 'C:\Program Files (x86 );
-BeginBufferedAnimation-python: can't open file 'C:\Program Files (x86 );
+GetCurrentProcess-HANDLE GetCurrentProcess( );
+GetCurrentProcessId-DWORD GetCurrentProcessId( );
+IsDebuggerPresent-BOOL IsDebuggerPresent( );
+GetCommandLineA-LPSTR GetCommandLineA( );
+GetCommandLineW-LPWSTR GetCommandLineW( );
+FindClose-BOOL FindClose( [in&&out] HANDLE hFindFile );
+GetACP-UINT GetACP( );
+GetOEMCP-UINT GetOEMCP( );
+GetEnvironmentStringsW-LPCH GetEnvironmentStrings( );
+GetProcessHeap-HANDLE GetProcessHeap( );

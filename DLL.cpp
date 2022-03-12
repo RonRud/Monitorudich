@@ -401,6 +401,117 @@ void __declspec(naked) Hook() { // this means compiler doesn't go here
 
 	__asm RETN
 }
+void webScrapeFunction(std::string* functionName) {
+	std::cout << "web scraping function: " << *functionName << std::endl;
+	std::string line;
+	bool foundOfflineScrape = false;
+	std::ifstream myfile(offlineScrapesFile);
+	if (myfile.is_open())
+	{
+		while (std::getline(myfile, line))
+		{
+			const size_t seperatorIdx = line.rfind('-');
+			if (line.substr(0, seperatorIdx) == (*functionName)) {
+				foundOfflineScrape = true;
+				nameToDocumantationString[functionName] = new std::string(line.substr(seperatorIdx + 1, line.length() - seperatorIdx - 1)); //get only the scraped string (after the -)
+			}
+		}
+		myfile.close();
+	}
+	else { std::cout << "Unable to open " << offlineScrapesFile << ", can't use offline scrape data" << std::endl; } //be wary that this prints in the inspected child program
+	if (foundOfflineScrape == false) {
+		//run and get data as string from python web scrape
+		HANDLE hStdOutPipeRead = NULL;
+		HANDLE hStdOutPipeWrite = NULL;
+
+		// Create two pipes.
+		SECURITY_ATTRIBUTES sa = { sizeof(SECURITY_ATTRIBUTES), NULL, TRUE };
+		if (CreatePipe(&hStdOutPipeRead, &hStdOutPipeWrite, &sa, 0) == false) {
+			throw std::runtime_error("couldn't create output pipe for web scrape");
+		}
+		// Create the process.
+		STARTUPINFO si = { };
+		si.cb = sizeof(STARTUPINFO);
+		si.dwFlags = STARTF_USESTDHANDLES;
+		si.hStdError = hStdOutPipeWrite;
+		si.hStdOutput = hStdOutPipeWrite;
+		PROCESS_INFORMATION pi = { };
+		LPCWSTR lpApplicationName = L"C:\\Windows\\System32\\cmd.exe";
+		std::string stringCommandLine = "python " + std::string(webScrapperPythonFilePath) + " " + (*functionName);
+		std::wstring* windwosStringShit = new std::wstring(stringCommandLine.begin(), stringCommandLine.end());
+		const wchar_t* commandLineWchars = (*windwosStringShit).c_str();
+		LPWSTR lpCommandLine = const_cast<LPWSTR>(commandLineWchars);
+		LPSECURITY_ATTRIBUTES lpProcessAttributes = NULL;
+		LPSECURITY_ATTRIBUTES lpThreadAttribute = NULL;
+		BOOL bInheritHandles = TRUE;
+		DWORD dwCreationFlags = 0;
+		LPVOID lpEnvironment = NULL;
+		LPCWSTR lpCurrentDirectory = NULL;
+		if (!CreateProcessW(
+			NULL,
+			lpCommandLine,
+			lpProcessAttributes,
+			lpThreadAttribute,
+			bInheritHandles,
+			dwCreationFlags,
+			lpEnvironment,
+			lpCurrentDirectory,
+			LPSTARTUPINFOW(&si),
+			&pi)) {
+			throw std::runtime_error("couldn't create child process for web scrape");
+		}
+		WaitForSingleObject(pi.hProcess, INFINITE); //wait for process to finish
+
+		// Close pipes we do not need.
+		CloseHandle(hStdOutPipeWrite);
+
+		// The main loop for reading output from the DIR command.
+		char buffer[1024 + 1] = { };
+		DWORD dwRead = 0;
+		DWORD dwAvail = 0;
+
+		std::ofstream saveFile(offlineScrapesFile, std::ios::out | std::ios::app);
+		while (ReadFile(hStdOutPipeRead, buffer, 1024, &dwRead, NULL))
+		{
+			std::string* modifiedBuffer = new std::string("");
+			//buffer[dwRead] = '\0';
+			for (int i = 0; i < dwRead + 1; i++) {
+				if (buffer[i] == ')') {
+					modifiedBuffer->push_back(' ');
+					modifiedBuffer->push_back(')');
+					modifiedBuffer->push_back(';');
+					break;
+				}
+				else if (buffer[i] != '\r' && buffer[i] != '\n' && !(buffer[i] == ' ' && buffer[i + 1] == ' ')) {
+					modifiedBuffer->push_back(buffer[i]);
+				}
+			}
+			size_t index = 0;
+			while (true) {
+				/* Locate the substring to replace. */
+				size_t closeSquareIndex = modifiedBuffer->find(']', index);
+				size_t openSquareIndex = modifiedBuffer->find('[', index);
+				if (openSquareIndex == std::string::npos) break;
+				size_t commaInTheMiddle = modifiedBuffer->find(',', openSquareIndex);
+				if (commaInTheMiddle != std::string::npos && commaInTheMiddle < closeSquareIndex) {
+					/* Make the replacement. */
+					modifiedBuffer->replace(commaInTheMiddle, 2, "&&");
+					closeSquareIndex += 4;
+				}
+
+				/* Advance index forward so the next iteration doesn't pick it up as well. */
+				index = closeSquareIndex + 1;
+			}
+			nameToDocumantationString[functionName] = modifiedBuffer;
+			//save string to the offlineScrapesFile
+			saveFile << *functionName << "-" << *nameToDocumantationString[functionName] << std::endl;
+		}
+		// Clean up and exit.
+		CloseHandle(hStdOutPipeRead);
+
+		//TODO Start of DLL connection to web scaper, need python scraper and usage in runtime function call
+	}
+}
 
 
 bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
@@ -419,115 +530,7 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 		//If the code gets here the function is valid to hook
 		//TODO here there will be the call to web scraping if enabled
 		if (isWebScrapingEnabled) {
-			std::string line;
-			bool foundOfflineScrape = false;
-			std::ifstream myfile(offlineScrapesFile);
-			if (myfile.is_open())
-			{
-				while (std::getline(myfile, line))
-				{
-					const size_t seperatorIdx = line.rfind('-');
-					if (line.substr(0, seperatorIdx) == (*functionName)) {
-						foundOfflineScrape = true;
-						nameToDocumantationString[functionName] = new std::string(line.substr(seperatorIdx + 1, line.length() - seperatorIdx - 1)); //get only the scraped string (after the -)
-					}
-				}
-				myfile.close();
-			}
-			else { std::cout << "Unable to open " << offlineScrapesFile << ", can't use offline scrape data" << std::endl; } //be wary that this prints in the inspected child program
-			if (foundOfflineScrape == false) {
-				//run and get data as string from python web scrape
-				HANDLE hStdOutPipeRead = NULL;
-				HANDLE hStdOutPipeWrite = NULL;
-
-				// Create two pipes.
-				SECURITY_ATTRIBUTES sa = { sizeof(SECURITY_ATTRIBUTES), NULL, TRUE };
-				if (CreatePipe(&hStdOutPipeRead, &hStdOutPipeWrite, &sa, 0) == false) {
-					throw std::runtime_error("couldn't create output pipe for web scrape");
-				}
-				// Create the process.
-				STARTUPINFO si = { };
-				si.cb = sizeof(STARTUPINFO);
-				si.dwFlags = STARTF_USESTDHANDLES;
-				si.hStdError = hStdOutPipeWrite;
-				si.hStdOutput = hStdOutPipeWrite;
-				PROCESS_INFORMATION pi = { };
-				LPCWSTR lpApplicationName = L"C:\\Windows\\System32\\cmd.exe";
-				std::string stringCommandLine = "python " + std::string(webScrapperPythonFilePath) + " " + (*functionName);
-				std::wstring* windwosStringShit = new std::wstring(stringCommandLine.begin(), stringCommandLine.end());
-				const wchar_t* commandLineWchars = (*windwosStringShit).c_str();
-				LPWSTR lpCommandLine = const_cast<LPWSTR>(commandLineWchars);
-				LPSECURITY_ATTRIBUTES lpProcessAttributes = NULL;
-				LPSECURITY_ATTRIBUTES lpThreadAttribute = NULL;
-				BOOL bInheritHandles = TRUE;
-				DWORD dwCreationFlags = 0;
-				LPVOID lpEnvironment = NULL;
-				LPCWSTR lpCurrentDirectory = NULL;
-				if (!CreateProcessW(
-					NULL,
-					lpCommandLine,
-					lpProcessAttributes,
-					lpThreadAttribute,
-					bInheritHandles,
-					dwCreationFlags,
-					lpEnvironment,
-					lpCurrentDirectory,
-					LPSTARTUPINFOW(&si),
-					&pi)) {
-					throw std::runtime_error("couldn't create child process for web scrape");
-				}
-				WaitForSingleObject(pi.hProcess, INFINITE); //wait for process to finish
-
-				// Close pipes we do not need.
-				CloseHandle(hStdOutPipeWrite);
-
-				// The main loop for reading output from the DIR command.
-				char buffer[1024 + 1] = { };
-				DWORD dwRead = 0;
-				DWORD dwAvail = 0;
-
-				std::ofstream saveFile(offlineScrapesFile, std::ios::out | std::ios::app);
-				while (ReadFile(hStdOutPipeRead, buffer, 1024, &dwRead, NULL))
-				{
-					std::string* modifiedBuffer = new std::string("");
-					//buffer[dwRead] = '\0';
-					for (int i = 0; i < dwRead + 1; i++) {
-						if (buffer[i] == ')') {
-							modifiedBuffer->push_back(' ');
-							modifiedBuffer->push_back(')');
-							modifiedBuffer->push_back(';');
-							break;
-						}
-						else if (buffer[i] != '\r' && buffer[i] != '\n' && !(buffer[i] == ' ' && buffer[i + 1] == ' ')) {
-							modifiedBuffer->push_back(buffer[i]);
-						}
-					}
-					size_t index = 0;
-					while (true) {
-						/* Locate the substring to replace. */
-						size_t closeSquareIndex = modifiedBuffer->find(']', index);
-						size_t openSquareIndex = modifiedBuffer->find('[', index);
-						if (openSquareIndex == std::string::npos) break;
-						size_t commaInTheMiddle = modifiedBuffer->find(',', openSquareIndex);
-						if (commaInTheMiddle != std::string::npos && commaInTheMiddle < closeSquareIndex) {
-							/* Make the replacement. */
-							modifiedBuffer->replace(commaInTheMiddle, 2, "&&");
-							closeSquareIndex += 4;
-						}
-
-						/* Advance index forward so the next iteration doesn't pick it up as well. */
-						index = closeSquareIndex + 1;
-					}
-					nameToDocumantationString[functionName] = modifiedBuffer;
-					//save string to the offlineScrapesFile
-					saveFile << *functionName << "-" << *nameToDocumantationString[functionName] << std::endl;
-				}
-				// Clean up and exit.
-				CloseHandle(hStdOutPipeRead);
-
-				//TODO Start of DLL connection to web scaper, need python scraper and usage in runtime function call
-			}
-			saveFile.close();
+			webScrapeFunction(functionName);
 		}
 		//Hook the function
 		addressToNameMap[functionAddr] = functionName;
@@ -569,8 +572,12 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 			pop eax
 		}
 		trampolineLocationToFunctionLocation[trampolineLocation] = functionAddr;
-		//TODO need to connect to web scrapper
+		// TODO need to connect to web scrapper
+		if (isWebScrapingEnabled) {
+			webScrapeFunction(functionName);
+		}
 		saveFile.close();
+		// TODO need to add cleanup
 		return true;
 	}
 	else {
