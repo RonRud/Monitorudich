@@ -19,12 +19,6 @@ ReadFile
 InitializeCriticalSectionExMultiByteToWideChar
 MultiByteToWideChar
 VirtualProtect
-
-
-
-
-
-
 CreateEventW
 WaitForMultipleObjects
 lstrcpynW
@@ -36,3 +30,6 @@ RaiseException
 GetUserDefaultLCID
 LoadCursorW
 WriteFile
+_get_stream_buffer_pointers
+exit
+_execute_onexit_table

@@ -34,8 +34,7 @@ bool InjectDLL(DWORD ProcessID)
 	std::string pathOfWebScrapper = loggerFilePath.substr(0, last_slash_idx_logger + 1) + "webScrapperMSDN.py";
 
 	bool blacklistIterate = true;
-	int runProgramForBeforeCheck = 10000; //in miliseconds
-	bool isWebScrapingEnabled = false;
+	bool isWebScrapingEnabled = true;
 	int numberOfFunctionsToPossiblyHook = 55555;
 
 	//Send data to injected dll

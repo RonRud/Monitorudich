@@ -160,6 +160,7 @@ void inlineHookFunctionCleanup(DWORD functionAddr) {
 		functionAddr += *(int*)(functionAddr + 1) + 5;
 		return inlineHookFunctionCleanup(functionAddr);
 	}
+	/* trampolines are hooked differently now and have a seperated cleanup
 	else if (*(BYTE*)functionAddr == 0xFF && *(BYTE*)(functionAddr + 1) == 0x25) {
 		DWORD dsOffsetOfFunction = *(DWORD*)(functionAddr + 2);
 
@@ -173,7 +174,7 @@ void inlineHookFunctionCleanup(DWORD functionAddr) {
 			pop eax
 		}
 		return inlineHookFunctionCleanup(functionAddr);
-	}
+	}*/
 	else {
 		DWORD Old;
 		DWORD n;
@@ -192,10 +193,25 @@ void inlineHookFunctionCleanup(DWORD functionAddr) {
 }
 
 void IAThookingCleanup() {
+	// regular inline functions cleanup
 	for (auto& iterator : addressToNameMap) {
 		inlineHookFunctionCleanup(iterator.first);
 		delete iterator.second;
 	}
+	std::ofstream sendToMainFile(infoToMainFilePath, std::ios::out | std::ios::app);
+	// trampoline hook cleanup
+	for (auto& iterator : trampolineLocationToFunctionLocationDsOffset) {
+		sendToMainFile << std::endl << "cleaning up fanction " << *addressToNameMap[iterator.first] << ", with offset: " << std::hex << trampolineLocationToFunctionLocationDsOffset[iterator.first];
+		DWORD Old;
+		DWORD n;
+		//got to function and not function call trampolines
+		VirtualProtect((void*)iterator.first, 6, PAGE_EXECUTE_READWRITE, &Old);
+		*(BYTE*)iterator.first = 0xFF;
+		*(BYTE*)(iterator.first + 1) = 0x25;
+		*(DWORD*)(iterator.first + 2) = iterator.second;
+		VirtualProtect((void*)iterator.first, 6, Old, &n);
+	}
+	sendToMainFile.close();
 }
 
 
@@ -549,7 +565,6 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 		return inlineHookFunction(functionAddr, functionName);
 	}
 	else if (*(BYTE*)functionAddr == 0xFF && *(BYTE*)(functionAddr + 1) == 0x25) {
-		std::cout << "Trampoline hooking function: " << *functionName << std::endl;
 		DWORD dsOffsetOfFunction = *(DWORD*)(functionAddr + 2);
 		DWORD trampolineLocation = functionAddr;
 		addressToNameMap[trampolineLocation] = functionName; //save the calling address to the hook (in this case it will be called from the trampoline location)
@@ -572,7 +587,9 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 			pop eax
 		}
 		trampolineLocationToFunctionLocation[trampolineLocation] = functionAddr;
-		// TODO need to connect to web scrapper
+		trampolineLocationToFunctionLocationDsOffset[trampolineLocation] = dsOffsetOfFunction;// save the offset value for the hook cleanup 
+
+		//std::cout << "Trampoline hooking function: " << *functionName << ", log continue in address: " << std::hex << dsOffsetOfFunction << std::endl;
 		if (isWebScrapingEnabled) {
 			webScrapeFunction(functionName);
 		}
