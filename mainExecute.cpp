@@ -154,7 +154,8 @@ int main(int argc, char* argv[])
 {
 	std::string inspectedProcessPath;
 	std::cout << "Enter the full path of the executable you wish to inspect: " << std::endl;
-	std::cin >> inspectedProcessPath;
+	std::getline(std::cin, inspectedProcessPath);
+	//std::cin >> inspectedProcessPath;
 	replaceSubstrInString(inspectedProcessPath, "\\\\", "\\");
 	replaceSubstrInString(inspectedProcessPath, "\\", "\\\\");
 	//opening the executable
@@ -179,9 +180,12 @@ int main(int argc, char* argv[])
 	};
 	std::string pathOfFileToDll = loggerFilePath.substr(0, last_slash_idx + 1) + "info_to_dll.txt";
 	std::string pathOfFileFromDll = loggerFilePath.substr(0, last_slash_idx + 1) + "dll_to_main_program.txt";
+	std::string pathOfOfflineScrapes = loggerFilePath.substr(0, last_slash_idx + 1) + "MSDNScrapes.txt";
+	std::string pathOfBlacklist = loggerFilePath.substr(0, last_slash_idx + 1) + "Natural_selector.txt";
+	std::string pathOfWebScrapper = loggerFilePath.substr(0, last_slash_idx + 1) + "webScrapperMSDN.py";
 
 	bool blacklistIterate = true;
-	int runProgramForBeforeCheck = 10000; //in miliseconds
+	int runProgramForBeforeCheck = 35000; //in miliseconds
 	bool isWebScrapingEnabled = true;
 	int numberOfFunctionsToPossiblyHook = 55555;
 
@@ -211,6 +215,9 @@ int main(int argc, char* argv[])
 		dllInfoFile << loggerFilePath << std::endl;
 		dllInfoFile << pathOfFileToDll << std::endl;
 		dllInfoFile << pathOfFileFromDll << std::endl;
+		dllInfoFile << pathOfOfflineScrapes << std::endl;
+		dllInfoFile << pathOfBlacklist << std::endl;
+		dllInfoFile << pathOfWebScrapper << std::endl;
 		dllInfoFile << isWebScrapingEnabled << std::endl;
 		dllInfoFile << numberOfFunctionsToPossiblyHook << std::endl;
 		dllInfoFile.close();
@@ -270,6 +277,9 @@ int main(int argc, char* argv[])
 			dllInfoFile << loggerFilePath << std::endl;
 			dllInfoFile << pathOfFileToDll << std::endl;
 			dllInfoFile << pathOfFileFromDll << std::endl;
+			dllInfoFile << pathOfOfflineScrapes << std::endl;
+			dllInfoFile << pathOfBlacklist << std::endl;
+			dllInfoFile << pathOfWebScrapper << std::endl;
 			dllInfoFile << isWebScrapingEnabled << std::endl;
 			dllInfoFile << numberOfFunctionsToPossiblyHook << std::endl;
 			dllInfoFile.close();

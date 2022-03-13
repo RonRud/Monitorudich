@@ -21,6 +21,38 @@ bool InjectDLL(DWORD ProcessID)
 		DllPath = DllPath.substr(0, last_slash_idx + 1) + "DLL.dll"; // Than add the dll file name to it
 	};
 
+	//Send required info to dll
+	std::string loggerFilePath = std::string(thisFilePath);
+	const size_t last_slash_idx_logger = loggerFilePath.rfind('\\'); //Get the last occurareance of \\ (before the exe name)
+	if (std::string::npos != last_slash_idx_logger) {
+		loggerFilePath = loggerFilePath.substr(0, last_slash_idx_logger + 1) + "logger_output.txt"; // Than add the logger file name to it
+	};
+	std::string pathOfFileToDll = loggerFilePath.substr(0, last_slash_idx_logger + 1) + "info_to_dll.txt";
+	std::string pathOfFileFromDll = loggerFilePath.substr(0, last_slash_idx_logger + 1) + "dll_to_main_program.txt";
+	std::string pathOfOfflineScrapes = loggerFilePath.substr(0, last_slash_idx_logger + 1) + "MSDNScrapes.txt";
+	std::string pathOfBlacklist = loggerFilePath.substr(0, last_slash_idx_logger + 1) + "Natural_selector.txt";
+	std::string pathOfWebScrapper = loggerFilePath.substr(0, last_slash_idx_logger + 1) + "webScrapperMSDN.py";
+
+	bool blacklistIterate = true;
+	int runProgramForBeforeCheck = 10000; //in miliseconds
+	bool isWebScrapingEnabled = true;
+	int numberOfFunctionsToPossiblyHook = 55555;
+
+	//Send data to injected dll
+	std::ofstream dllInfoFile("D:\\info_to_dll.txt", std::ios::out | std::ios::trunc);
+	dllInfoFile << loggerFilePath << std::endl;
+	dllInfoFile << pathOfFileToDll << std::endl;
+	dllInfoFile << pathOfFileFromDll << std::endl;
+	dllInfoFile << pathOfOfflineScrapes << std::endl;
+	dllInfoFile << pathOfBlacklist << std::endl;
+	dllInfoFile << pathOfWebScrapper << std::endl;
+	dllInfoFile << isWebScrapingEnabled << std::endl;
+	dllInfoFile << numberOfFunctionsToPossiblyHook << std::endl;
+	dllInfoFile.close();
+	//clean the recieving file
+	std::ofstream mainInfoFileFromDll("dll_to_main_program.txt", std::ios::out | std::ios::trunc);
+
+
 
 	//Get the current memory location of LoadLibraryA function in the current loaded instance of kernel32.dll
 	LPVOID llAddress = GetProcAddress(GetModuleHandleA("kernel32.dll"), "LoadLibraryA");
@@ -65,14 +97,14 @@ int main(int argc, char* argv[])
 	{
 		std::cout << "Enter Process ID:" << std::endl;
 		std::cin >> ProcessID;
-		std::cout << "Enter Executable Name: " << std::endl;
-		std::cin >> processName;
+		//std::cout << "Enter Executable Name: " << std::endl;
+		//std::cin >> processName;
 		
 		bool is_successful = InjectDLL(ProcessID);
 		if (is_successful == false) {
 			std::cout << "DLL injection failed" << std::endl;
 		}
-
+		/*
 		std::ofstream saveFile("process_resources_logger.txt", std::ios::out | std::ios::trunc);
 
 		HQUERY query;
@@ -123,6 +155,7 @@ int main(int argc, char* argv[])
 		}
 		PdhCloseQuery(query);
 		saveFile.close();
+		*/
 	}
 	return 0;
 }

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 InitializeCriticalSectionEx-BOOL InitializeCriticalSectionEx( [out] LPCRITICAL_SECTION lpCriticalSection, [in] DWORD dwSpinCount, [in] DWORD Flags );
 DeleteCriticalSection-void DeleteCriticalSection( [in&&out] LPCRITICAL_SECTION lpCriticalSection );
 EncodePointer-PVOID EncodePointer( _In_ PVOID Ptr );
@@ -422,3 +423,490 @@ DestroyAcceleratorTable-BOOL DestroyAcceleratorTable( [in] HACCEL hAccel );
 DestroyCursor-BOOL DestroyCursor( [in] HCURSOR hCursor );
 CloseThemeData-HRESULT CloseThemeData( [in] HTHEME hTheme );
 CreateFileW-HANDLE CreateFileW( [in] LPCWSTR lpFileName, [in] DWORD dwDesiredAccess, [in] DWORD dwShareMode, [in&&optional] LPSECURITY_ATTRIBUTES lpSecurityAttributes, [in] DWORD dwCreationDisposition, [in] DWORD dwFlagsAndAttributes, [in&&optional] HANDLE hTemplateFile );
+=======
+InitializeCriticalSectionEx-BOOL InitializeCriticalSectionEx( [out] LPCRITICAL_SECTION lpCriticalSection, [in] DWORD dwSpinCount, [in] DWORD Flags );
+DeleteCriticalSection-void DeleteCriticalSection( [in&&out] LPCRITICAL_SECTION lpCriticalSection );
+EncodePointer-PVOID EncodePointer( _In_ PVOID Ptr );
+LCMapStringEx-int LCMapStringEx( [in&&optional] LPCWSTR lpLocaleName, [in] DWORD dwMapFlags, [in] LPCWSTR lpSrcStr, [in] int cchSrc, [out&&optional] LPWSTR lpDestStr, [in] int cchDest, [in&&optional] LPNLSVERSIONINFO lpVersionInformation, [in&&optional] LPVOID lpReserved, [in&&optional] LPARAM sortHandle );
+GetStringTypeW-BOOL GetStringTypeW( [in] DWORD dwInfoType, [in] _In_NLS_string_(cchSrc );
+GetCPInfo-BOOL GetCPInfo( [in] UINT CodePage, [out] LPCPINFO lpCPInfo );
+UnhandledExceptionFilter-LONG UnhandledExceptionFilter( [in] _EXCEPTION_POINTERS *ExceptionInfo );
+SetUnhandledExceptionFilter-LPTOP_LEVEL_EXCEPTION_FILTER SetUnhandledExceptionFilter( [in] LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter );
+TerminateProcess-BOOL TerminateProcess( [in] HANDLE hProcess, [in] UINT uExitCode );
+IsProcessorFeaturePresent-BOOL IsProcessorFeaturePresent( [in] DWORD ProcessorFeature );
+QueryPerformanceCounter-BOOL QueryPerformanceCounter( [out] LARGE_INTEGER *lpPerformanceCount );
+GetSystemTimeAsFileTime-void GetSystemTimeAsFileTime( [out] LPFILETIME lpSystemTimeAsFileTime );
+InitializeSListHead-void InitializeSListHead( [in&&out] PSLIST_HEADER ListHead );
+GetStartupInfoW-void GetStartupInfoW( [out] LPSTARTUPINFOW lpStartupInfo );
+RaiseException-void RaiseException( [in] DWORD dwExceptionCode, [in] DWORD dwExceptionFlags, [in] DWORD nNumberOfArguments, [in] const ULONG_PTR *lpArguments );
+RtlUnwind-NTSYSAPI VOID RtlUnwind( [in&&optional] PVOID TargetFrame, [in&&optional] PVOID TargetIp, [in&&optional] PEXCEPTION_RECORD ExceptionRecord, [in] PVOID ReturnValue );
+InitializeCriticalSectionAndSpinCount-BOOL InitializeCriticalSectionAndSpinCount( [out] LPCRITICAL_SECTION lpCriticalSection, [in] DWORD dwSpinCount );
+TlsAlloc-DWORD TlsAlloc( );
+TlsGetValue-LPVOID TlsGetValue( [in] DWORD dwTlsIndex );
+TlsSetValue-BOOL TlsSetValue( [in] DWORD dwTlsIndex, [in&&optional] LPVOID lpTlsValue );
+TlsFree-BOOL TlsFree( [in] DWORD dwTlsIndex );
+FreeLibrary-BOOL FreeLibrary( [in] HMODULE hLibModule );
+GetProcAddress-FARPROC GetProcAddress( [in] HMODULE hModule, [in] LPCSTR lpProcName );
+LoadLibraryExW-HMODULE LoadLibraryExA( [in] LPCSTR lpLibFileName, HANDLE hFile, [in] DWORD dwFlags );
+GetStdHandle-HANDLE WINAPI GetStdHandle( _In_ DWORD nStdHandle );
+GetModuleFileNameW-DWORD GetModuleFileNameW( [in&&optional] HMODULE hModule, [out] LPWSTR lpFilename, [in] DWORD nSize );
+GetModuleHandleExW-BOOL GetModuleHandleExA( [in] DWORD dwFlags, [in&&optional] LPCSTR lpModuleName, [out] HMODULE *phModule );
+CompareStringW-int CompareStringW( [in] LCID Locale, [in] DWORD dwCmpFlags, [in] _In_NLS_string_(cchCount1 );
+LCMapStringW-int LCMapStringA( [in] LCID Locale, [in] DWORD dwMapFlags, [in] LPCSTR lpSrcStr, [in] int cchSrc, [out&&optional] LPSTR lpDestStr, [in] int cchDest );
+GetLocaleInfoW-int GetLocaleInfoW( [in] LCID Locale, [in] LCTYPE LCType, [out&&optional] LPWSTR lpLCData, [in] int cchData );
+IsValidLocale-BOOL IsValidLocale( [in] LCID Locale, [in] DWORD dwFlags );
+GetUserDefaultLCID-LCID GetUserDefaultLCID( );
+EnumSystemLocalesW-BOOL EnumSystemLocalesA( [in] LOCALE_ENUMPROCA lpLocaleEnumProc, [in] DWORD dwFlags );
+GetConsoleOutputCP-UINT WINAPI GetConsoleOutputCP(void );
+GetConsoleMode-BOOL WINAPI GetConsoleMode( _In_  HANDLE  hConsoleHandle, _Out_ LPDWORD lpMode );
+GetFileSizeEx-BOOL GetFileSizeEx( [in] HANDLE hFile, [out] PLARGE_INTEGER lpFileSize );
+ReadConsoleW-BOOL WINAPI ReadConsole( _In_     HANDLE  hConsoleInput, _Out_    LPVOID  lpBuffer, _In_     DWORD   nNumberOfCharsToRead, _Out_    LPDWORD lpNumberOfCharsRead, _In_opt_ LPVOID  pInputControl );
+HeapReAlloc-DECLSPEC_ALLOCATOR LPVOID HeapReAlloc( [in] HANDLE hHeap, [in] DWORD dwFlags, [in] _Frees_ptr_opt_ LPVOID lpMem, [in] SIZE_T dwBytes );
+FindFirstFileExW-HANDLE FindFirstFileExA( [in] LPCSTR lpFileName, [in] FINDEX_INFO_LEVELS fInfoLevelId, [out] LPVOID lpFindFileData, [in] FINDEX_SEARCH_OPS fSearchOp, LPVOID lpSearchFilter, [in] DWORD dwAdditionalFlags );
+FindNextFileW-BOOL FindNextFileW( [in] HANDLE hFindFile, [out] LPWIN32_FIND_DATAW lpFindFileData );
+IsValidCodePage-BOOL IsValidCodePage( [in] UINT CodePage );
+FreeEnvironmentStringsW-BOOL FreeEnvironmentStringsA( LPCH penv );
+SetEnvironmentVariableW-BOOL SetEnvironmentVariable( [in] LPCTSTR lpName, [in&&optional] LPCTSTR lpValue );
+SetStdHandle-BOOL WINAPI SetStdHandle( _In_ DWORD  nStdHandle, _In_ HANDLE hHandle );
+HeapSize-SIZE_T HeapSize( [in] HANDLE hHeap, [in] DWORD dwFlags, [in] LPCVOID lpMem );
+WriteConsoleW-BOOL WINAPI WriteConsole( _In_             HANDLE  hConsoleOutput, _In_       const VOID    *lpBuffer, _In_             DWORD   nNumberOfCharsToWrite, _Out_opt_        LPDWORD lpNumberOfCharsWritten, _Reserved_       LPVOID  lpReserved );
+WideCharToMultiByte-int WideCharToMultiByte( [in] UINT CodePage, [in] DWORD dwFlags, [in] _In_NLS_string_(cchWideChar );
+EnterCriticalSection-void EnterCriticalSection( [in&&out] LPCRITICAL_SECTION lpCriticalSection );
+GetFileType-DWORD GetFileType( [in] HANDLE hFile );
+HeapAlloc-DECLSPEC_ALLOCATOR LPVOID HeapAlloc( [in] HANDLE hHeap, [in] DWORD dwFlags, [in] SIZE_T dwBytes );
+lstrcmpA-int lstrcmpA( [in] LPCSTR lpString1, [in] LPCSTR lpString2 );
+SetEndOfFile-BOOL SetEndOfFile( [in] HANDLE hFile );
+SetFilePointerEx-BOOL SetFilePointerEx( [in] HANDLE hFile, [in] LARGE_INTEGER liDistanceToMove, [out&&optional] PLARGE_INTEGER lpNewFilePointer, [in] DWORD dwMoveMethod );
+DecodePointer-PVOID DecodePointer(  PVOID Ptr );
+MultiByteToWideChar-int MultiByteToWideChar( [in] UINT CodePage, [in] DWORD dwFlags, [in] _In_NLS_string_(cbMultiByte );
+FlushFileBuffers-BOOL FlushFileBuffers( [in] HANDLE hFile );
+LeaveCriticalSection-void LeaveCriticalSection( [in&&out] LPCRITICAL_SECTION lpCriticalSection );
+GetModuleHandleW-HMODULE GetModuleHandleA( [in&&optional] LPCSTR lpModuleName );
+SetLastError-void SetLastError( [in] DWORD dwErrCode );
+HeapFree-BOOL HeapFree( [in] HANDLE hHeap, [in] DWORD dwFlags, [in] _Frees_ptr_opt_ LPVOID lpMem );
+PathMatchSpecW-BOOL PathMatchSpecA( [in] LPCSTR pszFile, [in] LPCSTR pszSpec );
+ColorRGBToHLS-void ColorRGBToHLS( COLORREF clrRGB, [out] WORD *pwHue, [out] WORD *pwLuminance, [out] WORD *pwSaturation );
+PathStripPathW-void PathStripPathW( [in&&out] LPWSTR pszPath );
+PathAppendW-BOOL PathAppendA( [in&&out] LPSTR pszPath, [in] LPCSTR pszMore );
+PathAddExtensionW-BOOL PathAddExtensionW( [in&&out] LPWSTR pszPath, [in&&optional] LPCWSTR pszExt );
+PathRemoveExtensionW-void PathRemoveExtensionW( [in&&out] LPWSTR pszPath );
+PathIsDirectoryW-BOOL PathIsDirectoryW( [in] LPCWSTR pszPath );
+PathCombineW-LPWSTR PathCombineW( [out] LPWSTR pszDest, [in&&optional] LPCWSTR pszDir, [in] LPCWSTR pszFile );
+AssocQueryStringW-LWSTDAPI AssocQueryStringW( [in] ASSOCF flags, [in] ASSOCSTR str, [in] LPCWSTR pszAssoc, [in&&optional] LPCWSTR pszExtra, [out&&optional] LPWSTR pszOut, [in&&out] DWORD *pcchOut );
+PathFindFileNameW-LPCWSTR PathFindFileNameW( [in] LPCWSTR pszPath );
+PathIsRelativeW-BOOL PathIsRelativeW( [in] LPCWSTR pszPath );
+PathGetDriveNumberW-int PathGetDriveNumberW( [in] LPCWSTR pszPath );
+PathCompactPathExW-BOOL PathCompactPathExW( [out] LPWSTR pszOut, [in] LPCWSTR pszSrc, [in] UINT cchMax, [in] DWORD dwFlags );
+PathFileExistsW-BOOL PathFileExistsW( [in] LPCWSTR pszPath );
+PathRemoveFileSpecW-Traceback (most recent call last );
+PathRemoveFileSpecW-pec_from_loader(fullname, self );
+PathRemoveFileSpecW-in _find_and_load_unlocked File "<frozen importlib._bootstrap>", line 680, in _load_unlocked File "<frozen importlib._bootstrap_external>", line 786, in exec_module File "<frozen importlib._bootstrap_external>", line 875, in get_code File "<frozen importlib._bootstrap_external>", line 1019, in path_stats File "<frozen importlib._bootstrap_external>", line 87, in _path_statKeyboardInterrupt 
+ColorHLSToRGB-Traceback (most recent call last );
+ColorHLSToRGB-mportlib._bootstrap>", line 925, in _find_spec File "<frozen importlib._bootstrap_external>", line 1349, in find_spec File "<frozen importlib._bootstrap_external>", line 1321, in _get_spec File "<frozen importlib._bootstrap_external>", line 1476, in find_spec File "<frozen importlib._bootstrap_external>", line 101, in _path_isfile File "<frozen importlib._bootstrap_external>", line 93, in _path_is_mode_type File "<frozen importlib._bootstrap_external>", line 87, in _path_statKeyboardInterrupt 
+ImageNtHeader-Traceback (most recent call last );
+ImageNtHeader-pec_from_loader(fullname, self );
+ImageNtHeader-m email.feedparser import FeedParser, BytesFeedParser File "C:\Users\Rudic\AppData\Local\Programs\Python\Python39\lib\email\feedparser.py", line 27, in <module> from email._policybase import compat32 File "C:\Users\Rudic\AppData\Local\Programs\Python\Python39\lib\email\_policybase.py", line 9, in <module> from email.utils import _has_surrogates File "C:\Users\Rudic\AppData\Local\Programs\Python\Python39\lib\email\utils.py", line 31, in <module> import urllib.parse File "<frozen importlib._bootstrap>", line 1007, in _find_and_load File "<frozen importlib._bootstrap>", line 986, in _find_and_load_unlocked File "<frozen importlib._bootstrap>", line 680, in _load_unlocked File "<frozen importlib._bootstrap_external>", line 786, in exec_module File "<frozen importlib._bootstrap_external>", line 881, in get_code File "<frozen importlib._bootstrap_external>", line 979, in get_dataKeyboardInterruptr
+GetFileVersionInfoSizeW-Traceback (most recent call last );
+GetFileVersionInfoW-Traceback (most recent call last );
+GetFileVersionInfoW-pq as _heapq File "<frozen importlib._bootstrap>", line 1007, in _find_and_load File "<frozen importlib._bootstrap>", line 982, in _find_and_load_unlocked File "<frozen importlib._bootstrap>", line 925, in _find_spec File "<frozen importlib._bootstrap_external>", line 1349, in find_spec File "<frozen importlib._bootstrap_external>", line 1321, in _get_spec File "<frozen importlib._bootstrap_external>", line 1446, in find_spec File "<frozen importlib._bootstrap_external>", line 87, in _path_statKeyboardInterruptn
+VerQueryValueW-BOOL VerQueryValueW( [in] LPCVOID pBlock, [in] LPCWSTR lpSubBlock, [out] LPVOID *lplpBuffer, [out] PUINT puLen );
+WinVerifyTrust-LONG WinVerifyTrust( [in] HWND hwnd, [in] GUID *pgActionID, [in] LPVOID pWVTData );
+IsNetworkAlive-BOOL IsNetworkAlive( [out] LPDWORD lpdwFlags );
+InternetCrackUrlW-BOOL InternetCrackUrlW( [in] LPCWSTR lpszUrl, [in] DWORD dwUrlLength, [in] DWORD dwFlags, [in&&out] LPURL_COMPONENTSW lpUrlComponents );
+ImmSetCompositionStringW-BOOL ImmSetCompositionStringW( HIMC unnamedParam1, [in] DWORD dwIndex, [in&&optional] LPVOID lpComp, [in] DWORD dwCompLen, [in&&optional] LPVOID lpRead, [in] DWORD dwReadLen );
+ImmGetCompositionStringW-LONG ImmGetCompositionStringW( HIMC unnamedParam1, DWORD unnamedParam2, [out&&optional] LPVOID lpBuf, [in] DWORD dwBufLen );
+ImmSetCompositionFontW-BOOL ImmSetCompositionFontW( HIMC unnamedParam1, [in] LPLOGFONTW lplf );
+ImmGetContext-HIMC ImmGetContext( HWND unnamedParam1 );
+ImmNotifyIME-BOOL ImmNotifyIME( HIMC unnamedParam1, [in] DWORD dwAction, [in] DWORD dwIndex, [in] DWORD dwValue );
+ImmSetCandidateWindow-BOOL ImmSetCandidateWindow( HIMC unnamedParam1, [in] LPCANDIDATEFORM lpCandidate );
+AlphaBlend-BOOL AlphaBlend( [in] HDC hdcDest, [in] int xoriginDest, [in] int yoriginDest, [in] int wDest, [in] int hDest, [in] HDC hdcSrc, [in] int xoriginSrc, [in] int yoriginSrc, [in] int wSrc, [in] int hSrc, [in] BLENDFUNCTION ftn );
+GetCurrentDirectoryW-DWORD GetCurrentDirectory( [in] DWORD nBufferLength, [out] LPTSTR lpBuffer );
+GetTimeFormatEx-int GetTimeFormatA( [in] LCID Locale, [in] DWORD dwFlags, [in&&optional] const SYSTEMTIME *lpTime, [in&&optional] LPCSTR lpFormat, [out&&optional] LPSTR lpTimeStr, [in] int cchTime );
+LoadResource-HGLOBAL LoadResource( [in&&optional] HMODULE hModule, [in] HRSRC hResInfo );
+LockResource-LPVOID LockResource( [in] HGLOBAL hResData );
+SizeofResource-DWORD SizeofResource( [in&&optional] HMODULE hModule, [in] HRSRC hResInfo );
+FindResourceW-HRSRC FindResourceA( [in&&optional] HMODULE hModule, [in] LPCSTR lpName, [in] LPCSTR lpType );
+ResetEvent-BOOL ResetEvent( [in] HANDLE hEvent );
+WaitForSingleObject-DWORD WaitForSingleObject( [in] HANDLE hHandle, [in] DWORD dwMilliseconds );
+CreateEventW-HANDLE CreateEventA( [in&&optional] LPSECURITY_ATTRIBUTES lpEventAttributes, [in] BOOL bManualReset, [in] BOOL bInitialState, [in&&optional] LPCSTR lpName );
+CreateThread-HANDLE CreateThread( [in&&optional] LPSECURITY_ATTRIBUTES lpThreadAttributes, [in] SIZE_T dwStackSize, [in] LPTHREAD_START_ROUTINE lpStartAddress, [in&&optional] __drv_aliasesMem LPVOID lpParameter, [in] DWORD dwCreationFlags, [out&&optional] LPDWORD lpThreadId );
+CopyFileW-BOOL CopyFile( [in] LPCTSTR lpExistingFileName, [in] LPCTSTR lpNewFileName, [in] BOOL bFailIfExists );
+LoadLibraryW-HMODULE LoadLibraryW( [in] LPCWSTR lpLibFileName );
+ReleaseMutex-BOOL ReleaseMutex( [in] HANDLE hMutex );
+DeleteFileW-BOOL DeleteFile( [in] LPCTSTR lpFileName );
+Sleep-void Sleep( [in] DWORD dwMilliseconds );
+lstrcpynW-LPSTR lstrcpynA( [out] LPSTR lpString1, [in] LPCSTR lpString2, [in] int iMaxLength );
+WaitForMultipleObjects-DWORD WaitForMultipleObjects( [in] DWORD nCount, [in] const HANDLE *lpHandles, [in] BOOL bWaitAll, [in] DWORD dwMilliseconds );
+CopyFileExW-BOOL CopyFileExA( [in] LPCSTR lpExistingFileName, [in] LPCSTR lpNewFileName, [in&&optional] LPPROGRESS_ROUTINE lpProgressRoutine, [in&&optional] LPVOID lpData, [in&&optional] LPBOOL pbCancel, [in] DWORD dwCopyFlags );
+GetSystemInfo-void GetSystemInfo( [out] LPSYSTEM_INFO lpSystemInfo );
+GetVersionExW-NOT_BUILD_WINDOWS_DEPRECATE BOOL GetVersionExA( [in&&out] LPOSVERSIONINFOA lpVersionInformation );
+CreateFileMappingW-HANDLE CreateFileMappingW( [in] HANDLE hFile, [in&&optional] LPSECURITY_ATTRIBUTES lpFileMappingAttributes, [in] DWORD flProtect, [in] DWORD dwMaximumSizeHigh, [in] DWORD dwMaximumSizeLow, [in&&optional] LPCWSTR lpName );
+MapViewOfFile-LPVOID MapViewOfFile( [in] HANDLE hFileMappingObject, [in] DWORD dwDesiredAccess, [in] DWORD dwFileOffsetHigh, [in] DWORD dwFileOffsetLow, [in] SIZE_T dwNumberOfBytesToMap );
+UnmapViewOfFile-BOOL UnmapViewOfFile( [in] LPCVOID lpBaseAddress );
+CancelIo-BOOL WINAPI CancelIo( _In_ HANDLE hFile );
+WaitForSingleObjectEx-DWORD WaitForSingleObjectEx( [in] HANDLE hHandle, [in] DWORD dwMilliseconds, [in] BOOL bAlertable );
+QueueUserAPC-DWORD QueueUserAPC( [in] PAPCFUNC pfnAPC, [in] HANDLE hThread, [in] ULONG_PTR dwData );
+ReadDirectoryChangesW-BOOL ReadDirectoryChangesW( [in] HANDLE hDirectory, [out] LPVOID lpBuffer, [in] DWORD nBufferLength, [in] BOOL bWatchSubtree, [in] DWORD dwNotifyFilter, [out&&optional] LPDWORD lpBytesReturned, [in&&out, optional] LPOVERLAPPED lpOverlapped, [in&&optional] LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine );
+GetLocaleInfoA-int GetLocaleInfoA( [in] LCID Locale, [in] LCTYPE LCType, [out&&optional] LPSTR lpLCData, [in] int cchData );
+LoadLibraryA-HMODULE LoadLibraryA( [in] LPCSTR lpLibFileName );
+LCMapStringA-int LCMapStringA( [in] LCID Locale, [in] DWORD dwMapFlags, [in] LPCSTR lpSrcStr, [in] int cchSrc, [out&&optional] LPSTR lpDestStr, [in] int cchDest );
+GetModuleHandleA-HMODULE GetModuleHandleA( [in&&optional] LPCSTR lpModuleName );
+FreeLibraryAndExitThread-void FreeLibraryAndExitThread( [in] HMODULE hLibModule, [in] DWORD dwExitCode );
+GetThreadTimes-BOOL GetThreadTimes( [in] HANDLE hThread, [out] LPFILETIME lpCreationTime, [out] LPFILETIME lpExitTime, [out] LPFILETIME lpKernelTime, [out] LPFILETIME lpUserTime );
+GetTimeFormatW-int GetTimeFormatA( [in] LCID Locale, [in] DWORD dwFlags, [in&&optional] const SYSTEMTIME *lpTime, [in&&optional] LPCSTR lpFormat, [out&&optional] LPSTR lpTimeStr, [in] int cchTime );
+RegisterWaitForSingleObject-BOOL RegisterWaitForSingleObject( [out] PHANDLE phNewWaitObject, [in] HANDLE hObject, [in] WAITORTIMERCALLBACK Callback, [in&&optional] PVOID Context, [in] ULONG dwMilliseconds, [in] ULONG dwFlags );
+SetThreadAffinityMask-DWORD_PTR SetThreadAffinityMask( [in] HANDLE hThread, [in] DWORD_PTR dwThreadAffinityMask );
+GetProcessAffinityMask-BOOL GetProcessAffinityMask( [in] HANDLE hProcess, [out] PDWORD_PTR lpProcessAffinityMask, [out] PDWORD_PTR lpSystemAffinityMask );
+GetNumaHighestNodeNumber-BOOL GetNumaHighestNodeNumber( [out] PULONG HighestNodeNumber );
+DeleteTimerQueueTimer-BOOL DeleteTimerQueueTimer( [in&&optional] HANDLE TimerQueue, [in] HANDLE Timer, [in&&optional] HANDLE CompletionEvent );
+ChangeTimerQueueTimer-BOOL ChangeTimerQueueTimer( [in&&optional] HANDLE TimerQueue, [in&&out] HANDLE Timer, [in] ULONG DueTime, [in] ULONG Period );
+CreateTimerQueueTimer-BOOL CreateTimerQueueTimer( [out] PHANDLE phNewTimer, [in&&optional] HANDLE TimerQueue, [in] WAITORTIMERCALLBACK Callback, [in&&optional] PVOID Parameter, [in] DWORD DueTime, [in] DWORD Period, [in] ULONG Flags );
+GetLogicalProcessorInformation-BOOL GetLogicalProcessorInformation( [out] PSYSTEM_LOGICAL_PROCESSOR_INFORMATION Buffer, [in&&out] PDWORD ReturnedLength );
+PathFindExtensionW-LPCSTR PathFindExtensionA( [in] LPCSTR pszPath );
+CertGetNameStringW-DWORD CertGetNameStringW( [in] PCCERT_CONTEXT pCertContext, [in] DWORD dwType, [in] DWORD dwFlags, [in] void *pvTypePara, [out] LPWSTR pszNameString, [in] DWORD cchNameString );
+CertNameToStrW-DWORD CertNameToStrA( [in] DWORD dwCertEncodingType, [in] PCERT_NAME_BLOB pName, [in] DWORD dwStrType, [out] LPSTR psz, [in] DWORD csz );
+GetLocalTime-void GetLocalTime( [out] LPSYSTEMTIME lpSystemTime );
+GlobalAlloc-DECLSPEC_ALLOCATOR HGLOBAL GlobalAlloc( [in] UINT uFlags, [in] SIZE_T dwBytes );
+FormatMessageW-DWORD FormatMessageW( [in] DWORD dwFlags, [in&&optional] LPCVOID lpSource, [in] DWORD dwMessageId, [in] DWORD dwLanguageId, [out] LPWSTR lpBuffer, [in] DWORD nSize, [in&&optional] va_list *Arguments );
+GetDateFormatEx-int GetDateFormatEx( [in&&optional] LPCWSTR lpLocaleName, [in] DWORD dwFlags, [in&&optional] const SYSTEMTIME *lpDate, [in&&optional] LPCWSTR lpFormat, [out&&optional] LPWSTR lpDateStr, [in] int cchDate, [in&&optional] LPCWSTR lpCalendar );
+ExpandEnvironmentStringsW-DWORD ExpandEnvironmentStringsA( [in] LPCSTR lpSrc, [out&&optional] LPSTR lpDst, [in] DWORD nSize );
+SetCurrentDirectoryW-BOOL SetCurrentDirectory( [in] LPCTSTR lpPathName );
+SetEvent-BOOL SetEvent( [in] HANDLE hEvent );
+GetStringTypeExW-BOOL GetStringTypeW( [in] DWORD dwInfoType, [in] _In_NLS_string_(cchSrc );
+GetStringTypeExA-BOOL GetStringTypeW( [in] DWORD dwInfoType, [in] _In_NLS_string_(cchSrc );
+GetThreadPriority-int GetThreadPriority( [in] HANDLE hThread );
+SetThreadPriority-BOOL SetThreadPriority( [in] HANDLE hThread, [in] int nPriority );
+SignalObjectAndWait-DWORD SignalObjectAndWait( [in] HANDLE hObjectToSignal, [in] HANDLE hObjectToWaitOn, [in] DWORD dwMilliseconds, [in] BOOL bAlertable );
+QueryPerformanceFrequency-BOOL QueryPerformanceFrequency( [out] LARGE_INTEGER *lpFrequency );
+CreateDirectoryW-BOOL CreateDirectoryW( [in] LPCWSTR lpPathName, [in&&optional] LPSECURITY_ATTRIBUTES lpSecurityAttributes );
+CompareFileTime-LONG CompareFileTime( [in] const FILETIME *lpFileTime1, [in] const FILETIME *lpFileTime2 );
+lstrlenW-int lstrlenW( [in] LPCWSTR lpString );
+lstrcmpW-int lstrcmpA( [in] LPCSTR lpString1, [in] LPCSTR lpString2 );
+GetFileAttributesW-DWORD GetFileAttributesW( [in] LPCWSTR lpFileName );
+FindFirstFileW-HANDLE FindFirstFileW( [in] LPCWSTR lpFileName, [out] LPWIN32_FIND_DATAW lpFindFileData );
+GlobalFree-HGLOBAL GlobalFree( [in] _Frees_ptr_opt_ HGLOBAL hMem );
+GetVersion-NOT_BUILD_WINDOWS_DEPRECATE DWORD GetVersion( );
+LocalFree-HLOCAL LocalFree( [in] _Frees_ptr_opt_ HLOCAL hMem );
+LocalAlloc-DECLSPEC_ALLOCATOR HLOCAL LocalAlloc( [in] UINT uFlags, [in] SIZE_T uBytes );
+GetDateFormatW-int GetDateFormatA( [in] LCID Locale, [in] DWORD dwFlags, [in&&optional] const SYSTEMTIME *lpDate, [in&&optional] LPCSTR lpFormat, [out&&optional] LPSTR lpDateStr, [in] int cchDate );
+lstrcmpiW-int lstrcmpiA( [in] LPCSTR lpString1, [in] LPCSTR lpString2 );
+VirtualProtect-BOOL VirtualProtect( [in] LPVOID lpAddress, [in] SIZE_T dwSize, [in] DWORD flNewProtect, [out] PDWORD lpflOldProtect );
+VirtualAlloc-LPVOID VirtualAlloc( [in&&optional] LPVOID lpAddress, [in] SIZE_T dwSize, [in] DWORD flAllocationType, [in] DWORD flProtect );
+VirtualFree-BOOL VirtualFree( [in] LPVOID lpAddress, [in] SIZE_T dwSize, [in] DWORD dwFreeType );
+FileTimeToSystemTime-BOOL FileTimeToSystemTime( [in] const FILETIME *lpFileTime, [out] LPSYSTEMTIME lpSystemTime );
+SystemTimeToTzSpecificLocalTime-BOOL SystemTimeToTzSpecificLocalTime( [in&&optional] const TIME_ZONE_INFORMATION *lpTimeZoneInformation, [in] const SYSTEMTIME *lpUniversalTime, [out] LPSYSTEMTIME lpLocalTime );
+MoveFileExW-BOOL MoveFileExW( [in] LPCWSTR lpExistingFileName, [in&&optional] LPCWSTR lpNewFileName, [in] DWORD dwFlags );
+SetFileAttributesW-BOOL SetFileAttributesA( [in] LPCSTR lpFileName, [in] DWORD dwFileAttributes );
+GetFullPathNameW-DWORD GetFullPathNameA( [in] LPCSTR lpFileName, [in] DWORD nBufferLength, [out] LPSTR lpBuffer, [out] LPSTR *lpFilePart );
+UnregisterWait-BOOL UnregisterWait( [in] HANDLE WaitHandle );
+GetFileAttributesExW-BOOL GetFileAttributesExA( [in] LPCSTR lpFileName, [in] GET_FILEEX_INFO_LEVELS fInfoLevelId, [out] LPVOID lpFileInformation );
+DuplicateHandle-BOOL DuplicateHandle( [in] HANDLE hSourceProcessHandle, [in] HANDLE hSourceHandle, [in] HANDLE hTargetProcessHandle, [out] LPHANDLE lpTargetHandle, [in] DWORD dwDesiredAccess, [in] BOOL bInheritHandle, [in] DWORD dwOptions );
+ReleaseSemaphore-BOOL ReleaseSemaphore( [in] HANDLE hSemaphore, [in] LONG lReleaseCount, [out&&optional] LPLONG lpPreviousCount );
+InterlockedPopEntrySList-PSLIST_ENTRY InterlockedPopEntrySList( [in&&out] PSLIST_HEADER ListHead );
+InterlockedPushEntrySList-PSLIST_ENTRY InterlockedPushEntrySList( [in&&out] PSLIST_HEADER ListHead, [in&&out] __drv_aliasesMem PSLIST_ENTRY ListEntry );
+InterlockedFlushSList-PSLIST_ENTRY InterlockedFlushSList( [in&&out] PSLIST_HEADER ListHead );
+QueryDepthSList-USHORT QueryDepthSList( [in] PSLIST_HEADER ListHead );
+UnregisterWaitEx-BOOL WINAPI UnregisterWaitEx( _In_     HANDLE WaitHandle, _In_opt_ HANDLE CompletionEvent );
+CreateTimerQueue-HANDLE CreateTimerQueue( );
+ExitThread-void ExitThread( [in] DWORD dwExitCode );
+GetTimeZoneInformation-DWORD GetTimeZoneInformation( [out] LPTIME_ZONE_INFORMATION lpTimeZoneInformation );
+GetConsoleCP-UINT WINAPI GetConsoleCP(void );
+CreateMutexW-HANDLE CreateMutexA( [in&&optional] LPSECURITY_ATTRIBUTES lpMutexAttributes, [in] BOOL bInitialOwner, [in&&optional] LPCSTR lpName );
+IsCharAlphaW-BOOL IsCharAlphaW( [in] WCHAR ch );
+IsCharAlphaNumericW-BOOL IsCharAlphaNumericA( [in] CHAR ch );
+IsCharLowerW-BOOL IsCharLowerW( WCHAR ch );
+FindWindowW-HWND FindWindowW( [in&&optional] LPCWSTR lpClassName, [in&&optional] LPCWSTR lpWindowName );
+CreateDialogIndirectParamW-HWND CreateDialogIndirectParamA( [in&&optional] HINSTANCE hInstance, [in] LPCDLGTEMPLATEA lpTemplate, [in&&optional] HWND hWndParent, [in&&optional] DLGPROC lpDialogFunc, [in] LPARAM dwInitParam );
+SetRectEmpty-BOOL SetRectEmpty( [out] LPRECT lprc );
+LoadBitmapW-HBITMAP LoadBitmapA( [in] HINSTANCE hInstance, [in] LPCSTR lpBitmapName );
+AppendMenuW-BOOL AppendMenuA( [in] HMENU hMenu, [in] UINT uFlags, [in] UINT_PTR uIDNewItem, [in&&optional] LPCSTR lpNewItem );
+RegisterWindowMessageW-UINT RegisterWindowMessageW( [in] LPCWSTR lpString );
+CreateCursor-HCURSOR CreateCursor( [in&&optional] HINSTANCE hInst, [in] int xHotSpot, [in] int yHotSpot, [in] int nWidth, [in] int nHeight, [in] const VOID *pvANDPlane, [in] const VOID *pvXORPlane );
+ScrollWindow-BOOL ScrollWindow( [in] HWND hWnd, [in] int XAmount, [in] int YAmount, [in] const RECT *lpRect, [in] const RECT *lpClipRect );
+GetPropW-HANDLE GetPropA( [in] HWND hWnd, [in] LPCSTR lpString );
+RemovePropW-HANDLE RemovePropA( [in] HWND hWnd, [in] LPCSTR lpString );
+LoadStringW-int LoadStringA( [in&&optional] HINSTANCE hInstance, [in] UINT uID, [out] LPSTR lpBuffer, [in] int cchBufferMax );
+InsertMenuItemW-BOOL InsertMenuItemW( [in] HMENU hmenu, [in] UINT item, [in] BOOL fByPosition, [in] LPCMENUITEMINFOW lpmi );
+BeginDeferWindowPos-HDWP BeginDeferWindowPos( [in] int nNumWindows );
+DeferWindowPos-HDWP DeferWindowPos( [in] HDWP hWinPosInfo, [in] HWND hWnd, [in&&optional] HWND hWndInsertAfter, [in] int x, [in] int y, [in] int cx, [in] int cy, [in] UINT uFlags );
+EndDeferWindowPos-BOOL EndDeferWindowPos( [in] HDWP hWinPosInfo );
+AppendMenuA-BOOL AppendMenuA( [in] HMENU hMenu, [in] UINT uFlags, [in] UINT_PTR uIDNewItem, [in&&optional] LPCSTR lpNewItem );
+GetKeyboardLayout-HKL GetKeyboardLayout( [in] DWORD idThread );
+SetTimer-UINT_PTR SetTimer( [in&&optional] HWND hWnd, [in] UINT_PTR nIDEvent, [in] UINT uElapse, [in&&optional] TIMERPROC lpTimerFunc );
+MsgWaitForMultipleObjects-DWORD MsgWaitForMultipleObjects( [in] DWORD nCount, [in] const HANDLE *pHandles, [in] BOOL fWaitAll, [in] DWORD dwMilliseconds, [in] DWORD dwWakeMask );
+NotifyWinEvent-void NotifyWinEvent( [in] DWORD event, [in] HWND hwnd, [in] LONG idObject, [in] LONG idChild );
+GetUpdateRgn-int GetUpdateRgn( [in] HWND hWnd, [in] HRGN hRgn, [in] BOOL bErase );
+DrawTextA-int DrawText( [in] HDC hdc, [in&&out] LPCTSTR lpchText, [in] int cchText, [in&&out] LPRECT lprc, [in] UINT format );
+CopyImage-HANDLE CopyImage( [in] HANDLE h, [in] UINT type, [in] int cx, [in] int cy, [in] UINT flags );
+AdjustWindowRectEx-BOOL AdjustWindowRectEx( [in&&out] LPRECT lpRect, [in] DWORD dwStyle, [in] BOOL bMenu, [in] DWORD dwExStyle );
+LoadStringA-int LoadStringA( [in&&optional] HINSTANCE hInstance, [in] UINT uID, [out] LPSTR lpBuffer, [in] int cchBufferMax );
+DispatchMessageW-LRESULT DispatchMessage( [in] const MSG *lpMsg );
+TranslateMessage-BOOL TranslateMessage( [in] const MSG *lpMsg );
+GetMessageW-BOOL GetMessage( [out] LPMSG lpMsg, [in&&optional] HWND hWnd, [in] UINT wMsgFilterMin, [in] UINT wMsgFilterMax );
+BringWindowToTop-BOOL BringWindowToTop( [in] HWND hWnd );
+CallNextHookEx-LRESULT CallNextHookEx( [in&&optional] HHOOK hhk, [in] int nCode, [in] WPARAM wParam, [in] LPARAM lParam );
+UnhookWindowsHookEx-BOOL UnhookWindowsHookEx( [in] HHOOK hhk );
+SetWindowsHookExW-HHOOK SetWindowsHookExA( [in] int idHook, [in] HOOKPROC lpfn, [in] HINSTANCE hmod, [in] DWORD dwThreadId );
+SetParent-HWND SetParent( [in] HWND hWndChild, [in&&optional] HWND hWndNewParent );
+GetDlgCtrlID-int GetDlgCtrlID( [in] HWND hWnd );
+FindWindowExW-HWND FindWindowExW( [in&&optional] HWND hWndParent, [in&&optional] HWND hWndChildAfter, [in&&optional] LPCWSTR lpszClass, [in&&optional] LPCWSTR lpszWindow );
+GetAsyncKeyState-SHORT GetAsyncKeyState( [in] int vKey );
+GetClassInfoExW-BOOL GetClassInfoExA( [in&&optional] HINSTANCE hInstance, [in] LPCSTR lpszClass, [out] LPWNDCLASSEXA lpwcx );
+SetMenuItemInfoW-BOOL SetMenuItemInfoW( [in] HMENU hmenu, [in] UINT item, BOOL fByPositon, [in] LPCMENUITEMINFOW lpmii );
+InsertMenuW-BOOL InsertMenuW( [in] HMENU hMenu, [in] UINT uPosition, [in] UINT uFlags, [in] UINT_PTR uIDNewItem, [in&&optional] LPCWSTR lpNewItem );
+CheckMenuItem-DWORD CheckMenuItem( [in] HMENU hMenu, [in] UINT uIDCheckItem, [in] UINT uCheck );
+EmptyClipboard-BOOL EmptyClipboard( );
+SetClipboardData-HANDLE SetClipboardData( [in] UINT uFormat, [in&&optional] HANDLE hMem );
+IsWindow-BOOL IsWindow( [in&&optional] HWND hWnd );
+GetDlgItemInt-UINT GetDlgItemInt( [in] HWND hDlg, [in] int nIDDlgItem, [out&&optional] BOOL *lpTranslated, [in] BOOL bSigned );
+FrameRect-int FrameRect( [in] HDC hDC, [in] const RECT *lprc, [in] HBRUSH hbr );
+CreateDialogParamW-HWND CreateDialogParamW( [in&&optional] HINSTANCE hInstance, [in] LPCWSTR lpTemplateName, [in&&optional] HWND hWndParent, [in&&optional] DLGPROC lpDialogFunc, [in] LPARAM dwInitParam );
+InflateRect-BOOL InflateRect( [in&&out] LPRECT lprc, [in] int dx, [in] int dy );
+GetSysColor-DWORD GetSysColor( [in] int nIndex );
+IsClipboardFormatAvailable-BOOL IsClipboardFormatAvailable( [in] UINT format );
+GetClipboardData-HANDLE GetClipboardData( [in] UINT uFormat );
+ChangeClipboardChain-BOOL ChangeClipboardChain( [in] HWND hWndRemove, [in] HWND hWndNewNext );
+SetClipboardViewer-HWND SetClipboardViewer( [in] HWND hWndNewViewer );
+CloseClipboard-BOOL CloseClipboard( );
+OpenClipboard-BOOL OpenClipboard( [in&&optional] HWND hWndNewOwner );
+LoadCursorW-HCURSOR LoadCursorA( [in&&optional] HINSTANCE hInstance, [in] LPCSTR lpCursorName );
+SetCaretPos-BOOL SetCaretPos( [in] int X, [in] int Y );
+ShowCaret-BOOL ShowCaret( [in&&optional] HWND hWnd );
+CharUpperW-LPSTR CharUpperA( [in&&out] LPSTR lpsz );
+CreateCaret-BOOL CreateCaret( [in] HWND hWnd, [in&&optional] HBITMAP hBitmap, [in] int nWidth, [in] int nHeight );
+MessageBeep-BOOL MessageBeep( [in] UINT uType );
+GetScrollRange-BOOL GetScrollRange( [in] HWND hWnd, [in] int nBar, [out] LPINT lpMinPos, [out] LPINT lpMaxPos );
+SetScrollRange-BOOL SetScrollRange( [in] HWND hWnd, [in] int nBar, [in] int nMinPos, [in] int nMaxPos, [in] BOOL bRedraw );
+GetScrollPos-BOOL GetScrollInfo( [in] HWND hwnd, [in] int nBar, [in&&out] LPSCROLLINFO lpsi );
+SetScrollPos-int SetScrollPos( [in] HWND hWnd, [in] int nBar, [in] int nPos, [in] BOOL bRedraw );
+GetDC-HDC GetDC( [in] HWND hWnd );
+UpdateWindow-BOOL UpdateWindow( [in] HWND hWnd );
+DrawTextExW-int DrawTextExW( [in] HDC hdc, [in&&out] LPWSTR lpchText, [in] int cchText, [in&&out] LPRECT lprc, [in] UINT format, [in] LPDRAWTEXTPARAMS lpdtp );
+ToAscii-int ToAscii( [in] UINT uVirtKey, [in] UINT uScanCode, [in&&optional] const BYTE *lpKeyState, [out] LPWORD lpChar, [in] UINT uFlags );
+CreateWindowExW-HWND CreateWindowExW( [in] DWORD dwExStyle, [in&&optional] LPCWSTR lpClassName, [in&&optional] LPCWSTR lpWindowName, [in] DWORD dwStyle, [in] int X, [in] int Y, [in] int nWidth, [in] int nHeight, [in&&optional] HWND hWndParent, [in&&optional] HMENU hMenu, [in&&optional] HINSTANCE hInstance, [in&&optional] LPVOID lpParam );
+RegisterClassW-ATOM RegisterClassA( [in] const WNDCLASSA *lpWndClass );
+PostMessageW-BOOL PostMessageA( [in&&optional] HWND hWnd, [in] UINT Msg, [in] WPARAM wParam, [in] LPARAM lParam );
+DrawEdge-BOOL DrawEdge( [in] HDC hdc, [in&&out] LPRECT qrc, [in] UINT edge, [in] UINT grfFlags );
+DrawIconEx-BOOL DrawIconEx( [in] HDC hdc, [in] int xLeft, [in] int yTop, [in] HICON hIcon, [in] int cxWidth, [in] int cyWidth, [in] UINT istepIfAniCur, [in&&optional] HBRUSH hbrFlickerFreeDraw, [in] UINT diFlags );
+LoadImageW-HANDLE LoadImageW( [in&&optional] HINSTANCE hInst, [in] LPCWSTR name, [in] UINT type, [in] int cx, [in] int cy, [in] UINT fuLoad );
+EnableWindow-BOOL EnableWindow( [in] HWND hWnd, [in] BOOL bEnable );
+GetKeyState-SHORT GetKeyState( [in] int nVirtKey );
+GetIconInfo-BOOL GetIconInfo( [in] HICON hIcon, [out] PICONINFO piconinfo );
+CreateIconIndirect-HICON CreateIconIndirect( [in] PICONINFO piconinfo );
+LoadIconW-HICON LoadIconA( [in&&optional] HINSTANCE hInstance, [in] LPCSTR lpIconName );
+DrawIcon-BOOL DrawIcon( [in] HDC hDC, [in] int X, [in] int Y, [in] HICON hIcon );
+GetDlgItemTextA-UINT GetDlgItemTextA( [in] HWND hDlg, [in] int nIDDlgItem, [out] LPSTR lpString, [in] int cchMax );
+LoadMenuW-HMENU LoadMenuW( [in&&optional] HINSTANCE hInstance, [in] LPCWSTR lpMenuName );
+IsDialogMessageW-BOOL IsDialogMessageA( [in] HWND hDlg, [in] LPMSG lpMsg );
+SetMenu-BOOL SetMenu( [in] HWND hWnd, [in&&optional] HMENU hMenu );
+GetMonitorInfoW-BOOL GetMonitorInfoA( [in] HMONITOR hMonitor, [out] LPMONITORINFO lpmi );
+CheckMenuRadioItem-BOOL CheckMenuRadioItem( [in] HMENU hmenu, [in] UINT first, [in] UINT last, [in] UINT check, [in] UINT flags );
+SetForegroundWindow-BOOL SetForegroundWindow( [in] HWND hWnd );
+SetMenuItemBitmaps-BOOL SetMenuItemBitmaps( [in] HMENU hMenu, [in] UINT uPosition, [in] UINT uFlags, [in&&optional] HBITMAP hBitmapUnchecked, [in&&optional] HBITMAP hBitmapChecked );
+DrawMenuBar-BOOL DrawMenuBar( [in] HWND hWnd );
+GetMenuStringW-int GetMenuStringA( [in] HMENU hMenu, [in] UINT uIDItem, [out&&optional] LPSTR lpString, [in] int cchMax, [in] UINT flags );
+TranslateAcceleratorW-int TranslateAcceleratorW( [in] HWND hWnd, [in] HACCEL hAccTable, [in] LPMSG lpMsg );
+mouse_event-void mouse_event( [in] DWORD dwFlags, [in] DWORD dx, [in] DWORD dy, [in] DWORD dwData, [in] ULONG_PTR dwExtraInfo );
+SetDlgItemInt-BOOL SetDlgItemInt( [in] HWND hDlg, [in] int nIDDlgItem, [in] UINT uValue, [in] BOOL bSigned );
+SendDlgItemMessageW-LRESULT SendDlgItemMessageA( [in] HWND hDlg, [in] int nIDDlgItem, [in] UINT Msg, [in] WPARAM wParam, [in] LPARAM lParam );
+EndDialog-BOOL EndDialog( [in] HWND hDlg, [in] INT_PTR nResult );
+DialogBoxIndirectParamW-INT_PTR DialogBoxIndirectParamA( [in&&optional] HINSTANCE hInstance, [in] LPCDLGTEMPLATEA hDialogTemplate, [in&&optional] HWND hWndParent, [in&&optional] DLGPROC lpDialogFunc, [in] LPARAM dwInitParam );
+DialogBoxParamW-INT_PTR DialogBoxParamA( [in&&optional] HINSTANCE hInstance, [in] LPCSTR lpTemplateName, [in&&optional] HWND hWndParent, [in&&optional] DLGPROC lpDialogFunc, [in] LPARAM dwInitParam );
+GetClassNameW-int GetClassNameW( [in] HWND hWnd, [out] LPWSTR lpClassName, [in] int nMaxCount );
+EnumChildWindows-BOOL EnumChildWindows( [in&&optional] HWND hWndParent, [in] WNDENUMPROC lpEnumFunc, [in] LPARAM lParam );
+PtInRect-BOOL PtInRect( [in] const RECT *lprc, [in] POINT pt );
+OffsetRect-BOOL OffsetRect( [in&&out] LPRECT lprc, [in] int dx, [in] int dy );
+IntersectRect-BOOL IntersectRect( [out] LPRECT lprcDst, [in] const RECT *lprcSrc1, [in] const RECT *lprcSrc2 );
+FillRect-int FillRect( [in] HDC hDC, [in] const RECT *lprc, [in] HBRUSH hbr );
+DrawFocusRect-BOOL DrawFocusRect( [in] HDC hDC, [in] const RECT *lprc );
+MapWindowPoints-int MapWindowPoints( [in] HWND hWndFrom, [in] HWND hWndTo, [in&&out] LPPOINT lpPoints, [in] UINT cPoints );
+GetCursorPos-BOOL GetCursorPos( [out] LPPOINT lpPoint );
+ReleaseDC-int ReleaseDC( [in] HWND hWnd, [in] HDC hDC );
+DrawTextW-int DrawText( [in] HDC hdc, [in&&out] LPCTSTR lpchText, [in] int cchText, [in&&out] LPRECT lprc, [in] UINT format );
+GetMenuItemInfoW-BOOL GetMenuItemInfoA( [in] HMENU hmenu, [in] UINT item, [in] BOOL fByPosition, [in&&out] LPMENUITEMINFOA lpmii );
+DefWindowProcW-LRESULT LRESULT DefWindowProcA( [in] HWND hWnd, [in] UINT Msg, [in] WPARAM wParam, [in] LPARAM lParam );
+SetWindowLongW-LONG SetWindowLongW( [in] HWND hWnd, [in] int nIndex, [in] LONG dwNewLong );
+GetWindowLongW-LONG GetWindowLongW( [in] HWND hWnd, [in] int nIndex );
+SetWindowTextW-BOOL SetWindowTextW( [in] HWND hWnd, [in&&optional] LPCWSTR lpString );
+GetDlgItemTextW-UINT GetDlgItemTextA( [in] HWND hDlg, [in] int nIDDlgItem, [out] LPSTR lpString, [in] int cchMax );
+SetDlgItemTextW-BOOL SetDlgItemTextW( [in] HWND hDlg, [in] int nIDDlgItem, [in] LPCWSTR lpString );
+SetDlgItemTextA-BOOL SetDlgItemTextA( [in] HWND hDlg, [in] int nIDDlgItem, [in] LPCSTR lpString );
+CallWindowProcW-LRESULT CallWindowProcW( [in] WNDPROC lpPrevWndFunc, [in] HWND hWnd, [in] UINT Msg, [in] WPARAM wParam, [in] LPARAM lParam );
+SendMessageW-LRESULT SendMessage( [in] HWND hWnd, [in] UINT Msg, [in] WPARAM wParam, [in] LPARAM lParam );
+MessageBoxW-int MessageBox( [in&&optional] HWND hWnd, [in&&optional] LPCTSTR lpText, [in&&optional] LPCTSTR lpCaption, [in] UINT uType );
+wsprintfW-int WINAPIV wsprintfW( [out] LPWSTR unnamedParam1, [in] LPCWSTR unnamedParam2, ...  );
+SetPropW-BOOL SetPropW( [in] HWND hWnd, [in] LPCWSTR lpString, [in&&optional] HANDLE hData );
+GetSysColorBrush-HBRUSH GetSysColorBrush( [in] int nIndex );
+MessageBoxA-int MessageBoxA( [in&&optional] HWND hWnd, [in&&optional] LPCSTR lpText, [in&&optional] LPCSTR lpCaption, [in] UINT uType );
+GetWindowTextLengthW-int GetWindowTextLengthA( [in] HWND hWnd );
+TrackPopupMenu-BOOL TrackPopupMenu( [in] HMENU hMenu, [in] UINT uFlags, [in] int x, [in] int y, [in] int nReserved, [in] HWND hWnd, [in&&optional] const RECT *prcRect );
+CharLowerW-LPWSTR CharLowerW( [in&&out] LPWSTR lpsz );
+HideCaret-BOOL HideCaret( [in&&optional] HWND hWnd );
+ModifyMenuW-BOOL ModifyMenuW( [in] HMENU hMnu, [in] UINT uPosition, [in] UINT uFlags, [in] UINT_PTR uIDNewItem, [in&&optional] LPCWSTR lpNewItem );
+RegisterClassExW-ATOM RegisterClassExA( [in] const WNDCLASSEXA *unnamedParam1 );
+UnregisterClassW-BOOL UnregisterClassA( [in] LPCSTR lpClassName, [in&&optional] HINSTANCE hInstance );
+PostQuitMessage-void PostQuitMessage( [in] int nExitCode );
+DeleteDC-BOOL DeleteDC( [in] HDC hdc );
+GetPixel-COLORREF GetPixel( [in] HDC hdc, [in] int x, [in] int y );
+BitBlt-BOOL BitBlt( [in] HDC hdc, [in] int x, [in] int y, [in] int cx, [in] int cy, [in] HDC hdcSrc, [in] int x1, [in] int y1, [in] DWORD rop );
+RestoreDC-BOOL RestoreDC( [in] HDC hdc, [in] int nSavedDC );
+CreateCompatibleDC-HDC CreateCompatibleDC( [in] HDC hdc );
+GetObjectW-int GetObject( [in] HANDLE h, [in] int c, [out] LPVOID pv );
+GetDeviceCaps-int GetDeviceCaps( [in] HDC hdc, [in] int index );
+SelectObject-HGDIOBJ SelectObject( [in] HDC hdc, [in] HGDIOBJ h );
+CreateCompatibleBitmap-HBITMAP CreateCompatibleBitmap( [in] HDC hdc, [in] int cx, [in] int cy );
+MoveToEx-BOOL MoveToEx( [in] HDC hdc, [in] int x, [in] int y, [out] LPPOINT lppt );
+LineTo-BOOL LineTo( [in] HDC hdc, [in] int x, [in] int y );
+CreateHatchBrush-HBRUSH CreateHatchBrush( [in] int iHatch, [in] COLORREF color );
+GetTextMetricsW-BOOL GetTextMetrics( [in] HDC hdc, [out] LPTEXTMETRIC lptm );
+SetROP2-int SetROP2( [in] HDC hdc, [in] int rop2 );
+GetROP2-int SetROP2( [in] HDC hdc, [in] int rop2 );
+CreateFontW-HFONT CreateFontA( [in] int cHeight, [in] int cWidth, [in] int cEscapement, [in] int cOrientation, [in] int cWeight, [in] DWORD bItalic, [in] DWORD bUnderline, [in] DWORD bStrikeOut, [in] DWORD iCharSet, [in] DWORD iOutPrecision, [in] DWORD iClipPrecision, [in] DWORD iQuality, [in] DWORD iPitchAndFamily, [in] LPCSTR pszFaceName );
+ExtTextOutW-BOOL ExtTextOutA( [in] HDC hdc, [in] int x, [in] int y, [in] UINT options, [in] const RECT *lprect, [in] LPCSTR lpString, [in] UINT c, [in] const INT *lpDx );
+SaveDC-int SaveDC( [in] HDC hdc );
+CreateBitmap-HBITMAP CreateBitmap( [in] int nWidth, [in] int nHeight, [in] UINT nPlanes, [in] UINT nBitCount, [in] const VOID *lpBits );
+CreatePatternBrush-HBRUSH CreatePatternBrush( [in] HBITMAP hbm );
+PatBlt-BOOL PatBlt( [in] HDC hdc, [in] int x, [in] int y, [in] int w, [in] int h, [in] DWORD rop );
+GetDIBits-int GetDIBits( [in] HDC hdc, [in] HBITMAP hbm, [in] UINT start, [in] UINT cLines, [out] LPVOID lpvBits, [in&&out] LPBITMAPINFO lpbmi, [in] UINT usage );
+SetDIBits-int SetDIBits( [in] HDC hdc, [in] HBITMAP hbm, [in] UINT start, [in] UINT cLines, [in] const VOID *lpBits, [in] const BITMAPINFO *lpbmi, [in] UINT ColorUse );
+SetTextAlign-UINT SetTextAlign( [in] HDC hdc, [in] UINT align );
+StartDocW-int StartDocA( [in] HDC hdc, [in] const DOCINFOA *lpdi );
+EndDoc-int EndDoc( [in] HDC hdc );
+StartPage-int StartPage( [in] HDC hdc );
+EndPage-int EndPage( [in] HDC hdc );
+DPtoLP-BOOL DPtoLP( [in] HDC hdc, [in&&out] LPPOINT lppt, [in] int c );
+GetTextExtentPointW-BOOL GetTextExtentPointA( [in] HDC hdc, [in] LPCSTR lpString, [in] int c, [out] LPSIZE lpsz );
+StretchBlt-BOOL StretchBlt( [in] HDC hdcDest, [in] int xDest, [in] int yDest, [in] int wDest, [in] int hDest, [in] HDC hdcSrc, [in] int xSrc, [in] int ySrc, [in] int wSrc, [in] int hSrc, [in] DWORD rop );
+CombineRgn-int CombineRgn( [in] HRGN hrgnDst, [in] HRGN hrgnSrc1, [in] HRGN hrgnSrc2, [in] int iMode );
+IntersectClipRect-int IntersectClipRect( [in] HDC hdc, [in] int left, [in] int top, [in] int right, [in] int bottom );
+RoundRect-BOOL RoundRect( [in] HDC hdc, [in] int left, [in] int top, [in] int right, [in] int bottom, [in] int width, [in] int height );
+Ellipse-BOOL Ellipse( [in] HDC hdc, [in] int left, [in] int top, [in] int right, [in] int bottom );
+Polygon-BOOL Polygon( [in] HDC hdc, [in] const POINT *apt, [in] int cpt );
+GetTextExtentExPointA-BOOL GetTextExtentExPointA( [in] HDC hdc, [in] LPCSTR lpszString, [in] int cchString, [in] int nMaxExtent, [out] LPINT lpnFit, [out] LPINT lpnDx, [out] LPSIZE lpSize );
+GetTextExtentExPointW-BOOL GetTextExtentPointA( [in] HDC hdc, [in] LPCSTR lpString, [in] int c, [out] LPSIZE lpsz );
+GetTextExtentPoint32A-BOOL GetTextExtentPoint32A( [in] HDC hdc, [in] LPCSTR lpString, [in] int c, [out] LPSIZE psizl );
+CreateDIBSection-HBITMAP CreateDIBSection( [in] HDC hdc, [in] const BITMAPINFO *pbmi, [in] UINT usage, [out] VOID **ppvBits, [in] HANDLE hSection, [in] DWORD offset );
+ExtTextOutA-BOOL ExtTextOutA( [in] HDC hdc, [in] int x, [in] int y, [in] UINT options, [in] const RECT *lprect, [in] LPCSTR lpString, [in] UINT c, [in] const INT *lpDx );
+SetTextColor-COLORREF SetTextColor( [in] HDC hdc, [in] COLORREF color );
+SetBkMode-int SetBkMode( [in] HDC hdc, [in] int mode );
+Polyline-BOOL Polyline( [in] HDC hdc, [in] const POINT *apt, [in] int cpt );
+SelectClipRgn-int SelectClipRgn( [in] HDC hdc, [in] HRGN hrgn );
+Rectangle-BOOL Rectangle( [in] HDC hdc, [in] int left, [in] int top, [in] int right, [in] int bottom );
+GetTextExtentPoint32W-BOOL GetTextExtentPoint32A( [in] HDC hdc, [in] LPCSTR lpString, [in] int c, [out] LPSIZE psizl );
+GetStockObject-HGDIOBJ GetStockObject( [in] int i );
+GetClipRgn-int GetClipRgn( [in] HDC hdc, [in] HRGN hrgn );
+DeleteObject-BOOL DeleteObject( [in] HGDIOBJ ho );
+CreateSolidBrush-HBRUSH CreateSolidBrush( [in] COLORREF color );
+CreateRectRgnIndirect-HRGN CreateRectRgnIndirect( [in] const RECT *lprect );
+CreateRectRgn-HRGN CreateRectRgn( [in] int x1, [in] int y1, [in] int x2, [in] int y2 );
+CreatePen-HPEN CreatePen( [in] int iStyle, [in] int cWidth, [in] COLORREF color );
+CreateFontIndirectW-HFONT CreateFontIndirectA( [in] const LOGFONTA *lplf );
+SetBkColor-COLORREF SetBkColor( [in] HDC hdc, [in] COLORREF color );
+SetWindowOrgEx-BOOL SetWindowOrgEx( [in] HDC hdc, [in] int x, [in] int y, [out] LPPOINT lppt );
+CreateFontA-HFONT CreateFontA( [in] int cHeight, [in] int cWidth, [in] int cEscapement, [in] int cOrientation, [in] int cWeight, [in] DWORD bItalic, [in] DWORD bUnderline, [in] DWORD bStrikeOut, [in] DWORD iCharSet, [in] DWORD iOutPrecision, [in] DWORD iClipPrecision, [in] DWORD iQuality, [in] DWORD iPitchAndFamily, [in] LPCSTR pszFaceName );
+ChooseColorW-BOOL WINAPI ChooseColor( _Inout_ LPCHOOSECOLOR lpcc );
+PrintDlgW-BOOL WINAPI PrintDlg( _Inout_ LPPRINTDLG lppd );
+RegCloseKey-LSTATUS RegCloseKey( [in] HKEY hKey );
+RegOpenKeyExW-LSTATUS RegOpenKeyExW( [in] HKEY hKey, [in&&optional] LPCWSTR lpSubKey, [in] DWORD ulOptions, [in] REGSAM samDesired, [out] PHKEY phkResult );
+RegQueryValueExW-LSTATUS RegQueryValueExA( [in] HKEY hKey, [in&&optional] LPCSTR lpValueName, LPDWORD lpReserved, [out&&optional] LPDWORD lpType, [out&&optional] LPBYTE lpData, [in&&out, optional] LPDWORD lpcbData );
+AllocateAndInitializeSid-BOOL AllocateAndInitializeSid( [in] PSID_IDENTIFIER_AUTHORITY pIdentifierAuthority, [in] BYTE nSubAuthorityCount, [in] DWORD nSubAuthority0, [in] DWORD nSubAuthority1, [in] DWORD nSubAuthority2, [in] DWORD nSubAuthority3, [in] DWORD nSubAuthority4, [in] DWORD nSubAuthority5, [in] DWORD nSubAuthority6, [in] DWORD nSubAuthority7, [out] PSID *pSid );
+CheckTokenMembership-BOOL CheckTokenMembership( [in&&optional] HANDLE TokenHandle, [in] PSID SidToCheck, [out] PBOOL IsMember );
+FreeSid-PVOID FreeSid( [in] PSID pSid );
+RegCreateKeyExW-LSTATUS RegCreateKeyExA( [in] HKEY hKey, [in] LPCSTR lpSubKey, DWORD Reserved, [in&&optional] LPSTR lpClass, [in] DWORD dwOptions, [in] REGSAM samDesired, [in&&optional] const LPSECURITY_ATTRIBUTES lpSecurityAttributes, [out] PHKEY phkResult, [out&&optional] LPDWORD lpdwDisposition );
+RegDeleteValueW-LSTATUS RegDeleteValueA( [in] HKEY hKey, [in&&optional] LPCSTR lpValueName );
+RegEnumKeyExW-LSTATUS RegEnumKeyExW( [in] HKEY hKey, [in] DWORD dwIndex, [out] LPWSTR lpName, [in&&out] LPDWORD lpcchName, LPDWORD lpReserved, [in&&out] LPWSTR lpClass, [in&&out, optional] LPDWORD lpcchClass, [out&&optional] PFILETIME lpftLastWriteTime );
+RegQueryInfoKeyW-LSTATUS RegQueryInfoKeyA( [in] HKEY hKey, [out&&optional] LPSTR lpClass, [in&&out, optional] LPDWORD lpcchClass, LPDWORD lpReserved, [out&&optional] LPDWORD lpcSubKeys, [out&&optional] LPDWORD lpcbMaxSubKeyLen, [out&&optional] LPDWORD lpcbMaxClassLen, [out&&optional] LPDWORD lpcValues, [out&&optional] LPDWORD lpcbMaxValueNameLen, [out&&optional] LPDWORD lpcbMaxValueLen, [out&&optional] LPDWORD lpcbSecurityDescriptor, [out&&optional] PFILETIME lpftLastWriteTime );
+RegSetValueExW-LSTATUS RegSetValueExA( [in] HKEY hKey, [in&&optional] LPCSTR lpValueName, DWORD Reserved, [in] DWORD dwType, [in] const BYTE *lpData, [in] DWORD cbData );
+IsTextUnicode-BOOL IsTextUnicode( [in] const VOID *lpv, [in] int iSize, [in&&out, optional] LPINT lpiResult );
+CLSIDFromProgID-HRESULT CLSIDFromProgID( [in] LPCOLESTR lpszProgID, [out] LPCLSID lpclsid );
+RegisterDragDrop-HRESULT RegisterDragDrop( [in] HWND hwnd, [in] LPDROPTARGET pDropTarget );
+OleInitialize-HRESULT OleInitialize( [in] LPVOID pvReserved );
+DoDragDrop-HRESULT DoDragDrop( [in] LPDATAOBJECT pDataObj, [in] LPDROPSOURCE pDropSource, [in] DWORD dwOKEffects, [out] LPDWORD pdwEffect );
+ReleaseStgMedium-void ReleaseStgMedium( LPSTGMEDIUM unnamedParam1 );
+CoInitialize-HRESULT CoInitialize( [in&&optional] LPVOID pvReserved );
+CoUninitialize-void CoUninitialize( );
+CoTaskMemFree-void CoTaskMemFree( [in&&optional] _Frees_ptr_opt_ LPVOID pv );
+CoCreateInstance-HRESULT CoCreateInstance( [in] REFCLSID rclsid, [in] LPUNKNOWN pUnkOuter, [in] DWORD dwClsContext, [in] REFIID riid, [out] LPVOID *ppv );
+RevokeDragDrop-HRESULT RevokeDragDrop( [in] HWND hwnd );
+OpenThemeData-HTHEME OpenThemeData( [in] HWND hwnd, [in] LPCWSTR pszClassList );
+DrawThemeBackground-HRESULT DrawThemeBackground( [in] HTHEME hTheme, [in] HDC hdc, [in] int iPartId, [in] int iStateId, [in] LPCRECT pRect, [in] LPCRECT pClipRect );
+GetThemePartSize-HRESULT GetThemePartSize( [in] HTHEME hTheme, [in] HDC hdc, [in] int iPartId, [in] int iStateId, [in] LPCRECT prc, THEMESIZE eSize, [out] SIZE *psz );
+GetThemeFont-HRESULT GetThemeFont( [in] HTHEME hTheme, [in] HDC hdc, [in] int iPartId, [in] int iStateId, [in] int iPropId, [out] LOGFONTW *pFont );
+SetWindowTheme-HRESULT SetWindowTheme( [in] HWND hwnd, [in] LPCWSTR pszSubAppName, [in] LPCWSTR pszSubIdList );
+EnableThemeDialogTexture-HRESULT EnableThemeDialogTexture( [in] HWND hwnd, [in] DWORD dwFlags );
+DrawThemeParentBackground-HRESULT DrawThemeParentBackground( [in] HWND hwnd, [in] HDC hdc, [in] const RECT *prc );
+GetThemeTransitionDuration-HRESULT GetThemeTransitionDuration( HTHEME hTheme, int iPartId, int iStateIdFrom, int iStateIdTo, int iPropId, [out] DWORD *pdwDuration );
+BufferedPaintRenderAnimation-BOOL BufferedPaintRenderAnimation( HWND hwnd, HDC hdcTarget );
+EndBufferedAnimation-HRESULT EndBufferedAnimation( HANIMATIONBUFFER hbpAnimation, BOOL fUpdateTarget );
+BufferedPaintStopAllAnimations-HRESULT BufferedPaintStopAllAnimations( HWND hwnd );
+DrawThemeTextEx-HRESULT DrawThemeTextEx( [in] HTHEME hTheme, [in] HDC hdc, [in] int iPartId, [in] int iStateId, [in] LPCWSTR pszText, [in] int cchText, [in] DWORD dwTextFlags, [in&&out] LPRECT pRect, [in] const DTTOPTS *pOptions );
+CertGetCertificateContextProperty-BOOL CertGetCertificateContextProperty( [in] PCCERT_CONTEXT pCertContext, [in] DWORD dwPropId, [out] void *pvData, [in&&out] DWORD *pcbData );
+CertFindCertificateInStore-PCCERT_CONTEXT CertFindCertificateInStore( [in] HCERTSTORE hCertStore, [in] DWORD dwCertEncodingType, [in] DWORD dwFindFlags, [in] DWORD dwFindType, [in] const void *pvFindPara, [in] PCCERT_CONTEXT pPrevCertContext );
+CertCloseStore-BOOL CertCloseStore( [in] HCERTSTORE hCertStore, [in] DWORD dwFlags );
+CryptMsgClose-BOOL CryptMsgClose( [in] HCRYPTMSG hCryptMsg );
+DestroyAcceleratorTable-BOOL DestroyAcceleratorTable( [in] HACCEL hAccel );
+DestroyCursor-BOOL DestroyCursor( [in] HCURSOR hCursor );
+CloseThemeData-HRESULT CloseThemeData( [in] HTHEME hTheme );
+_initialize_onexit_table-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_register_onexit_function-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_controlfp_s-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_initialize_narrow_environment-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_exit-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_register_thread_local_exe_atexit_callback-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_configure_narrow_argv-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_set_app_type-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_seh_filter_exe-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
+exit-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_initterm_e-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_initterm-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_crt_atexit-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
+__setusermatherr-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_set_fmode-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_configthreadlocale-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_set_new_mode-python: can't open file 'C:\Users\Rudic\source\repos\FibonacciTesting\FibonacciTesting\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_get_stream_buffer_pointers-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+fread-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+fsetpos-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+setvbuf-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+fgetpos-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+fwrite-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+fgetc-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+fflush-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_fseeki64-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_lock_file-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_unlock_file-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_callnewh-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+free-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+malloc-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+VirtualQuery-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+__p___argc-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+__p___argv-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_cexit-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_c_exit-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+__p__commode-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_seh_filter_dll-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_execute_onexit_table-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_crt_at_quick_exit-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+strcpy_s-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+strcat_s-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+__stdio_common_vsprintf_s-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+terminate-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_wmakepath_s-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_wsplitpath_s-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+wcscpy_s-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_CrtDbgReportW-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_malloc_dbg-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_free_dbg-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+ungetc-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+fputc-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+fclose-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_CrtDbgReport-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+_invalid_parameter-python: can't open file 'C:\Users\Rudic\source\repos\WriteHelloProject\WriteHelloProject\webScrapperMSDN.py': [Errno 2] No such file or directory 
+ImmSetCompositionWindow-python: can't open file 'C:\Program Files (x86 );
+OffsetWindowOrgEx-python: can't open file 'C:\Program Files (x86 );
+SetBrushOrgEx-python: can't open file 'C:\Program Files (x86 );
+EnumFontFamiliesExW-python: can't open file 'C:\Program Files (x86 );
+ExcludeClipRect-python: can't open file 'C:\Program Files (x86 );
+GetThemeBackgroundContentRect-python: can't open file 'C:\Program Files (x86 );
+BeginBufferedAnimation-python: can't open file 'C:\Program Files (x86 );
+>>>>>>> dac2e02fc2297774b6dbcac2a80524658276680d

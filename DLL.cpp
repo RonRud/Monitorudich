@@ -19,9 +19,15 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 				std::getline(myfile, dllRecievedInfo);
 				strcpy(infoToMainFilePath, dllRecievedInfo.c_str());
 				std::getline(myfile, dllRecievedInfo);
-				isWebScrapingEnabled = std::strtoul(dllRecievedInfo.c_str(), NULL, 10); // read from the forth line the boolean of isWebScrapingEnabled
+				strcpy(offlineScrapesFile, dllRecievedInfo.c_str());
 				std::getline(myfile, dllRecievedInfo);
-				attamptToHookNumFunctions = std::strtoul(dllRecievedInfo.c_str(), NULL, 10);// read from the fifth line the number of functions to hook
+				strcpy(blacklistFilePath, dllRecievedInfo.c_str());
+				std::getline(myfile, dllRecievedInfo);
+				strcpy(webScrapperPythonFilePath, dllRecievedInfo.c_str());
+				std::getline(myfile, dllRecievedInfo);
+				isWebScrapingEnabled = std::strtoul(dllRecievedInfo.c_str(), NULL, 10); // read from the seventh line the boolean of isWebScrapingEnabled
+				std::getline(myfile, dllRecievedInfo);
+				attamptToHookNumFunctions = std::strtoul(dllRecievedInfo.c_str(), NULL, 10);// read from the eighth line the number of functions to hook
 			}
 			else {
 				std::cout << "Unable to read text from info_to_dll.txt, quitting injected dll..." << std::endl;
@@ -34,15 +40,15 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 		//initialize an empty file
 		std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::trunc);
 		saveFile.close();
-		std::ofstream infoFromDllToMain("dll_to_main_program.txt", std::ios::out | std::ios::trunc);
+		std::ofstream infoFromDllToMain(infoToMainFilePath, std::ios::out | std::ios::trunc);
 		infoFromDllToMain.close();
 
 
 		IAThooking(GetModuleHandleA(NULL), attamptToHookNumFunctions);
 		std::cout << "dllmain finished executing" << std::endl << std::endl << std::endl;
 		//resume main program by indicating it can continue to run
-		std::ofstream sendToMainFile("dll_to_main_program.txt", std::ios::out | std::ios::app);
-		sendToMainFile << "Main program can continue executing" << std::endl;
+		std::ofstream sendToMainFile(infoToMainFilePath, std::ios::out | std::ios::app);
+		sendToMainFile << std::endl << "Main program can continue executing";
 		sendToMainFile.close();
 		break;
 	}
@@ -72,7 +78,7 @@ bool IAThooking(HMODULE hInstance, int attamptToHookNumFunctions)
 
 	int functionAttamptedToHookCounter = 0;
 	std::vector<const char*> blackList;
-	std::ifstream blacklistFile("Natural_selector.txt");
+	std::ifstream blacklistFile(blacklistFilePath);
 	if (blacklistFile.is_open()) {
 		std::string blacklistedFunctionName;
 		while (std::getline(blacklistFile, blacklistedFunctionName)) {
@@ -101,8 +107,8 @@ bool IAThooking(HMODULE hInstance, int attamptToHookNumFunctions)
 		while (*(WORD*)pFirstThunk != 0 && *(WORD*)pOriginalFirstThunk != 0) //moving over IAT and over names' table
 		{
 			saveFile << "0x" << std::hex << pFirstThunk->u1.Function << "\t\t" << pFuncData->Name << std::endl;//printing function's name and addr
-			std::ofstream infoToMainFile("dll_to_main_program.txt", std::ios::out | std::ios::app);
-			infoToMainFile << pFuncData->Name << std::endl;
+			std::ofstream infoToMainFile(infoToMainFilePath, std::ios::out | std::ios::app);
+			infoToMainFile << std::endl << pFuncData->Name;
 			infoToMainFile.close();
 			/*
 			std::vector<const char*> blackList = { "EnterCriticalSection", "LeaveCriticalSection", "HeapFree", "HeapAlloc", //8B = mov function crushes
@@ -200,9 +206,9 @@ void logHookName() {
 	saveFile << "address: 0x" << std::hex << originFuncAddr - 5 << ", ";
 	saveFile.close();
 
-	std::ofstream infoToMainFile("dll_to_main_program.txt", std::ios::out | std::ios::app); // TODO fix this, this is a shortcut to get the last function called to main program 
+	std::ofstream infoToMainFile(infoToMainFilePath, std::ios::out | std::ios::app); // TODO fix this, this is a shortcut to get the last function called to main program 
 																							  // so the main program will know the last function that ran in case it crashes (for blacklist)
-	infoToMainFile << *addressToNameMap[originFuncAddr - 5] << std::endl;
+	infoToMainFile << std::endl << *addressToNameMap[originFuncAddr - 5];
 	infoToMainFile.close();
 }
 
@@ -413,7 +419,7 @@ bool inlineHookFunction(DWORD functionAddr, std::string* functionName)
 				si.hStdOutput = hStdOutPipeWrite;
 				PROCESS_INFORMATION pi = { };
 				LPCWSTR lpApplicationName = L"C:\\Windows\\System32\\cmd.exe";
-				std::string stringCommandLine = "python webScrapperMSDN.py " + (*functionName);
+				std::string stringCommandLine = "python " + std::string(webScrapperPythonFilePath) + " " + (*functionName);
 				std::wstring* windwosStringShit = new std::wstring(stringCommandLine.begin(), stringCommandLine.end());
 				const wchar_t* commandLineWchars = (*windwosStringShit).c_str();
 				LPWSTR lpCommandLine = const_cast<LPWSTR>(commandLineWchars);
