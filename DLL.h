@@ -31,6 +31,8 @@ char webScrapperPythonFilePath[100];
 int MAX_STACK_TO_SHOW = 8;
 DWORD originFuncAddr;
 std::map<DWORD, std::string*> addressToNameMap;
+std::map<DWORD, DWORD> trampolineLocationToFunctionLocation;
+std::map<DWORD, DWORD> trampolineLocationToFunctionLocationDsOffset;
 
 int functionParamsNum;
 bool foundWINAPICleanup;

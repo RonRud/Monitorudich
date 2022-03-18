@@ -185,7 +185,7 @@ int main(int argc, char* argv[])
 	std::string pathOfWebScrapper = loggerFilePath.substr(0, last_slash_idx + 1) + "webScrapperMSDN.py";
 
 	bool blacklistIterate = true;
-	int runProgramForBeforeCheck = 35000; //in miliseconds
+	int runProgramForBeforeCheck = 10000; //in miliseconds
 	bool isWebScrapingEnabled = true;
 	int numberOfFunctionsToPossiblyHook = 55555;
 
@@ -292,7 +292,7 @@ int main(int argc, char* argv[])
 				std::cout << "DLL injection failed" << std::endl;
 			}
 
-			Sleep(3000);
+			Sleep(5000);
 
 			DWORD childProcessExitCode = getProcessExitCode(pi.hProcess);
 			if (childProcessExitCode == STILL_ACTIVE) {
