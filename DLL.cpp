@@ -43,6 +43,19 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 		std::ofstream infoFromDllToMain(infoToMainFilePath, std::ios::out | std::ios::trunc);
 		infoFromDllToMain.close();
 
+		//Save hook functions locations so they can be avoided when logging function calls
+		DWORD myFunctionsAddresses[] = { (DWORD)Hook,(DWORD)avoidFunctionLogsCreatedByTheHook,(DWORD)avoidFunctionLogsCreatedByTheHook,(DWORD)logHookName,
+								(DWORD)logAdditionalVariables,(DWORD)getStack,(DWORD)logStack,(DWORD)accountForTrampolineHookInOriginFuncAddr };
+		for (DWORD functionAddr : myFunctionsAddresses) {
+			DWORD functionPtr = functionAddr;
+			while (*(byte*)functionPtr != 0xCC) {
+				functionPtr++; //get pointer to the end of the function
+			}
+			myFunctionsStartAndEndAddressesVector.push_back(std::pair<DWORD, DWORD>({ functionAddr,functionPtr }));
+			//std::cout << "hook function adddress: " << std::hex << functionAddr << std::endl;
+			//std::cout << "end of hook function adddress: " << std::hex << functionPtr << std::endl;
+		}
+
 
 		IAThooking(GetModuleHandleA(NULL), attamptToHookNumFunctions);
 		std::cout << "dllmain finished executing" << std::endl << std::endl << std::endl;
@@ -381,6 +394,30 @@ void accountForTrampolineHookInOriginFuncAddr() {
 	}
 }
 
+void avoidFunctionLogsCreatedByTheHook() {
+	//Check if the function call originated from the hook and if so stop the hook from logging the function (return)
+	for (std::pair<DWORD, DWORD> functionsStartAndEndAddressPair : myFunctionsStartAndEndAddressesVector) {
+		if (functionsStartAndEndAddressPair.first <= originFuncAddr && originFuncAddr <= functionsStartAndEndAddressPair.second) {
+			//the function was called from the hook and not the user program, therefore let's finish the hook without logging anything
+			//this will also not call any other API calls therefore preventing functions creating stack overflow
+			accountForTrampolineHookInOriginFuncAddr();
+
+			__asm {
+				PUSH EBP
+				PUSH originFuncAddr
+				lea EBP, [ESP + 4]
+
+				mov eax, savedEax
+				mov ebx, savedEbx
+				mov ecx, savedEcx
+				mov edx, savedEdx
+			};
+
+			__asm RETN
+		}
+	}
+}
+
 
 void __declspec(naked) Hook() { // this means compiler doesn't go here
 								// this function definition tells the compiler not to touch the stack
@@ -398,6 +435,7 @@ void __declspec(naked) Hook() { // this means compiler doesn't go here
 		POP EAX
 		MOV originFuncAddr, EAX
 	};
+	avoidFunctionLogsCreatedByTheHook();
 	logHookName();
 	logAdditionalVariables();
 	getStack();
@@ -417,6 +455,7 @@ void __declspec(naked) Hook() { // this means compiler doesn't go here
 
 	__asm RETN
 }
+
 void webScrapeFunction(std::string* functionName) {
 	std::cout << "web scraping function: " << *functionName << std::endl;
 	std::string line;

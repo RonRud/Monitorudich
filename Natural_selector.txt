@@ -15,7 +15,6 @@ GetModuleHandleW
 EncodePointer
 IsProcessorFeaturePresent
 RtlUnwind
-ReadFile
 InitializeCriticalSectionExMultiByteToWideChar
 MultiByteToWideChar
 VirtualProtect
@@ -29,6 +28,6 @@ TlsSetValue
 RaiseException
 GetUserDefaultLCID
 LoadCursorW
-WriteFile
 _get_stream_buffer_pointers
 _execute_onexit_table
+WriteFile

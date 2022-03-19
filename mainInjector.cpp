@@ -38,7 +38,7 @@ bool InjectDLL(DWORD ProcessID)
 	int numberOfFunctionsToPossiblyHook = 55555;
 
 	//Send data to injected dll
-	std::ofstream dllInfoFile("D:\\info_to_dll.txt", std::ios::out | std::ios::trunc);
+	std::ofstream dllInfoFile("C:\\Windows\\Temp\\info_to_dll.txt", std::ios::out | std::ios::trunc);
 	dllInfoFile << loggerFilePath << std::endl;
 	dllInfoFile << pathOfFileToDll << std::endl;
 	dllInfoFile << pathOfFileFromDll << std::endl;

@@ -19,7 +19,15 @@ bool inlineHookFunction(DWORD Function, std::string* functionName);
 void IAThookingCleanup();
 void inlineHookFunctionCleanup(DWORD functionAddr);
 
+// Functions that are part of the hook procedure (ran at runtime)
 void Hook();
+void logHookName();
+void logAdditionalVariables();
+void getStack();
+void logStack();
+void accountForTrampolineHookInOriginFuncAddr();
+void avoidFunctionLogsCreatedByTheHook();
+
 
 char loggerFilePath[100];
 char infoToMainFilePath[100];
@@ -33,6 +41,7 @@ DWORD originFuncAddr;
 std::map<DWORD, std::string*> addressToNameMap;
 std::map<DWORD, DWORD> trampolineLocationToFunctionLocation;
 std::map<DWORD, DWORD> trampolineLocationToFunctionLocationDsOffset;
+std::vector<std::pair<DWORD, DWORD>> myFunctionsStartAndEndAddressesVector;
 
 int functionParamsNum;
 bool foundWINAPICleanup;
