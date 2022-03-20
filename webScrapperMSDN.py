@@ -5,7 +5,10 @@ import sys
 if len(sys.argv) != 2:
     print("didn't get function name as cmd argv 2")
 func_to_search = sys.argv[1]
-url = "https://www.google.com/search?q=" + func_to_search +"+msdn"
+if func_to_search[-1] == 'W':
+    url = "https://www.google.com/search?q=" + func_to_search
+else:
+    url = "https://www.google.com/search?q=" + func_to_search +"+msdn"
 CHROME_90_HEADERS = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36"}
 page = requests.get(url, headers = CHROME_90_HEADERS)
 

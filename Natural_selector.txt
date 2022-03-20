@@ -31,3 +31,4 @@ LoadCursorW
 _get_stream_buffer_pointers
 _execute_onexit_table
 WriteFile
+ReadFile

@@ -292,6 +292,16 @@ void __declspec(naked) getStack() {
 	__asm ret
 }
 
+std::string utf8_encode(const std::wstring& wstr)
+{
+	if (wstr.empty()) return std::string();
+	int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+	std::string strTo(size_needed, 0);
+	WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
+	return strTo;
+}
+
+
 void logStack() {
 	std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::app);
 	saveFile << "presumed function bytes in hex: ";
@@ -332,10 +342,10 @@ void logStack() {
 				saveFile << "\"" << (LPCTSTR)functionParameters[i] << "\"";
 			}
 			else if (parameterType == "LPCWSTR") {
-				saveFile << "\"" << (LPCWSTR)functionParameters[i] << "\"";
+				saveFile << "\"" << utf8_encode((LPCWSTR)functionParameters[i]) << "\"";
 			}
 			else if (parameterType == "LPWSTR") {
-				saveFile << "\"" << (LPWSTR)functionParameters[i] << "\"";
+				saveFile << "\"" << utf8_encode((LPWSTR)functionParameters[i]) << "\"";
 			}
 			else if (parameterType == "LPSTR") {
 				saveFile << "\"" << (LPSTR)functionParameters[i] << "\"";
