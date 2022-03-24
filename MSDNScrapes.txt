@@ -394,3 +394,6 @@ FindFirstFileExW-HANDLE FindFirstFileExW( [in] LPCWSTR lpFileName, [in] FINDEX_I
 GetEnvironmentStringsW-LPWCH GetEnvironmentStringsW( );
 FreeEnvironmentStringsW-BOOL FreeEnvironmentStringsA( LPCH penv );
 SetEnvironmentVariableW-BOOL SetEnvironmentVariableW( [in] LPCWSTR lpName, [in&&optional] LPCWSTR lpValue );
+GetExitCodeProcess-BOOL GetExitCodeProcess( [in] HANDLE hProcess, [out] LPDWORD lpExitCode );
+CreateProcessW-BOOL CreateProcessW( [in] LPCWSTR lpApplicationName, LPWSTR lpCommandLine, LPSECURITY_ATTRIBUTES lpProcessAttributes, LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles, DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory, LPSTARTUPINFOW lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation );
+GetFileAttributesExW-BOOL GetFileAttributesExW( [in] LPCWSTR lpFileName, [in] GET_FILEEX_INFO_LEVELS fInfoLevelId, [out] LPVOID lpFileInformation );
