@@ -32,3 +32,13 @@ _get_stream_buffer_pointers
 _execute_onexit_table
 WriteFile
 ReadFile
+AcquireSRWLockExclusive
+ReleaseSRWLockExclusive
+AcquireSRWLockShared
+InitializeCriticalSection
+ReleaseSRWLockShared
+_seh_filter_exe
+_configure_narrow_argv
+_initialize_narrow_environment
+GetFullPathNameW
+exit

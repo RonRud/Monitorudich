@@ -397,3 +397,18 @@ SetEnvironmentVariableW-BOOL SetEnvironmentVariableW( [in] LPCWSTR lpName, [in&&
 GetExitCodeProcess-BOOL GetExitCodeProcess( [in] HANDLE hProcess, [out] LPDWORD lpExitCode );
 CreateProcessW-BOOL CreateProcessW( [in] LPCWSTR lpApplicationName, LPWSTR lpCommandLine, LPSECURITY_ATTRIBUTES lpProcessAttributes, LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles, DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory, LPSTARTUPINFOW lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation );
 GetFileAttributesExW-BOOL GetFileAttributesExW( [in] LPCWSTR lpFileName, [in] GET_FILEEX_INFO_LEVELS fInfoLevelId, [out] LPVOID lpFileInformation );
+AcquireSRWLockExclusive-void AcquireSRWLockExclusive( [in&&out] PSRWLOCK SRWLock );
+ReleaseSRWLockExclusive-void ReleaseSRWLockExclusive( [in&&out] PSRWLOCK SRWLock );
+RtlCaptureContext-NTSYSAPI VOID RtlCaptureContext( [out] PCONTEXT ContextRecord );
+GetCurrentDirectoryW-DWORD GetCurrentDirectory( [in] DWORD nBufferLength, [out] LPTSTR lpBuffer );
+GetEnvironmentVariableW-DWORD GetEnvironmentVariableW( [in&&optional] LPCWSTR lpName, [out&&optional] LPWSTR lpBuffer, [in] DWORD nSize );
+AddVectoredExceptionHandler-PVOID AddVectoredExceptionHandler( ULONG First, PVECTORED_EXCEPTION_HANDLER Handler );
+SetThreadStackGuarantee-BOOL SetThreadStackGuarantee( [in&&out] PULONG StackSizeInBytes );
+InitializeCriticalSection-void InitializeCriticalSection( [out] LPCRITICAL_SECTION lpCriticalSection );
+AcquireSRWLockShared-void AcquireSRWLockShared( [in&&out] PSRWLOCK SRWLock );
+ReleaseSRWLockShared-void AcquireSRWLockShared( [in&&out] PSRWLOCK SRWLock );
+CreateMutexA-HANDLE CreateMutexA( [in&&optional] LPSECURITY_ATTRIBUTES lpMutexAttributes, [in] BOOL bInitialOwner, [in&&optional] LPCSTR lpName );
+GetFileInformationByHandle-BOOL GetFileInformationByHandle( [in] HANDLE hFile, [out] LPBY_HANDLE_FILE_INFORMATION lpFileInformation );
+DeviceIoControl-BOOL DeviceIoControl( [in] HANDLE hDevice, [in] DWORD dwIoControlCode, [in&&optional] LPVOID lpInBuffer, [in] DWORD nInBufferSize, [out&&optional] LPVOID lpOutBuffer, [in] DWORD nOutBufferSize, [out&&optional] LPDWORD lpBytesReturned, [in&&out, optional] LPOVERLAPPED lpOverlapped );
+GetFullPathNameW-DWORD GetFullPathNameW( [in] LPCWSTR lpFileName, [in] DWORD nBufferLength, [out] LPWSTR lpBuffer, [out] LPWSTR *lpFilePart );
+free-void free( void *memblock );
