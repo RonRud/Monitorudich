@@ -315,13 +315,13 @@ void logStack() {
 		size_t index = functionDocStr.find('(');
 		saveFile << "presumed function parameters: ";
 		for (int i = 0; i < functionParamsNum; i++) {
-			if (functionDocStr.find(' ', index) >= functionDocStr.find(';')) { break; }
-			size_t firstSpace = functionDocStr.find(' ', index); // between the first and second space is the atrribute [in] for example
-			size_t secondSpace = functionDocStr.find(' ', firstSpace + 1); // between the second and third space is the data type
-			size_t thirdSpace = functionDocStr.find(' ', secondSpace + 1); // after the third space space is the documantation name for the variable
-			if (firstSpace == std::string::npos || thirdSpace == std::string::npos || secondSpace == std::string::npos) { break; }
-			std::string parameterType = functionDocStr.substr(secondSpace + 1, thirdSpace - secondSpace - 1);
-			index = thirdSpace + 1;
+			size_t firstSpace = functionDocStr.find(' ', index); // between the first and second space is the data type
+			size_t secondSpace = functionDocStr.find(' ', firstSpace + 1); // after the second space space is the documantation name for the variable
+			if (firstSpace == std::string::npos || secondSpace == std::string::npos) { break; }
+			std::string parameterType = functionDocStr.substr(firstSpace + 1, secondSpace - firstSpace - 1);
+			
+			if (functionDocStr.find(',', index) == std::string::npos || functionDocStr.find(',', index) >= functionDocStr.find(';')) { break; } //lazy if
+			index = functionDocStr.find(',', index+1);
 
 			//saveFile << parameterType << " ";
 			//Desicion tree on how to treat data types
@@ -466,6 +466,23 @@ void __declspec(naked) Hook() { // this means compiler doesn't go here
 	__asm RETN
 }
 
+
+std::string replaceSubstrInString(std::string str, std::string replaceStr, std::string toStr) {
+	size_t index = 0;
+	while (true) {
+		/* Locate the substring to replace. */
+		index = str.find(replaceStr, index);
+		if (index == std::string::npos) break;
+
+		/* Make the replacement. */
+		str.replace(index, toStr.length(), toStr);
+
+		/* Advance index forward so the next iteration doesn't pick it up as well. */
+		index += toStr.length();
+	}
+	return str;
+}
+
 void webScrapeFunction(std::string* functionName) {
 	std::cout << "web scraping function: " << *functionName << std::endl;
 	std::string line;
@@ -547,26 +564,38 @@ void webScrapeFunction(std::string* functionName) {
 					modifiedBuffer->push_back(';');
 					break;
 				}
+				else if (buffer[i] == '\t' && buffer[i + 1] == '\t') {
+					modifiedBuffer->push_back(' ');
+					i++;
+				}
+				else if (buffer[i] == '\t') {
+					modifiedBuffer->push_back(' ');
+				}
+				else if (buffer[i] == ' ' && buffer[i + 1] == '*') { //saves void *name to void* name for better scraping
+					modifiedBuffer->push_back('*');
+					modifiedBuffer->push_back(' ');
+				}
 				else if (buffer[i] != '\r' && buffer[i] != '\n' && !(buffer[i] == ' ' && buffer[i + 1] == ' ')) {
 					modifiedBuffer->push_back(buffer[i]);
 				}
 			}
-			size_t index = 0;
 			while (true) {
 				/* Locate the substring to replace. */
-				size_t closeSquareIndex = modifiedBuffer->find(']', index);
-				size_t openSquareIndex = modifiedBuffer->find('[', index);
+				size_t openSquareIndex = modifiedBuffer->find(' [', 0);
+				size_t closeSquareIndex = modifiedBuffer->find(']', 0);
 				if (openSquareIndex == std::string::npos) break;
-				size_t commaInTheMiddle = modifiedBuffer->find(',', openSquareIndex);
-				if (commaInTheMiddle != std::string::npos && commaInTheMiddle < closeSquareIndex) {
-					/* Make the replacement. */
-					modifiedBuffer->replace(commaInTheMiddle, 2, "&&");
-					closeSquareIndex += 4;
-				}
-
-				/* Advance index forward so the next iteration doesn't pick it up as well. */
-				index = closeSquareIndex + 1;
+				if (closeSquareIndex == std::string::npos) break;
+				modifiedBuffer->erase(openSquareIndex,closeSquareIndex-openSquareIndex+2);
 			}
+			while (true) {
+				/* Locate the substring to replace. */
+				size_t openIndex = modifiedBuffer->find(" _ ", 0);
+				size_t closeIndex = modifiedBuffer->find(" _", openIndex);
+				if (openIndex == std::string::npos) break;
+				if (closeIndex == std::string::npos) break;
+				modifiedBuffer->erase(openIndex, closeIndex-openIndex+2);
+			}
+			std::cout << *modifiedBuffer << std::endl;
 			nameToDocumantationString[functionName] = modifiedBuffer;
 			//save string to the offlineScrapesFile
 			saveFile << *functionName << "-" << *nameToDocumantationString[functionName] << std::endl;

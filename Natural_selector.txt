@@ -42,3 +42,5 @@ _configure_narrow_argv
 _initialize_narrow_environment
 GetFullPathNameW
 exit
+WaitForSingleObject
+CreateProcessW
