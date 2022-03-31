@@ -416,7 +416,28 @@ void mainMenu() {
 			std::cout << "wha" << std::endl;
 		}
 		else if (chosenOption == "blacklist" || chosenOption == "b") { //blacklist status and options
+			
 			std::cout << "Current blacklist status: " << std::endl;
+			std::ifstream readBlacklistFile(pathOfBlacklist);
+			if (readBlacklistFile) {
+				// get length of file:
+				readBlacklistFile.seekg(0, readBlacklistFile.end);
+				int length = readBlacklistFile.tellg();
+				readBlacklistFile.seekg(0, readBlacklistFile.beg);
+
+				char* buffer = new char[length];
+				// read the entire file as a block into buffer:
+				readBlacklistFile.read(buffer, length);
+
+				//Here goes the main action loop
+				std::cout << buffer << std::endl;
+				std::cout << std::endl << std::endl << "enter blacklist option. options are: add, remove, remove-all, add-filter, remove-filter, add-dll, remove-dll" << std::endl;
+				//cleanup
+				readBlacklistFile.close();
+				delete[] buffer;
+			}
+			else { std::cout << "Unable to open blacklist file, quitting blacklist option..." << std::endl; continue; }
+
 			// TODO print the entire blacklist content and than give user option to add/remove/remove all
 			// TODO add option to add filter/ entire DLL
 		}
