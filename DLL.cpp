@@ -301,6 +301,9 @@ std::string utf8_encode(const std::wstring& wstr)
 	return strTo;
 }
 
+void logParameterAccordingToType(std::ofstream saveFile, std::string parameterType, int value) {
+
+}
 
 void logStack() {
 	std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::app);
@@ -320,12 +323,14 @@ void logStack() {
 			if (firstSpace == std::string::npos || secondSpace == std::string::npos) { break; }
 			std::string parameterType = functionDocStr.substr(firstSpace + 1, secondSpace - firstSpace - 1);
 			
-			if (functionDocStr.find(',', index) == std::string::npos || functionDocStr.find(',', index) >= functionDocStr.find(';')) { break; } //lazy if
-			index = functionDocStr.find(',', index+1);
-
-			//saveFile << parameterType << " ";
-			//Desicion tree on how to treat data types
 			saveFile << parameterType << "=";
+			size_t nextSpace = functionDocStr.find(' ', secondSpace+1); //this finds the next space which will be after the , or before the closing ), this is an ugly solution
+
+			//std::cout << *addressToNameMap[originFuncAddr - 5] << " : " << functionDocStr.substr(secondSpace + 1, nextSpace - secondSpace - 2) << std::endl;
+			//Desicion tree on how to treat data types
+			if (functionDocStr.substr(secondSpace + 1, nextSpace - secondSpace - 2) == "lpBuffer") {
+				saveFile << "VOID*~wstr attempt " << "\"" << utf8_encode((LPCWSTR)functionParameters[i]) << "\"";
+			}
 			if (parameterType == "LPARAM" || parameterType == "long") {
 				saveFile << "long" << (LPARAM)functionParameters[i]; //basically long
 			}
@@ -356,6 +361,9 @@ void logStack() {
 			else if (parameterType == "WPARAM" || parameterType == "UINT") {
 				saveFile << "UINT " << (UINT)functionParameters[i];
 			}
+			//else if (parameterType == "VOID*" || parameterType == "LPVOID") {
+			//	saveFile << "VOID*~wstr attempt " << "\"" << utf8_encode((LPCWSTR)functionParameters[i]) << "\"";
+			//}
 			else if (parameterType == "int") {
 				saveFile << "int " << (int)functionParameters[i];
 			}
@@ -364,6 +372,10 @@ void logStack() {
 				saveFile << "0x" << functionParameters[i];
 			}
 			saveFile << ",";
+
+			if (functionDocStr.find(',', index) == std::string::npos || functionDocStr.find(',', index) >= functionDocStr.find(';')) { break; } //lazy if
+			index = functionDocStr.find(',', index + 1);
+
 		}
 	}
 	else { saveFile << ", "; }
@@ -565,15 +577,20 @@ void webScrapeFunction(std::string* functionName) {
 					break;
 				}
 				else if (buffer[i] == '\t' && buffer[i + 1] == '\t') {
-					modifiedBuffer->push_back(' ');
+					if (buffer[i + 1] != ' ' && buffer[i + 1] != ' ' && buffer[i - 1] != ' ') { //prevent double weird spaces
+						modifiedBuffer->push_back(' ');
+					}
 					i++;
 				}
-				else if (buffer[i] == '\t') {
-					modifiedBuffer->push_back(' ');
+				else if (buffer[i] == '\t' || buffer[i] == ' ') { // wtf windows why is there a non space space (hover to see shenaniganery)
+					if (buffer[i + 1] != ' ' && buffer[i + 1] != ' ' && buffer[i-1] != ' ') { //prevent double weird spaces
+						modifiedBuffer->push_back(' ');
+					}
 				}
 				else if (buffer[i] == ' ' && buffer[i + 1] == '*') { //saves void *name to void* name for better scraping
 					modifiedBuffer->push_back('*');
 					modifiedBuffer->push_back(' ');
+					i++; //skip writing the * again
 				}
 				else if (buffer[i] != '\r' && buffer[i] != '\n' && !(buffer[i] == ' ' && buffer[i + 1] == ' ')) {
 					modifiedBuffer->push_back(buffer[i]);
@@ -589,11 +606,11 @@ void webScrapeFunction(std::string* functionName) {
 			}
 			while (true) {
 				/* Locate the substring to replace. */
-				size_t openIndex = modifiedBuffer->find(" _ ", 0);
-				size_t closeIndex = modifiedBuffer->find(" _", openIndex);
+				size_t openIndex = modifiedBuffer->find(" _", 0);
+				size_t closeIndex = modifiedBuffer->find("_ ", openIndex);
 				if (openIndex == std::string::npos) break;
 				if (closeIndex == std::string::npos) break;
-				modifiedBuffer->erase(openIndex, closeIndex-openIndex+2);
+				modifiedBuffer->erase(openIndex, closeIndex-openIndex+1);
 			}
 			std::cout << *modifiedBuffer << std::endl;
 			nameToDocumantationString[functionName] = modifiedBuffer;

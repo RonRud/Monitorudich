@@ -44,3 +44,4 @@ GetFullPathNameW
 exit
 WaitForSingleObject
 CreateProcessW
+_set_new_mode
