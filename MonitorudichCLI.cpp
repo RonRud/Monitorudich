@@ -20,6 +20,7 @@ std::string pathOfFileFromDll;
 std::string pathOfOfflineScrapes;
 std::string pathOfBlacklist;
 std::string pathOfWebScrapper;
+std::string pathOfExecutable;
 
 bool blacklistIterate = true;
 int runProgramForBeforeCheck = 10000; //in miliseconds
@@ -175,6 +176,8 @@ bool spawnProcessByPath(std::string inspectedProcessPath) {
 	const wchar_t* exePathWchars = (*windwosStringShit).c_str();
 	LPCWSTR exePath = const_cast<LPCWSTR>(exePathWchars);
 
+	pathOfExecutable = inspectedProcessPath.substr(0, inspectedProcessPath.rfind('\\') + 1);
+
 	if (blacklistIterate == false) { //Run normally, assumes blacklist is precalculated (this is unadvised)
 
 	// Start the child process suspended. 
@@ -204,6 +207,7 @@ bool spawnProcessByPath(std::string inspectedProcessPath) {
 		dllInfoFile << pathOfOfflineScrapes << std::endl;
 		dllInfoFile << pathOfBlacklist << std::endl;
 		dllInfoFile << pathOfWebScrapper << std::endl;
+		dllInfoFile << pathOfExecutable << std::endl;
 		dllInfoFile << isWebScrapingEnabled << std::endl;
 		dllInfoFile << numberOfFunctionsToPossiblyHook << std::endl;
 		dllInfoFile.close();
@@ -266,6 +270,7 @@ bool spawnProcessByPath(std::string inspectedProcessPath) {
 			dllInfoFile << pathOfOfflineScrapes << std::endl;
 			dllInfoFile << pathOfBlacklist << std::endl;
 			dllInfoFile << pathOfWebScrapper << std::endl;
+			dllInfoFile << pathOfExecutable << std::endl;
 			dllInfoFile << isWebScrapingEnabled << std::endl;
 			dllInfoFile << numberOfFunctionsToPossiblyHook << std::endl;
 			dllInfoFile.close();

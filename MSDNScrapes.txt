@@ -75,3 +75,9 @@ WriteConsoleW-BOOL WINAPI WriteConsole( HANDLE hConsoleOutput, VOID* lpBuffer, D
 GetStdHandle-HANDLE WINAPI GetStdHandle( DWORD nStdHandle );
 GetConsoleMode-BOOL WINAPI GetConsoleMode( HANDLE hConsoleHandle, LPDWORD lpMode );
 ReadConsoleW-BOOL WINAPI ReadConsole( HANDLE hConsoleInput, LPVOID lpBuffer, DWORD  nNumberOfCharsToRead, LPDWORD lpNumberOfCharsRead, LPVOID pInputControl );
+_register_onexit_function-Traceback (most recent call last );
+_register_onexit_function-NTENT_CHUNK_SIZE );
+_initialize_onexit_table-Traceback (most recent call last );
+_initialize_onexit_table-\AppData\Local\Programs\Python\Python39\lib\site-packages\requests\adapters.py", line 440, in send resp = conn.urlopen( File "C:\Users\Rudic\AppData\Local\Programs\Python\Python39\lib\site-packages\urllib3\connectionpool.py", line 703, in urlopen httplib_response = self._make_request( File "C:\Users\Rudic\AppData\Local\Programs\Python\Python39\lib\site-packages\urllib3\connectionpool.py", line 386, in _make_request self._validate_conn(conn );
+_exit-Traceback (most recent call last );
+_exit-as _shutil File "C:\Users\Rudic\AppData\Local\Programs\Python\Python39\lib\shutil.py", line 22, in <module> import bz2 File "<frozen importlib._bootstrap>", line 1007, in _find_and_load File "<frozen importlib._bootstrap>", line 986, in _find_and_load_unlocked File "<frozen importlib._bootstrap>", line 680, in _load_unlocked File "<frozen importlib._bootstrap_external>", line 786, in exec_module File "<frozen importlib._bootstrap_external>", line 881, in get_code File "<frozen importlib._bootstrap_external>", line 979, in get_dataKeyboardInterruptt

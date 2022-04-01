@@ -25,9 +25,11 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 				std::getline(myfile, dllRecievedInfo);
 				strcpy(webScrapperPythonFilePath, dllRecievedInfo.c_str());
 				std::getline(myfile, dllRecievedInfo);
-				isWebScrapingEnabled = std::strtoul(dllRecievedInfo.c_str(), NULL, 10); // read from the seventh line the boolean of isWebScrapingEnabled
+				strcpy(executablePath, dllRecievedInfo.c_str());
 				std::getline(myfile, dllRecievedInfo);
-				attamptToHookNumFunctions = std::strtoul(dllRecievedInfo.c_str(), NULL, 10);// read from the eighth line the number of functions to hook
+				isWebScrapingEnabled = std::strtoul(dllRecievedInfo.c_str(), NULL, 10); // read from the eighth line the boolean of isWebScrapingEnabled
+				std::getline(myfile, dllRecievedInfo);
+				attamptToHookNumFunctions = std::strtoul(dllRecievedInfo.c_str(), NULL, 10);// read from the nineth line the number of functions to hook
 			}
 			else {
 				std::cout << "Unable to read text from info_to_dll.txt, quitting injected dll..." << std::endl;
@@ -56,8 +58,22 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 			//std::cout << "end of hook function adddress: " << std::hex << functionPtr << std::endl;
 		}
 
+		std::cout << loggerFilePath << std::endl;
+		std::cout << infoToMainFilePath << std::endl;
+		std::cout << infoFromMainFilePath << std::endl;
+		std::cout << offlineScrapesFile << std::endl;
+		std::cout << blacklistFilePath << std::endl;
+		std::cout << webScrapperPythonFilePath << std::endl;
+		std::cout << executablePath << std::endl;
 
 		IAThooking(GetModuleHandleA(NULL), attamptToHookNumFunctions);
+
+		//change the process to it's original working directory (where the executable is)
+		if (SetCurrentDirectory(executablePath) == 0) {
+			std::cout << "Failed to change working directory" << std::endl;
+			std::cout << GetLastError() << std::endl;
+		};
+
 		std::cout << "dllmain finished executing" << std::endl << std::endl << std::endl;
 		//resume main program by indicating it can continue to run
 		std::ofstream sendToMainFile(infoToMainFilePath, std::ios::out | std::ios::app);

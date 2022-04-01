@@ -45,3 +45,5 @@ exit
 WaitForSingleObject
 CreateProcessW
 _set_new_mode
+cleaning up fanction , with offset: 77460d38
+cleaning up fanction , with offset: 77460d38

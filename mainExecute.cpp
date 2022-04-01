@@ -183,6 +183,8 @@ int main(int argc, char* argv[])
 	std::string pathOfOfflineScrapes = loggerFilePath.substr(0, last_slash_idx + 1) + "MSDNScrapes.txt";
 	std::string pathOfBlacklist = loggerFilePath.substr(0, last_slash_idx + 1) + "Natural_selector.txt";
 	std::string pathOfWebScrapper = loggerFilePath.substr(0, last_slash_idx + 1) + "webScrapperMSDN.py";
+	std::cout << inspectedProcessPath << std::endl;
+	std::string pathOfExecutable = inspectedProcessPath.substr(0, inspectedProcessPath.rfind('\\')+1);
 
 	bool blacklistIterate = true;
 	int runProgramForBeforeCheck = 10000; //in miliseconds
@@ -218,6 +220,7 @@ int main(int argc, char* argv[])
 		dllInfoFile << pathOfOfflineScrapes << std::endl;
 		dllInfoFile << pathOfBlacklist << std::endl;
 		dllInfoFile << pathOfWebScrapper << std::endl;
+		dllInfoFile << pathOfExecutable << std::endl;
 		dllInfoFile << isWebScrapingEnabled << std::endl;
 		dllInfoFile << numberOfFunctionsToPossiblyHook << std::endl;
 		dllInfoFile.close();
@@ -280,6 +283,7 @@ int main(int argc, char* argv[])
 			dllInfoFile << pathOfOfflineScrapes << std::endl;
 			dllInfoFile << pathOfBlacklist << std::endl;
 			dllInfoFile << pathOfWebScrapper << std::endl;
+			dllInfoFile << pathOfExecutable << std::endl;
 			dllInfoFile << isWebScrapingEnabled << std::endl;
 			dllInfoFile << numberOfFunctionsToPossiblyHook << std::endl;
 			dllInfoFile.close();
