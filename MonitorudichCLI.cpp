@@ -425,6 +425,7 @@ void mainMenu() {
 			std::cout << "Current blacklist status: " << std::endl;
 			std::ifstream readBlacklistFile(pathOfBlacklist);
 			if (readBlacklistFile) {
+				
 				// get length of file:
 				readBlacklistFile.seekg(0, readBlacklistFile.end);
 				int length = readBlacklistFile.tellg();
@@ -433,10 +434,48 @@ void mainMenu() {
 				char* buffer = new char[length];
 				// read the entire file as a block into buffer:
 				readBlacklistFile.read(buffer, length);
+				
+				std::string fileContent(buffer);
+				std::getline(readBlacklistFile, fileContent, '\0');
 
 				//Here goes the main action loop
-				std::cout << buffer << std::endl;
-				std::cout << std::endl << std::endl << "enter blacklist option. options are: add, remove, remove-all, add-filter, remove-filter, add-dll, remove-dll" << std::endl;
+				std::cout << fileContent << std::endl;
+				std::cout << std::endl << std::endl << "enter blacklist option. options are: quit, add, remove, remove-all, add-dll, remove-dll" << std::endl;
+				std::string blacklistOption;
+
+				while (true) {
+					std::getline(std::cin, blacklistOption);
+
+					if (blacklistOption.substr(0, 3) == "add") {
+						fileContent.append(blacklistOption.substr(4, blacklistOption.length() - 3).append("\n").c_str());
+					}
+					else if (blacklistOption.substr(0, 5) == "remove") {
+						std::string deleteEntry = blacklistOption.substr(4, blacklistOption.length() - 3);
+						size_t place = fileContent.find(deleteEntry.c_str());
+						if (place != std::string::npos) {
+							fileContent.erase(place, deleteEntry.length());
+						}
+					}
+					else if (blacklistOption == "remove-all") {
+						fileContent = "";
+					}
+					else if (blacklistOption == "add-dll") {
+						//TODO lower priorety feature
+					}
+					else if (blacklistOption == "remove-dll") {
+						//TODO lower priorety feature
+					}
+					else if (blacklistOption == "quit" || blacklistOption == "q") {
+						std::ofstream saveFile(pathOfBlacklist, std::ios::out | std::ios::trunc);
+						saveFile << fileContent;
+						saveFile.close();
+						break;
+					}
+					else {
+						std::cout << "Invalid blacklist option, options are: quit, add, remove, remove-all, add-dll, remove-dll" << std::endl;
+					}
+				}
+
 				//cleanup
 				readBlacklistFile.close();
 				delete[] buffer;

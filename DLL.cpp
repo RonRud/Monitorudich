@@ -91,6 +91,7 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 	}
 	return true;
 }
+
 bool IAThooking(HMODULE hInstance, int attamptToHookNumFunctions)
 {
 	bool flag = false;
@@ -317,10 +318,6 @@ std::string utf8_encode(const std::wstring& wstr)
 	return strTo;
 }
 
-void logParameterAccordingToType(std::ofstream saveFile, std::string parameterType, int value) {
-
-}
-
 void logStack() {
 	std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::app);
 	saveFile << "presumed function bytes in hex: ";
@@ -342,54 +339,57 @@ void logStack() {
 			saveFile << parameterType << "=";
 			size_t nextSpace = functionDocStr.find(' ', secondSpace+1); //this finds the next space which will be after the , or before the closing ), this is an ugly solution
 
-			//std::cout << *addressToNameMap[originFuncAddr - 5] << " : " << functionDocStr.substr(secondSpace + 1, nextSpace - secondSpace - 2) << std::endl;
-			//Desicion tree on how to treat data types
-			if (functionDocStr.substr(secondSpace + 1, nextSpace - secondSpace - 2) == "lpBuffer") {
-				saveFile << "VOID*~wstr attempt " << "\"" << utf8_encode((LPCWSTR)functionParameters[i]) << "\"";
-			}
-			if (parameterType == "LPARAM" || parameterType == "long") {
-				saveFile << "long" << (LPARAM)functionParameters[i]; //basically long
-			}
-			else if (parameterType == "LPBOOL") {
-				saveFile << "boolean " << *(LPBOOL)functionParameters[i];
-			}
-			else if (parameterType == "LPCCH") {
-				saveFile << "char " << *(LPCCH)functionParameters[i];
-			}
-			else if (parameterType == "LPCSTR") {
-				saveFile << "\"" << (LPCSTR)functionParameters[i] << "\"";
-			}
-			else if (parameterType == "LPCTSTR") {
-				saveFile << "\"" << (LPCTSTR)functionParameters[i] << "\"";
-			}
-			else if (parameterType == "LPCWSTR") {
-				saveFile << "\"" << utf8_encode((LPCWSTR)functionParameters[i]) << "\"";
-			}
-			else if (parameterType == "LPWSTR") {
-				saveFile << "\"" << utf8_encode((LPWSTR)functionParameters[i]) << "\"";
-			}
-			else if (parameterType == "LPSTR") {
-				saveFile << "\"" << (LPSTR)functionParameters[i] << "\"";
-			}
-			else if (parameterType == "LPWORD") {
-				saveFile << "WORD " << *(LPWORD)functionParameters[i];
-			}
-			else if (parameterType == "WPARAM" || parameterType == "UINT") {
-				saveFile << "UINT " << (UINT)functionParameters[i];
-			}
-			//else if (parameterType == "VOID*" || parameterType == "LPVOID") {
-			//	saveFile << "VOID*~wstr attempt " << "\"" << utf8_encode((LPCWSTR)functionParameters[i]) << "\"";
-			//}
-			else if (parameterType == "int") {
-				saveFile << "int " << (int)functionParameters[i];
-			}
-			else {
-				//just display hex
-				saveFile << "0x" << functionParameters[i];
-			}
-			saveFile << ",";
+			__try {
+				//std::cout << *addressToNameMap[originFuncAddr - 5] << " : " << functionDocStr.substr(secondSpace + 1, nextSpace - secondSpace - 2) << std::endl;
+				//Desicion tree on how to treat data types
+				if (functionDocStr.substr(secondSpace + 1, nextSpace - secondSpace - 2) == "lpBuffer") {
+					saveFile << "~wstr " << "\"" << utf8_encode((LPCWSTR)functionParameters[i]) << "\"";
+				}
+				else if (parameterType == "LPARAM" || parameterType == "long") {
+					saveFile << "long" << (LPARAM)functionParameters[i]; //basically long
+				}
+				else if (parameterType == "LPBOOL") {
+					saveFile << "boolean " << *(LPBOOL)functionParameters[i];
+				}
+				else if (parameterType == "LPCCH") {
+					saveFile << "char " << *(LPCCH)functionParameters[i];
+				}
+				else if (parameterType == "LPCSTR") {
+					saveFile << "\"" << (LPCSTR)functionParameters[i] << "\"";
+				}
+				else if (parameterType == "LPCTSTR") {
+					saveFile << "\"" << (LPCTSTR)functionParameters[i] << "\"";
+				}
+				else if (parameterType == "LPCWSTR") {
+					saveFile << "\"" << utf8_encode((LPCWSTR)functionParameters[i]) << "\"";
+				}
+				else if (parameterType == "LPWSTR") {
+					saveFile << "\"" << utf8_encode((LPWSTR)functionParameters[i]) << "\"";
+				}
+				else if (parameterType == "LPSTR") {
+					saveFile << "\"" << (LPSTR)functionParameters[i] << "\"";
+				}
+				else if (parameterType == "LPWORD") {
+					saveFile << "WORD " << *(LPWORD)functionParameters[i];
+				}
+				else if (parameterType == "WPARAM" || parameterType == "UINT") {
+					saveFile << "UINT " << (UINT)functionParameters[i];
+				}
+				//else if (parameterType == "VOID*" || parameterType == "LPVOID") {
+				//	saveFile << "VOID*~wstr attempt " << "\"" << utf8_encode((LPCWSTR)functionParameters[i]) << "\"";
+				//}
+				else if (parameterType == "int") {
+					saveFile << "int " << (int)functionParameters[i];
+				}
+				else {
+					//just display hex
+					saveFile << "0x" << functionParameters[i];
+				}
+				saveFile << ",";
 
-			if (functionDocStr.find(',', index) == std::string::npos || functionDocStr.find(',', index) >= functionDocStr.find(';')) { break; } //lazy if
+				if (functionDocStr.find(',', index) == std::string::npos || functionDocStr.find(',', index) >= functionDocStr.find(';')) { break; } //lazy if
+			}
+			__except (0) {}
 			index = functionDocStr.find(',', index + 1);
 
 		}
