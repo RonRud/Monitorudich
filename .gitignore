@@ -17,3 +17,5 @@
 *.obj
 !MSDNScrapes.txt
 !Natural_selector.txt
+!rust_test.exe
+!log.txt

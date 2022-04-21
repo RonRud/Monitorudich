@@ -25,9 +25,11 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 				std::getline(myfile, dllRecievedInfo);
 				strcpy(webScrapperPythonFilePath, dllRecievedInfo.c_str());
 				std::getline(myfile, dllRecievedInfo);
-				isWebScrapingEnabled = std::strtoul(dllRecievedInfo.c_str(), NULL, 10); // read from the seventh line the boolean of isWebScrapingEnabled
+				strcpy(executablePath, dllRecievedInfo.c_str());
 				std::getline(myfile, dllRecievedInfo);
-				attamptToHookNumFunctions = std::strtoul(dllRecievedInfo.c_str(), NULL, 10);// read from the eighth line the number of functions to hook
+				isWebScrapingEnabled = std::strtoul(dllRecievedInfo.c_str(), NULL, 10); // read from the eighth line the boolean of isWebScrapingEnabled
+				std::getline(myfile, dllRecievedInfo);
+				attamptToHookNumFunctions = std::strtoul(dllRecievedInfo.c_str(), NULL, 10);// read from the nineth line the number of functions to hook
 			}
 			else {
 				std::cout << "Unable to read text from info_to_dll.txt, quitting injected dll..." << std::endl;
@@ -56,8 +58,22 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 			//std::cout << "end of hook function adddress: " << std::hex << functionPtr << std::endl;
 		}
 
+		std::cout << loggerFilePath << std::endl;
+		std::cout << infoToMainFilePath << std::endl;
+		std::cout << infoFromMainFilePath << std::endl;
+		std::cout << offlineScrapesFile << std::endl;
+		std::cout << blacklistFilePath << std::endl;
+		std::cout << webScrapperPythonFilePath << std::endl;
+		std::cout << executablePath << std::endl;
 
 		IAThooking(GetModuleHandleA(NULL), attamptToHookNumFunctions);
+
+		//change the process to it's original working directory (where the executable is)
+		if (SetCurrentDirectory(executablePath) == 0) {
+			std::cout << "Failed to change working directory" << std::endl;
+			std::cout << GetLastError() << std::endl;
+		};
+
 		std::cout << "dllmain finished executing" << std::endl << std::endl << std::endl;
 		//resume main program by indicating it can continue to run
 		std::ofstream sendToMainFile(infoToMainFilePath, std::ios::out | std::ios::app);
@@ -75,6 +91,7 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 	}
 	return true;
 }
+
 bool IAThooking(HMODULE hInstance, int attamptToHookNumFunctions)
 {
 	bool flag = false;
@@ -301,7 +318,6 @@ std::string utf8_encode(const std::wstring& wstr)
 	return strTo;
 }
 
-
 void logStack() {
 	std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::app);
 	saveFile << "presumed function bytes in hex: ";
@@ -320,50 +336,62 @@ void logStack() {
 			if (firstSpace == std::string::npos || secondSpace == std::string::npos) { break; }
 			std::string parameterType = functionDocStr.substr(firstSpace + 1, secondSpace - firstSpace - 1);
 			
-			if (functionDocStr.find(',', index) == std::string::npos || functionDocStr.find(',', index) >= functionDocStr.find(';')) { break; } //lazy if
-			index = functionDocStr.find(',', index+1);
-
-			//saveFile << parameterType << " ";
-			//Desicion tree on how to treat data types
 			saveFile << parameterType << "=";
-			if (parameterType == "LPARAM" || parameterType == "long") {
-				saveFile << "long" << (LPARAM)functionParameters[i]; //basically long
+			size_t nextSpace = functionDocStr.find(' ', secondSpace+1); //this finds the next space which will be after the , or before the closing ), this is an ugly solution
+
+			__try {
+				//std::cout << *addressToNameMap[originFuncAddr - 5] << " : " << functionDocStr.substr(secondSpace + 1, nextSpace - secondSpace - 2) << std::endl;
+				//Desicion tree on how to treat data types
+				if (functionDocStr.substr(secondSpace + 1, nextSpace - secondSpace - 2) == "lpBuffer") {
+					saveFile << "~wstr " << "\"" << utf8_encode((LPCWSTR)functionParameters[i]) << "\"";
+				}
+				else if (parameterType == "LPARAM" || parameterType == "long") {
+					saveFile << "long" << (LPARAM)functionParameters[i]; //basically long
+				}
+				else if (parameterType == "LPBOOL") {
+					saveFile << "boolean " << *(LPBOOL)functionParameters[i];
+				}
+				else if (parameterType == "LPCCH") {
+					saveFile << "char " << *(LPCCH)functionParameters[i];
+				}
+				else if (parameterType == "LPCSTR") {
+					saveFile << "\"" << (LPCSTR)functionParameters[i] << "\"";
+				}
+				else if (parameterType == "LPCTSTR") {
+					saveFile << "\"" << (LPCTSTR)functionParameters[i] << "\"";
+				}
+				else if (parameterType == "LPCWSTR") {
+					saveFile << "\"" << utf8_encode((LPCWSTR)functionParameters[i]) << "\"";
+				}
+				else if (parameterType == "LPWSTR") {
+					saveFile << "\"" << utf8_encode((LPWSTR)functionParameters[i]) << "\"";
+				}
+				else if (parameterType == "LPSTR") {
+					saveFile << "\"" << (LPSTR)functionParameters[i] << "\"";
+				}
+				else if (parameterType == "LPWORD") {
+					saveFile << "WORD " << *(LPWORD)functionParameters[i];
+				}
+				else if (parameterType == "WPARAM" || parameterType == "UINT") {
+					saveFile << "UINT " << (UINT)functionParameters[i];
+				}
+				//else if (parameterType == "VOID*" || parameterType == "LPVOID") {
+				//	saveFile << "VOID*~wstr attempt " << "\"" << utf8_encode((LPCWSTR)functionParameters[i]) << "\"";
+				//}
+				else if (parameterType == "int") {
+					saveFile << "int " << (int)functionParameters[i];
+				}
+				else {
+					//just display hex
+					saveFile << "0x" << functionParameters[i];
+				}
+				saveFile << ",";
+
+				if (functionDocStr.find(',', index) == std::string::npos || functionDocStr.find(',', index) >= functionDocStr.find(';')) { break; } //lazy if
 			}
-			else if (parameterType == "LPBOOL") {
-				saveFile << "boolean " << *(LPBOOL)functionParameters[i];
-			}
-			else if (parameterType == "LPCCH") {
-				saveFile << "char " << *(LPCCH)functionParameters[i];
-			}
-			else if (parameterType == "LPCSTR") {
-				saveFile << "\"" << (LPCSTR)functionParameters[i] << "\"";
-			}
-			else if (parameterType == "LPCTSTR") {
-				saveFile << "\"" << (LPCTSTR)functionParameters[i] << "\"";
-			}
-			else if (parameterType == "LPCWSTR") {
-				saveFile << "\"" << utf8_encode((LPCWSTR)functionParameters[i]) << "\"";
-			}
-			else if (parameterType == "LPWSTR") {
-				saveFile << "\"" << utf8_encode((LPWSTR)functionParameters[i]) << "\"";
-			}
-			else if (parameterType == "LPSTR") {
-				saveFile << "\"" << (LPSTR)functionParameters[i] << "\"";
-			}
-			else if (parameterType == "LPWORD") {
-				saveFile << "WORD " << *(LPWORD)functionParameters[i];
-			}
-			else if (parameterType == "WPARAM" || parameterType == "UINT") {
-				saveFile << "UINT " << (UINT)functionParameters[i];
-			}
-			else if (parameterType == "int") {
-				saveFile << "int " << (int)functionParameters[i];
-			}
-			else {
-				//just display hex
-				saveFile << "0x" << functionParameters[i];
-			}
-			saveFile << ",";
+			__except (0) {}
+			index = functionDocStr.find(',', index + 1);
+
 		}
 	}
 	else { saveFile << ", "; }
@@ -565,15 +593,20 @@ void webScrapeFunction(std::string* functionName) {
 					break;
 				}
 				else if (buffer[i] == '\t' && buffer[i + 1] == '\t') {
-					modifiedBuffer->push_back(' ');
+					if (buffer[i + 1] != ' ' && buffer[i + 1] != ' ' && buffer[i - 1] != ' ') { //prevent double weird spaces
+						modifiedBuffer->push_back(' ');
+					}
 					i++;
 				}
-				else if (buffer[i] == '\t') {
-					modifiedBuffer->push_back(' ');
+				else if (buffer[i] == '\t' || buffer[i] == ' ') { // wtf windows why is there a non space space (hover to see shenaniganery)
+					if (buffer[i + 1] != ' ' && buffer[i + 1] != ' ' && buffer[i-1] != ' ') { //prevent double weird spaces
+						modifiedBuffer->push_back(' ');
+					}
 				}
 				else if (buffer[i] == ' ' && buffer[i + 1] == '*') { //saves void *name to void* name for better scraping
 					modifiedBuffer->push_back('*');
 					modifiedBuffer->push_back(' ');
+					i++; //skip writing the * again
 				}
 				else if (buffer[i] != '\r' && buffer[i] != '\n' && !(buffer[i] == ' ' && buffer[i + 1] == ' ')) {
 					modifiedBuffer->push_back(buffer[i]);
@@ -589,11 +622,11 @@ void webScrapeFunction(std::string* functionName) {
 			}
 			while (true) {
 				/* Locate the substring to replace. */
-				size_t openIndex = modifiedBuffer->find(" _ ", 0);
-				size_t closeIndex = modifiedBuffer->find(" _", openIndex);
+				size_t openIndex = modifiedBuffer->find(" _", 0);
+				size_t closeIndex = modifiedBuffer->find("_ ", openIndex);
 				if (openIndex == std::string::npos) break;
 				if (closeIndex == std::string::npos) break;
-				modifiedBuffer->erase(openIndex, closeIndex-openIndex+2);
+				modifiedBuffer->erase(openIndex, closeIndex-openIndex+1);
 			}
 			std::cout << *modifiedBuffer << std::endl;
 			nameToDocumantationString[functionName] = modifiedBuffer;

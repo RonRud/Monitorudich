@@ -14,6 +14,20 @@
 #include <stdio.h>
 
 bool keepLoggingSystemResources;
+std::string pathOfLogger;
+std::string pathOfFileToDll;
+std::string pathOfFileFromDll;
+std::string pathOfOfflineScrapes;
+std::string pathOfBlacklist;
+std::string pathOfWebScrapper;
+std::string pathOfExecutable;
+
+bool blacklistIterate = true;
+int runProgramForBeforeCheck = 10000; //in miliseconds
+bool isWebScrapingEnabled = true;
+int numberOfFunctionsToPossiblyHook = 55555;
+
+
 
 bool InjectDLL(DWORD ProcessID)
 {
@@ -150,14 +164,7 @@ DWORD getProcessExitCode(HANDLE processHandle) {
 	return childProcessExitCode;
 }
 
-int main(int argc, char* argv[])
-{
-	std::string inspectedProcessPath;
-	std::cout << "Enter the full path of the executable you wish to inspect: " << std::endl;
-	std::getline(std::cin, inspectedProcessPath);
-	//std::cin >> inspectedProcessPath;
-	replaceSubstrInString(inspectedProcessPath, "\\\\", "\\");
-	replaceSubstrInString(inspectedProcessPath, "\\", "\\\\");
+bool spawnProcessByPath(std::string inspectedProcessPath) {
 	//opening the executable
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
@@ -169,27 +176,7 @@ int main(int argc, char* argv[])
 	const wchar_t* exePathWchars = (*windwosStringShit).c_str();
 	LPCWSTR exePath = const_cast<LPCWSTR>(exePathWchars);
 
-	//Get file path of logger_output.txt (with the additional path to where this program runs)
-	char thisFilePath[100] = { 0 };
-
-	GetModuleFileName(NULL, thisFilePath, 100);
-	std::string loggerFilePath = std::string(thisFilePath);
-	const size_t last_slash_idx = loggerFilePath.rfind('\\'); //Get the last occurareance of \\ (before the exe name)
-	if (std::string::npos != last_slash_idx) {
-		loggerFilePath = loggerFilePath.substr(0, last_slash_idx + 1) + "logger_output.txt"; // Than add the logger file name to it
-	};
-	std::string pathOfFileToDll = loggerFilePath.substr(0, last_slash_idx + 1) + "info_to_dll.txt";
-	std::string pathOfFileFromDll = loggerFilePath.substr(0, last_slash_idx + 1) + "dll_to_main_program.txt";
-	std::string pathOfOfflineScrapes = loggerFilePath.substr(0, last_slash_idx + 1) + "MSDNScrapes.txt";
-	std::string pathOfBlacklist = loggerFilePath.substr(0, last_slash_idx + 1) + "Natural_selector.txt";
-	std::string pathOfWebScrapper = loggerFilePath.substr(0, last_slash_idx + 1) + "webScrapperMSDN.py";
-	std::cout << inspectedProcessPath << std::endl;
-	std::string pathOfExecutable = inspectedProcessPath.substr(0, inspectedProcessPath.rfind('\\')+1);
-
-	bool blacklistIterate = true;
-	int runProgramForBeforeCheck = 10000; //in miliseconds
-	bool isWebScrapingEnabled = true;
-	int numberOfFunctionsToPossiblyHook = 55555;
+	pathOfExecutable = inspectedProcessPath.substr(0, inspectedProcessPath.rfind('\\') + 1);
 
 	if (blacklistIterate == false) { //Run normally, assumes blacklist is precalculated (this is unadvised)
 
@@ -214,7 +201,7 @@ int main(int argc, char* argv[])
 
 		//Send data to injected dll
 		std::ofstream dllInfoFile("C:\\Windows\\Temp\\info_to_dll.txt", std::ios::out | std::ios::trunc);
-		dllInfoFile << loggerFilePath << std::endl;
+		dllInfoFile << pathOfLogger << std::endl;
 		dllInfoFile << pathOfFileToDll << std::endl;
 		dllInfoFile << pathOfFileFromDll << std::endl;
 		dllInfoFile << pathOfOfflineScrapes << std::endl;
@@ -277,7 +264,7 @@ int main(int argc, char* argv[])
 
 			//Send data to injected dll
 			std::ofstream dllInfoFile("C:\\Windows\\Temp\\info_to_dll.txt", std::ios::out | std::ios::trunc);
-			dllInfoFile << loggerFilePath << std::endl;
+			dllInfoFile << pathOfLogger << std::endl;
 			dllInfoFile << pathOfFileToDll << std::endl;
 			dllInfoFile << pathOfFileFromDll << std::endl;
 			dllInfoFile << pathOfOfflineScrapes << std::endl;
@@ -289,7 +276,7 @@ int main(int argc, char* argv[])
 			dllInfoFile.close();
 			//clean the recieving file
 			std::ofstream mainInfoFileFromDll("dll_to_main_program.txt", std::ios::out | std::ios::trunc);
-			
+
 			//now hook the inspected child process
 			bool is_successful = InjectDLL(pi.dwProcessId);
 			if (is_successful == false) {
@@ -343,11 +330,11 @@ int main(int argc, char* argv[])
 					{
 						if (recievedInfo == "Main program can continue executing") {
 							dllmainFinished = true;
-							break; 
+							break;
 						}
 						//if (lstrcmp(recievedInfo.c_str(), TEXT("Main program can continue executing"))==0) { break; }
 						recievedInfo = "";
-					}/* 
+					}/*
 					else {
 						std::cout << "Unable to read text from dll_to_main_program.txt, quitting main program..." << std::endl;
 						myfile.close();
@@ -362,7 +349,7 @@ int main(int argc, char* argv[])
 			Sleep(runProgramForBeforeCheck);
 			childProcessExitCode = getProcessExitCode(pi.hProcess);
 			if (childProcessExitCode == STILL_ACTIVE) {
-				std::cout << "still active after " << runProgramForBeforeCheck/1000 << " seconds of the program's main" << std::endl;
+				std::cout << "still active after " << runProgramForBeforeCheck / 1000 << " seconds of the program's main" << std::endl;
 				programSuccesfullyRunsWithHooks = true;
 			}
 			else if (childProcessExitCode == 0) {
@@ -411,8 +398,130 @@ int main(int argc, char* argv[])
 		// Close process and thread handles. 
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
+		std::cout << "whee" << std::endl; // TODO check why ended spawn func doesn't execute (when there isn't a return here)
+		return true;
 	}
 	catch (const std::exception& e) { std::cout << "crushed, error: " << e.what() << std::endl; }
+	std::cout << "ended spawn func" << std::endl;
+	return true;
+}
+
+void mainMenu() {
+	while (true) {
+		std::string chosenOption;
+		std::getline(std::cin, chosenOption);
+		if (chosenOption == "spawn") { // spawn child program and hook it
+			std::string inspectedProcessPath;
+			std::cout << "Enter the full path of the executable you wish to inspect including .exe: " << std::endl;
+			std::getline(std::cin, inspectedProcessPath);
+			replaceSubstrInString(inspectedProcessPath, "\\\\", "\\");
+			replaceSubstrInString(inspectedProcessPath, "\\", "\\\\");
+			
+			bool didItWork = spawnProcessByPath(inspectedProcessPath);
+			std::cout << "wha" << std::endl;
+		}
+		else if (chosenOption == "blacklist" || chosenOption == "b") { //blacklist status and options
+			
+			std::cout << "Current blacklist status: " << std::endl;
+			std::ifstream readBlacklistFile(pathOfBlacklist);
+			if (readBlacklistFile) {
+				
+				// get length of file:
+				readBlacklistFile.seekg(0, readBlacklistFile.end);
+				int length = readBlacklistFile.tellg();
+				readBlacklistFile.seekg(0, readBlacklistFile.beg);
+
+				char* buffer = new char[length];
+				// read the entire file as a block into buffer:
+				readBlacklistFile.read(buffer, length);
+				
+				std::string fileContent(buffer);
+				std::getline(readBlacklistFile, fileContent, '\0');
+
+				//Here goes the main action loop
+				std::cout << fileContent << std::endl;
+				std::cout << std::endl << std::endl << "enter blacklist option. options are: quit, add, remove, remove-all, add-dll, remove-dll" << std::endl;
+				std::string blacklistOption;
+
+				while (true) {
+					std::getline(std::cin, blacklistOption);
+
+					if (blacklistOption.substr(0, 3) == "add") {
+						fileContent.append(blacklistOption.substr(4, blacklistOption.length() - 3).append("\n").c_str());
+					}
+					else if (blacklistOption.substr(0, 5) == "remove") {
+						std::string deleteEntry = blacklistOption.substr(4, blacklistOption.length() - 3);
+						size_t place = fileContent.find(deleteEntry.c_str());
+						if (place != std::string::npos) {
+							fileContent.erase(place, deleteEntry.length());
+						}
+					}
+					else if (blacklistOption == "remove-all") {
+						fileContent = "";
+					}
+					else if (blacklistOption == "add-dll") {
+						//TODO lower priorety feature
+					}
+					else if (blacklistOption == "remove-dll") {
+						//TODO lower priorety feature
+					}
+					else if (blacklistOption == "quit" || blacklistOption == "q") {
+						std::ofstream saveFile(pathOfBlacklist, std::ios::out | std::ios::trunc);
+						saveFile << fileContent;
+						saveFile.close();
+						break;
+					}
+					else {
+						std::cout << "Invalid blacklist option, options are: quit, add, remove, remove-all, add-dll, remove-dll" << std::endl;
+					}
+				}
+
+				//cleanup
+				readBlacklistFile.close();
+				delete[] buffer;
+			}
+			else { std::cout << "Unable to open blacklist file, quitting blacklist option..." << std::endl; continue; }
+
+			// TODO print the entire blacklist content and than give user option to add/remove/remove all
+			// TODO add option to add filter/ entire DLL
+		}
+		else if (chosenOption == "quit" || chosenOption == "q") { // quit programs
+			exit(0);
+		}
+		else { // Catch incorrect option, regive the user the log
+			std::cout << "Unknown option, options are: " << std::endl;
+		}
+	}
+}
+
+
+
+int main(int argc, char* argv[])
+{
+	//Command line interface
+
+	//Get file path of logger_output.txt (with the additional path to where this program runs)
+	char thisFilePath[100] = { 0 };
+
+	GetModuleFileName(NULL, thisFilePath, 100);
+	pathOfLogger = std::string(thisFilePath);
+	const size_t last_slash_idx = pathOfLogger.rfind('\\'); //Get the last occurareance of \\ (before the exe name)
+	if (std::string::npos != last_slash_idx) {
+		pathOfLogger = pathOfLogger.substr(0, last_slash_idx + 1) + "logger_output.txt"; // Than add the logger file name to it
+	};
+	pathOfFileToDll = pathOfLogger.substr(0, last_slash_idx + 1) + "info_to_dll.txt";
+	pathOfFileFromDll = pathOfLogger.substr(0, last_slash_idx + 1) + "dll_to_main_program.txt";
+	pathOfOfflineScrapes = pathOfLogger.substr(0, last_slash_idx + 1) + "MSDNScrapes.txt";
+	pathOfBlacklist = pathOfLogger.substr(0, last_slash_idx + 1) + "Natural_selector.txt";
+	pathOfWebScrapper = pathOfLogger.substr(0, last_slash_idx + 1) + "webScrapperMSDN.py";
+
+	blacklistIterate = true;
+	runProgramForBeforeCheck = 10000; //in miliseconds
+	isWebScrapingEnabled = true;
+	numberOfFunctionsToPossiblyHook = 55555;
+
+	mainMenu();
+
 	return 0;
 }
 

@@ -32,6 +32,7 @@ bool InjectDLL(DWORD ProcessID)
 	std::string pathOfOfflineScrapes = loggerFilePath.substr(0, last_slash_idx_logger + 1) + "MSDNScrapes.txt";
 	std::string pathOfBlacklist = loggerFilePath.substr(0, last_slash_idx_logger + 1) + "Natural_selector.txt";
 	std::string pathOfWebScrapper = loggerFilePath.substr(0, last_slash_idx_logger + 1) + "webScrapperMSDN.py";
+	std::string pathOfWebScrapper = "This isn't needed when injecting, let it fail";
 
 	bool blacklistIterate = true;
 	bool isWebScrapingEnabled = true;
@@ -45,6 +46,7 @@ bool InjectDLL(DWORD ProcessID)
 	dllInfoFile << pathOfOfflineScrapes << std::endl;
 	dllInfoFile << pathOfBlacklist << std::endl;
 	dllInfoFile << pathOfWebScrapper << std::endl;
+	dllInfoFile << pathOfExecutable << std::endl;
 	dllInfoFile << isWebScrapingEnabled << std::endl;
 	dllInfoFile << numberOfFunctionsToPossiblyHook << std::endl;
 	dllInfoFile.close();
