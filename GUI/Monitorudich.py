@@ -8,6 +8,8 @@ import qdarkstyle
 
 
 from main_window import Ui_MainWindow
+from logger_view_window import Logger_window
+import os
 
 class Window(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
@@ -17,13 +19,17 @@ class Window(QMainWindow, Ui_MainWindow):
 
     def connectSignalsSlots(self):
         self.fileExplorerButton.clicked.connect(self.select_file_dialog_opener)
+        self.launchByExeButton.clicked.connect(self.run_as_exe)
 
     def select_file_dialog_opener(self):
         self.executablePathTextEdit.setText(QFileDialog.getOpenFileName()[0])
 
-    def findAndReplace(self):
-        dialog = FindReplaceDialog(self)
-        dialog.exec()
+    def run_as_exe(self):
+        print(self.executablePathTextEdit.toPlainText())
+        #os.system()
+        os.popen(f"cd .. && mainExecute.exe {self.executablePathTextEdit.toPlainText()}")
+        self.logger_view_window = Logger_window()
+        self.logger_view_window.show()
 
     def about(self):
         QMessageBox.about(
@@ -35,10 +41,6 @@ class Window(QMainWindow, Ui_MainWindow):
             "<p>- Python</p>",
         )
 
-class FindReplaceDialog(QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        loadUi("ui/find_replace.ui", self)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

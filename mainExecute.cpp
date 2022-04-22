@@ -153,9 +153,13 @@ DWORD getProcessExitCode(HANDLE processHandle) {
 int main(int argc, char* argv[])
 {
 	std::string inspectedProcessPath;
-	std::cout << "Enter the full path of the executable you wish to inspect: " << std::endl;
-	std::getline(std::cin, inspectedProcessPath);
-	//std::cin >> inspectedProcessPath;
+	if (argc > 1) {
+		inspectedProcessPath = argv[1];
+	}
+	else {
+		std::cout << "Enter the full path of the executable you wish to inspect: " << std::endl;
+		std::getline(std::cin, inspectedProcessPath);
+	}
 	replaceSubstrInString(inspectedProcessPath, "\\\\", "\\");
 	replaceSubstrInString(inspectedProcessPath, "\\", "\\\\");
 	//opening the executable

@@ -19,3 +19,10 @@ _configure_narrow_argv
 _initialize_narrow_environment
 _set_new_mode
 _configure_narrow_argv
+MultiByteToWideChar
+GetFileType
+DecodePointer
+WideCharToMultiByte
+GetModuleHandleW
+exit
+
