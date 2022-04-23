@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QListWidget, QVBoxLayout, QLi
 
 from threading import Thread
 import time
+import re
 
 class Logger_window(QWidget):
     def __init__(self, parent=None):
@@ -27,10 +28,19 @@ class Logger_window(QWidget):
         while (True):
             self.log_list.clear()
             with open(self.logger_file_path, "r") as logger_file:
-                logger_lines = logger_file.readlines()
+                pattern = re.compile(
+                    r"name: (?P<name>[a-zA-Z]*), address: (?P<address>0x[0-9a-zA-Z]*), eax: (?P<eax>0x[0-9a-zA-Z]*), ebx: (?P<ebx>0x[0-9a-zA-Z]*), ecx: (?P<ecx>0x[0-9a-zA-Z]*), edx: (?P<edx>0x[0-9a-zA-Z]*), (?P<param_bytes>params bytes: [0-9]*, )?presumed function bytes in hex: (?P<presumed_hex>[a-z0-9-]*), presumed function parameters: (?P<presumed_params>.*?),\n",
+                    re.MULTILINE | re.DOTALL)
+                matches = pattern.finditer(logger_file.read())
+                for match in matches:
+                    QListWidgetItem(f"name: {match.group('name')}, presumed function parameters: {match.group('presumed_params')}", self.log_list)
+                """logger_lines = logger_file.readlines()
+                print("wha")
+                print(logger_lines)
                 for current_line in logger_lines:
                     current_line = current_line.replace('\n', '')
                     QListWidgetItem(current_line, self.log_list)
+                """
             time.sleep(30) # crushes if there are constant reads
 
 if __name__ == '__main__':

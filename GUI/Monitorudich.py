@@ -3,7 +3,6 @@ import sys
 from PyQt5.QtWidgets import (
     QApplication, QDialog, QMainWindow, QMessageBox, QFileDialog
 )
-from PyQt5.uic import loadUi
 import qdarkstyle
 
 
@@ -25,9 +24,15 @@ class Window(QMainWindow, Ui_MainWindow):
         self.executablePathTextEdit.setText(QFileDialog.getOpenFileName()[0])
 
     def run_as_exe(self):
-        print(self.executablePathTextEdit.toPlainText())
+        #print(self.executablePathTextEdit.toPlainText())
         #os.system()
+
         os.popen(f"cd .. && mainExecute.exe {self.executablePathTextEdit.toPlainText()}")
+        """ use for debugging
+        process = os.popen(f"cd .. && mainExecute.exe {self.executablePathTextEdit.toPlainText()}")
+        print(process.read())
+        process.close()
+        """
         self.logger_view_window = Logger_window()
         self.logger_view_window.show()
 
