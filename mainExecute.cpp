@@ -88,7 +88,7 @@ void LogSystemResourcesForProcess(std::string processName) {
 			const wchar_t* counterPath = (*wha2).c_str();
 			cleanupVector.push_back(counterPath);
 
-			status = PdhAddCounter(query, LPWSTR(counterPath), NULL, &performanceCounterNamesToHandle[counterName]);
+			status = PdhAddCounterW(query, LPWSTR(counterPath), NULL, &performanceCounterNamesToHandle[counterName]);
 			if (status != ERROR_SUCCESS) {
 				std::cout << "Add Counter " << counterName << " Error, status: " << std::hex << status << std::endl;
 			}
@@ -189,6 +189,7 @@ int main(int argc, char* argv[])
 	std::string pathOfOfflineScrapes = loggerFilePath.substr(0, last_slash_idx + 1) + "MSDNScrapes.txt";
 	std::string pathOfBlacklist = loggerFilePath.substr(0, last_slash_idx + 1) + "Natural_selector.txt";
 	std::string pathOfWebScrapper = loggerFilePath.substr(0, last_slash_idx + 1) + "webScrapperMSDN.py";
+	std::string pathOfDllFunctionsLogger = loggerFilePath.substr(0, last_slash_idx + 1) + "dllFunctionLogger.txt";
 	std::cout << inspectedProcessPath << std::endl;
 	std::string pathOfExecutable = inspectedProcessPath.substr(0, inspectedProcessPath.rfind('\\')+1);
 
@@ -227,6 +228,8 @@ int main(int argc, char* argv[])
 		dllInfoFile << pathOfBlacklist << std::endl;
 		dllInfoFile << pathOfWebScrapper << std::endl;
 		dllInfoFile << pathOfExecutable << std::endl;
+		dllInfoFile << pathOfDllFunctionsLogger << std::endl;
+		dllInfoFile << pathOfDllFunctionsLogger << std::endl;
 		dllInfoFile << isWebScrapingEnabled << std::endl;
 		dllInfoFile << numberOfFunctionsToPossiblyHook << std::endl;
 		dllInfoFile.close();
@@ -290,6 +293,7 @@ int main(int argc, char* argv[])
 			dllInfoFile << pathOfBlacklist << std::endl;
 			dllInfoFile << pathOfWebScrapper << std::endl;
 			dllInfoFile << pathOfExecutable << std::endl;
+			dllInfoFile << pathOfDllFunctionsLogger << std::endl;
 			dllInfoFile << isWebScrapingEnabled << std::endl;
 			dllInfoFile << numberOfFunctionsToPossiblyHook << std::endl;
 			dllInfoFile.close();
@@ -365,6 +369,8 @@ int main(int argc, char* argv[])
 			}
 			
 			std::cout << "before process logs" << std::endl;
+			
+			/*
 			//Log processes system resources
 			std::thread threadThing;
 			keepLoggingSystemResources = true;
@@ -375,6 +381,7 @@ int main(int argc, char* argv[])
 			}
 			catch (const std::exception& e) { std::cout << "crushed, error: " << e.what() << std::endl; }
 
+			*/
 			//resumes (starts in this case) the child process
 			ResumeThread(pi.hThread);
 

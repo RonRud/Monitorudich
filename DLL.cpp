@@ -27,9 +27,11 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 				std::getline(myfile, dllRecievedInfo);
 				strcpy(executablePath, dllRecievedInfo.c_str());
 				std::getline(myfile, dllRecievedInfo);
-				isWebScrapingEnabled = std::strtoul(dllRecievedInfo.c_str(), NULL, 10); // read from the eighth line the boolean of isWebScrapingEnabled
+				strcpy(dllFunctionsLoggerPath, dllRecievedInfo.c_str());
 				std::getline(myfile, dllRecievedInfo);
-				attamptToHookNumFunctions = std::strtoul(dllRecievedInfo.c_str(), NULL, 10);// read from the nineth line the number of functions to hook
+				isWebScrapingEnabled = std::strtoul(dllRecievedInfo.c_str(), NULL, 10); // read from the nineth line the boolean of isWebScrapingEnabled
+				std::getline(myfile, dllRecievedInfo);
+				attamptToHookNumFunctions = std::strtoul(dllRecievedInfo.c_str(), NULL, 10);// read from the tenth line the number of functions to hook
 			}
 			else {
 				std::cout << "Unable to read text from info_to_dll.txt, quitting injected dll..." << std::endl;
@@ -106,6 +108,8 @@ bool IAThooking(HMODULE hInstance, int attamptToHookNumFunctions)
 	//log file 
 	std::ofstream saveFile(loggerFilePath, std::ios::out | std::ios::app);
 
+	std::ofstream dllFunctionsLogFile(dllFunctionsLoggerPath, std::ios::out | std::ios::trunc);
+
 	int functionAttamptedToHookCounter = 0;
 	std::vector<const char*> blackList;
 	std::ifstream blacklistFile(blacklistFilePath);
@@ -130,6 +134,8 @@ bool IAThooking(HMODULE hInstance, int attamptToHookNumFunctions)
 			continue;
 		}
 		saveFile << std::endl << (char*)((PBYTE)hInstance + importedModule->Name) << ":" << std::endl;//printing Module Name
+		dllFunctionsLogFile << (char*)((PBYTE)hInstance + importedModule->Name) << ":" << std::endl;//printing Module Name
+
 		pFirstThunk = (PIMAGE_THUNK_DATA)((PBYTE)hInstance + importedModule->FirstThunk);//pointing to its IAT
 		pOriginalFirstThunk = (PIMAGE_THUNK_DATA)((PBYTE)hInstance + importedModule->OriginalFirstThunk);//pointing to OriginalThunk
 		pFuncData = (PIMAGE_IMPORT_BY_NAME)((PBYTE)hInstance + pOriginalFirstThunk->u1.AddressOfData);// and to IMAGE_IMPORT_BY_NAME
@@ -137,6 +143,8 @@ bool IAThooking(HMODULE hInstance, int attamptToHookNumFunctions)
 		while (*(WORD*)pFirstThunk != 0 && *(WORD*)pOriginalFirstThunk != 0) //moving over IAT and over names' table
 		{
 			saveFile << "0x" << std::hex << pFirstThunk->u1.Function << "\t\t" << pFuncData->Name << std::endl;//printing function's name and addr
+			dllFunctionsLogFile << pFuncData->Name << " " << "0x" << std::hex << pFirstThunk->u1.Function << " ";//printing function's name and addr
+			
 			std::ofstream infoToMainFile(infoToMainFilePath, std::ios::out | std::ios::app);
 			infoToMainFile << std::endl << pFuncData->Name;
 			infoToMainFile.close();
@@ -160,6 +168,7 @@ bool IAThooking(HMODULE hInstance, int attamptToHookNumFunctions)
 				if (strcmp(name, (char*)pFuncData->Name) == 0) {
 					shouldHook = false;
 					saveFile << "Blacklisted, not hooked" << std::endl << std::endl;
+					dllFunctionsLogFile << "Blacklisted, not hooked" << std::endl;
 					break;
 				}
 			}
@@ -168,9 +177,11 @@ bool IAThooking(HMODULE hInstance, int attamptToHookNumFunctions)
 				bool isHooked = inlineHookFunction(pFirstThunk->u1.Function, new std::string(pFuncData->Name));
 				if (isHooked) {
 					saveFile << "Hooked function successfully" << std::endl;
+					dllFunctionsLogFile << "Hooked function successfully" << std::endl;
 				}
 				else {
 					saveFile << "Didn't Hook function" << std::endl;
+					dllFunctionsLogFile << "Didn't Hook function" << std::endl;
 				}
 				saveFile << std::endl;
 			}
@@ -593,13 +604,13 @@ void webScrapeFunction(std::string* functionName) {
 					break;
 				}
 				else if (buffer[i] == '\t' && buffer[i + 1] == '\t') {
-					if (buffer[i + 1] != ' ' && buffer[i + 1] != ' ' && buffer[i - 1] != ' ') { //prevent double weird spaces
+					if (buffer[i + 1] != ' ' && buffer[i + 1] != 'ï¿½' && buffer[i - 1] != ' ') { //prevent double weird spaces
 						modifiedBuffer->push_back(' ');
 					}
 					i++;
 				}
-				else if (buffer[i] == '\t' || buffer[i] == ' ') { // wtf windows why is there a non space space (hover to see shenaniganery)
-					if (buffer[i + 1] != ' ' && buffer[i + 1] != ' ' && buffer[i-1] != ' ') { //prevent double weird spaces
+				else if (buffer[i] == '\t' || buffer[i] == 'ï¿½') { // wtf windows why is there a non space space (hover to see shenaniganery)
+					if (buffer[i + 1] != ' ' && buffer[i + 1] != 'ï¿½' && buffer[i-1] != ' ') { //prevent double weird spaces
 						modifiedBuffer->push_back(' ');
 					}
 				}
@@ -838,6 +849,7 @@ PIMAGE_IMPORT_DESCRIPTOR getImportTable(HMODULE hInstance)
 		}
 		sectionLocation += sectionSize;
 	}
+	saveFile << "End of PE header extraction" << std::endl;
 
 	IMAGE_OPTIONAL_HEADER optionalHeader;
 	PIMAGE_NT_HEADERS ntHeader;
