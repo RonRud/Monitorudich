@@ -20,7 +20,7 @@ bool InjectDLL(DWORD ProcessID)
 
 	char thisFilePath[100] = { 0 };
 
-	GetModuleFileName(NULL, thisFilePath, 100);
+	GetModuleFileNameA(NULL, thisFilePath, 100);
 	std::string DllPath = std::string(thisFilePath);
 	const size_t last_slash_idx = DllPath.rfind('\\'); //Get the last occurareance of \\ (before the exe name)
 	if (std::string::npos != last_slash_idx) {
@@ -42,7 +42,7 @@ bool InjectDLL(DWORD ProcessID)
 	}
 	//Save the full path of the injected dll in the inspected process (needs to be in it's address space in order to be called by a thread in the other process)
 	LPVOID lpDllAddress = VirtualAllocEx(hProcess, NULL, strlen(DllPath.c_str()) + 1, MEM_COMMIT, PAGE_READWRITE);
-	DWORD nBytesWritten;
+	SIZE_T nBytesWritten;
 
 	if (WriteProcessMemory(hProcess, lpDllAddress, DllPath.c_str(), strlen(DllPath.c_str()) + 1, &nBytesWritten) == 0 || nBytesWritten == 0) //if WriteProcessMemory fails the return value is zero
 	{
@@ -64,6 +64,7 @@ bool InjectDLL(DWORD ProcessID)
 }
 
 void LogSystemResourcesForProcess(std::string processName) {
+	std::cout << "Got to log system resources" << std::endl;
 	try {
 		std::ofstream saveFile("process_resources_logger.txt", std::ios::out | std::ios::trunc);
 
@@ -87,7 +88,7 @@ void LogSystemResourcesForProcess(std::string processName) {
 			const wchar_t* counterPath = (*wha2).c_str();
 			cleanupVector.push_back(counterPath);
 
-			status = PdhAddCounterW(query, LPWSTR(counterPath), NULL, &performanceCounterNamesToHandle[counterName]);
+			status = PdhAddCounter(query, LPWSTR(counterPath), NULL, &performanceCounterNamesToHandle[counterName]);
 			if (status != ERROR_SUCCESS) {
 				std::cout << "Add Counter " << counterName << " Error, status: " << std::hex << status << std::endl;
 			}
@@ -176,8 +177,9 @@ int main(int argc, char* argv[])
 	//Get file path of logger_output.txt (with the additional path to where this program runs)
 	char thisFilePath[100] = { 0 };
 
-	GetModuleFileName(NULL, thisFilePath, 100);
-	std::string loggerFilePath = std::string(thisFilePath);
+	GetModuleFileNameA(NULL, thisFilePath, 100);
+	//std::string loggerFilePath = std::string(thisFilePath);
+	std::string loggerFilePath = std::string("C:\\Users\\Rudic\\source\\repos\\RonRud\\Monitorudich\\");
 	const size_t last_slash_idx = loggerFilePath.rfind('\\'); //Get the last occurareance of \\ (before the exe name)
 	if (std::string::npos != last_slash_idx) {
 		loggerFilePath = loggerFilePath.substr(0, last_slash_idx + 1) + "logger_output.txt"; // Than add the logger file name to it
@@ -340,7 +342,7 @@ int main(int argc, char* argv[])
 			bool dllmainFinished = false;
 			while (dllmainFinished == false) {
 				std::string recievedInfo;
-				std::ifstream myfile("dll_to_main_program.txt");
+				std::ifstream myfile(pathOfFileFromDll);
 				if (myfile.is_open())
 				{
 					while (std::getline(myfile, recievedInfo))
@@ -361,8 +363,21 @@ int main(int argc, char* argv[])
 				}
 				else { std::cout << "Unable to open dll_to_main_program, quitting main program..." << std::endl; return 0; }
 			}
+			
+			std::cout << "before process logs" << std::endl;
+			//Log processes system resources
+			std::thread threadThing;
+			keepLoggingSystemResources = true;
+			const size_t last_slash_idx = inspectedProcessPath.rfind('\\');
+			try {
+				std::cout << inspectedProcessPath.substr(last_slash_idx + 1, inspectedProcessPath.length() - 5 - last_slash_idx) << std::endl;
+				threadThing = std::thread(LogSystemResourcesForProcess, inspectedProcessPath.substr(last_slash_idx + 1, inspectedProcessPath.length() - 5 - last_slash_idx)); //makes sure to pass the name without .exe
+			}
+			catch (const std::exception& e) { std::cout << "crushed, error: " << e.what() << std::endl; }
+
 			//resumes (starts in this case) the child process
 			ResumeThread(pi.hThread);
+
 			Sleep(runProgramForBeforeCheck);
 			childProcessExitCode = getProcessExitCode(pi.hProcess);
 			if (childProcessExitCode == STILL_ACTIVE) {
@@ -398,25 +413,17 @@ int main(int argc, char* argv[])
 			}
 		}
 	}
+	 
+	// Wait until child process exits.
+	std::cout << "before process terminate check" << std::endl;
+	WaitForSingleObject(pi.hProcess, INFINITE);
+	std::cout << "after process terminate check" << std::endl;
+	keepLoggingSystemResources = false;
 
-	//Log processes system resources
-	try {
-		keepLoggingSystemResources = true;
-		const size_t last_slash_idx = inspectedProcessPath.rfind('\\');
-		//TODO add with threading
-		std::thread threadThing(LogSystemResourcesForProcess, inspectedProcessPath.substr(last_slash_idx + 1, inspectedProcessPath.length() - 5 - last_slash_idx)); //makes sure to pass the name without .exe
+	// Close process and thread handles. 
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
 
-		// Wait until child process exits.
-		std::cout << "before process terminate check" << std::endl;
-		WaitForSingleObject(pi.hProcess, INFINITE);
-		std::cout << "after process terminate check" << std::endl;
-		keepLoggingSystemResources = false;
-
-		// Close process and thread handles. 
-		CloseHandle(pi.hProcess);
-		CloseHandle(pi.hThread);
-	}
-	catch (const std::exception& e) { std::cout << "crushed, error: " << e.what() << std::endl; }
 	return 0;
 }
 

@@ -1,7 +1,7 @@
 import sys
 
 from PyQt5.QtWidgets import (
-    QApplication, QDialog, QMainWindow, QMessageBox, QFileDialog
+    QApplication, QDialog, QMainWindow, QMessageBox, QFileDialog, QAction
 )
 import qdarkstyle
 

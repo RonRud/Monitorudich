@@ -394,8 +394,8 @@ void logStack() {
 
 		}
 	}
-	else { saveFile << ", "; }
-	saveFile << std::endl;
+	else { saveFile << ","; }
+	saveFile << "," << std::endl;
 	saveFile.close();
 }
 
