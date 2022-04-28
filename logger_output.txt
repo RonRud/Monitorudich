@@ -1,0 +1,556 @@
+PE header extraction
+
+--DOS HEADER--
+	0x5a4d		Magic number
+	0x90		Bytes on last page of file
+	0x3		Pages in file
+	0x0		Relocations
+	0x4		Size of header in paragraphs
+	0x0		Minimum extra paragraphs needed
+	0xffff		Maximum extra paragraphs needed
+	0x0		Initial (relative) SS value
+	0xb8		Initial SP value
+	0x0		Checksum
+	0x0		Initial IP value
+	0x0		Initial (relative) CS value
+	0x40		File address of relocation table
+	0x0		Overlay number
+	0x0		OEM identifier (for e_oeminfo)
+	0x0		OEM information; e_oemid specific
+	0xf8		File address of new exe header
+--NT HEADERS--
+	4550		Signature
+--FILE HEADER--
+	0x14c		Machine
+	0x4		Number of Sections
+	0x6214d1e3	Time Stamp
+	0x0		Pointer to Symbol Table
+	0x0		Number of Symbols
+	0xe0		Size of Optional Header
+	0x102		Characteristics
+--OPTIONAL HEADER--
+	0x10b		Magic
+	0x		Major Linker Version
+	0x		Minor Linker Version
+	0x24200		Size Of Code
+	0x13a00		Size Of Initialized Data
+	0x0		Size Of UnInitialized Data
+	0x99a5		Address Of Entry Point (.text)
+	0x1000		Base Of Code
+	0x150000		Image Base
+	0x1000		Section Alignment
+	0x200		File Alignment
+	0x6		Major Operating System Version
+	0x0		Minor Operating System Version
+	0x0		Major Image Version
+	0x0		Minor Image Version
+	0x6		Major Subsystem Version
+	0x0		Minor Subsystem Version
+	0x0		Win32 Version Value
+	0x3b000		Size Of Image
+	0x400		Size Of Headers
+	0x0		CheckSum
+	0x3 (speculated): IMAGE_SUBSYSTEM_WINDOWS_CUI		Subsystem
+	0x8140		DllCharacteristics
+	0x100000		Size Of Stack Reserve
+	0x1000		Size Of Stack Commit
+	0x100000		Size Of Heap Reserve
+	0x1000		Size Of Heap Commit
+	0x0		Loader Flags
+	0x10		Number Of Rva And Sizes
+--DATA DIRECTORIES--
+	Export Directory Address: 0x0; Size: 0x0
+	Import Directory Address: 0x3530c; Size: 0x28
+--SECTION HEADERS--
+	.text
+		0x240a4		Virtual Size
+		0x1000		Virtual Address
+		0x24200		Size Of Raw Data
+		0x400		Pointer To Raw Data
+		0x0		Pointer To Relocations
+		0x0		Pointer To Line Numbers
+		0x0		Number Of Relocations
+		0x0		Number Of Line Numbers
+		0x60000020	Characteristics
+	.rdata
+		0xf9dc		Virtual Size
+		0x26000		Virtual Address
+		0xfa00		Size Of Raw Data
+		0x24600		Pointer To Raw Data
+		0x0		Pointer To Relocations
+		0x0		Pointer To Line Numbers
+		0x0		Number Of Relocations
+		0x0		Number Of Line Numbers
+		0x40000040	Characteristics
+	.data
+		0x1d18		Virtual Size
+		0x36000		Virtual Address
+		0x1000		Size Of Raw Data
+		0x34000		Pointer To Raw Data
+		0x0		Pointer To Relocations
+		0x0		Pointer To Line Numbers
+		0x0		Number Of Relocations
+		0x0		Number Of Line Numbers
+		0xc0000040	Characteristics
+	.reloc
+		0x2120		Virtual Size
+		0x38000		Virtual Address
+		0x2200		Size Of Raw Data
+		0x35000		Pointer To Raw Data
+		0x0		Pointer To Relocations
+		0x0		Pointer To Line Numbers
+		0x0		Number Of Relocations
+		0x0		Number Of Line Numbers
+		0x42000040	Characteristics
+End of PE header extraction
+
+KERNEL32.dll:
+0x75761700		GetStdHandle
+function addr: 75761700
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x75763b60		SetConsoleTextAttribute
+function addr: 75763b60
+The first bytes of the function are: FF 25 B0 0D 7C 75
+Hooked function successfully
+
+0x7575dff0		WideCharToMultiByte
+Blacklisted, not hooked
+
+0x7575e010		GetLastError
+Blacklisted, not hooked
+
+0x771bfed0		EnterCriticalSection
+Blacklisted, not hooked
+
+0x771be740		LeaveCriticalSection
+Blacklisted, not hooked
+
+0x771afbd0		DeleteCriticalSection
+function addr: 771afbd0
+The first bytes of the function are: 8B FF 55 8B EC 6A
+Hooked function successfully
+
+0x7575df80		MultiByteToWideChar
+Blacklisted, not hooked
+
+0x771e5730		EncodePointer
+function addr: 771e5730
+The first bytes of the function are: 8B FF 55 8B EC 51
+Hooked function successfully
+
+0x771e4d70		DecodePointer
+Blacklisted, not hooked
+
+0x7575dfa0		SetLastError
+Blacklisted, not hooked
+
+0x75762fe0		InitializeCriticalSectionAndSpinCount
+function addr: 75762fe0
+The first bytes of the function are: FF 25 20 18 7C 75
+Hooked function successfully
+
+0x75757cc0		SwitchToThread
+function addr: 75757cc0
+The first bytes of the function are: FF 25 40 15 7C 75
+Hooked function successfully
+
+0x75761140		TlsAlloc
+function addr: 75761140
+The first bytes of the function are: FF 25 34 15 7C 75
+Hooked function successfully
+
+0x7575df20		TlsGetValue
+function addr: 7575df20
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x7575dfb0		TlsSetValue
+function addr: 7575dfb0
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x75760f70		TlsFree
+function addr: 75760f70
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x7575f390		GetSystemTimeAsFileTime
+function addr: 7575f390
+The first bytes of the function are: FF 25 78 18 7C 75
+Hooked function successfully
+
+0x75760e50		GetModuleHandleW
+Blacklisted, not hooked
+
+0x7575f550		GetProcAddress
+function addr: 7575f550
+The first bytes of the function are: 8B FF 55 8B EC FF
+Hooked function successfully
+
+0x7575dfd0		CompareStringW
+function addr: 7575dfd0
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x75760e70		LCMapStringW
+function addr: 75760e70
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x757606a0		GetLocaleInfoW
+function addr: 757606a0
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x75760c40		GetStringTypeW
+function addr: 75760c40
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x75761530		GetCPInfo
+function addr: 75761530
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x75775c40		UnhandledExceptionFilter
+function addr: 75775c40
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x75761720		SetUnhandledExceptionFilter
+function addr: 75761720
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x75762e80		GetCurrentProcess
+function addr: 75762e80
+The first bytes of the function are: FF 25 24 15 7C 75
+Hooked function successfully
+
+0x75759910		TerminateProcess
+function addr: 75759910
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x75760b70		IsProcessorFeaturePresent
+function addr: 75760b70
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x7575df40		QueryPerformanceCounter
+function addr: 7575df40
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x75762e90		GetCurrentProcessId
+function addr: 75762e90
+The first bytes of the function are: FF 25 54 15 7C 75
+Hooked function successfully
+
+0x7575df10		GetCurrentThreadId
+function addr: 7575df10
+The first bytes of the function are: 64 A1 18 00 00 00
+Didn't Hook function
+
+0x771e85c0		InitializeSListHead
+function addr: 771e85c0
+The first bytes of the function are: 8B FF 55 8B EC 8B
+Hooked function successfully
+
+0x757620d0		IsDebuggerPresent
+function addr: 757620d0
+The first bytes of the function are: FF 25 E4 0E 7C 75
+Hooked function successfully
+
+0x75761550		GetStartupInfoW
+function addr: 75761550
+The first bytes of the function are: FF 25 78 15 7C 75
+Hooked function successfully
+
+0x75763140		CreateFileW
+Blacklisted, not hooked
+
+0x757605b0		RaiseException
+function addr: 757605b0
+The first bytes of the function are: FF 25 20 0F 7C 75
+Hooked function successfully
+
+0x757605c0		RtlUnwind
+function addr: 757605c0
+The first bytes of the function are: FF 25 5C 17 7C 75
+Hooked function successfully
+
+0x75760ae0		FreeLibrary
+function addr: 75760ae0
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x7575f3a0		LoadLibraryExW
+function addr: 7575f3a0
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x757635b0		WriteFile
+Blacklisted, not hooked
+
+0x75760900		GetModuleFileNameW
+function addr: 75760900
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x75764e10		ExitProcess
+function addr: 75764e10
+The first bytes of the function are: 55 8B EC 6A FF 68
+Didn't Hook function
+
+0x75761640		GetModuleHandleExW
+function addr: 75761640
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x75761ee0		GetCommandLineA
+function addr: 75761ee0
+The first bytes of the function are: FF 25 7C 14 7C 75
+Hooked function successfully
+
+0x75761d70		GetCommandLineW
+function addr: 75761d70
+The first bytes of the function are: FF 25 80 14 7C 75
+Hooked function successfully
+
+0x771c5d90		HeapAlloc
+Blacklisted, not hooked
+
+0x7575df60		HeapFree
+Blacklisted, not hooked
+
+0x75763390		GetFileType
+Blacklisted, not hooked
+
+0x75761880		IsValidLocale
+function addr: 75761880
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x7575e760		GetUserDefaultLCID
+function addr: 7575e760
+The first bytes of the function are: FF 25 A8 12 7C 75
+Hooked function successfully
+
+0x75759680		EnumSystemLocalesW
+function addr: 75759680
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x75762ee0		CloseHandle
+Blacklisted, not hooked
+
+0x757632a0		FlushFileBuffers
+function addr: 757632a0
+The first bytes of the function are: FF 25 7C 10 7C 75
+Hooked function successfully
+
+0x757638b0		GetConsoleCP
+function addr: 757638b0
+The first bytes of the function are: FF 25 60 0D 7C 75
+Hooked function successfully
+
+0x757638c0		GetConsoleMode
+function addr: 757638c0
+The first bytes of the function are: FF 25 5C 0D 7C 75
+Hooked function successfully
+
+0x757634c0		ReadFile
+Blacklisted, not hooked
+
+0x75763370		GetFileSizeEx
+function addr: 75763370
+The first bytes of the function are: FF 25 88 0F 7C 75
+Hooked function successfully
+
+0x75763560		SetFilePointerEx
+Blacklisted, not hooked
+
+0x75763940		ReadConsoleW
+function addr: 75763940
+The first bytes of the function are: FF 25 3C 0D 7C 75
+Hooked function successfully
+
+0x771c2710		HeapReAlloc
+function addr: 771c2710
+The first bytes of the function are: 8B FF 55 8B EC 83
+Hooked function successfully
+
+0x757631a0		FindClose
+function addr: 757631a0
+The first bytes of the function are: FF 25 B8 0F 7C 75
+Hooked function successfully
+
+0x75763200		FindFirstFileExW
+function addr: 75763200
+The first bytes of the function are: FF 25 6C 10 7C 75
+Hooked function successfully
+
+0x75763270		FindNextFileW
+function addr: 75763270
+The first bytes of the function are: FF 25 88 10 7C 75
+Hooked function successfully
+
+0x757616a0		IsValidCodePage
+function addr: 757616a0
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x757603c0		GetACP
+function addr: 757603c0
+The first bytes of the function are: FF 25 6C 12 7C 75
+Hooked function successfully
+
+0x75762190		GetOEMCP
+function addr: 75762190
+The first bytes of the function are: FF 25 90 12 7C 75
+Hooked function successfully
+
+0x75761ef0		GetEnvironmentStringsW
+function addr: 75761ef0
+The first bytes of the function are: FF 25 8C 14 7C 75
+Hooked function successfully
+
+0x75761ba0		FreeEnvironmentStringsW
+function addr: 75761ba0
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x75758620		SetEnvironmentVariableW
+function addr: 75758620
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x757759e0		SetStdHandle
+function addr: 757759e0
+The first bytes of the function are: 8B FF 55 8B EC 5D
+Hooked function successfully
+
+0x7575f380		GetProcessHeap
+function addr: 7575f380
+The first bytes of the function are: FF 25 50 11 7C 75
+Hooked function successfully
+
+0x771db870		HeapSize
+function addr: 771db870
+The first bytes of the function are: 8B FF 55 8B EC 83
+Hooked function successfully
+
+0x75763990		WriteConsoleW
+function addr: 75763990
+The first bytes of the function are: FF 25 38 0D 7C 75
+Hooked function successfully
+
+name: TlsGetValue, address: 0x7575df20, eax: 0x0, ebx: 0x1, ecx: 0x77105cd0, edx: 0x770d0000, presumed function bytes in hex: 3-3-0-77105cd0-e3fc60-, presumed function parameters: DWORD=0x3,,
+name: IsProcessorFeaturePresent, address: 0x75760b70, eax: 0xcffdec, ebx: 0x1, ecx: 0x33b5d58b, edx: 0x1599a5, presumed function bytes in hex: a-ad7000-0-0-0-0-0-0-, presumed function parameters: DWORD=0xa,,
+name: LoadLibraryExW, address: 0x7575f3a0, eax: 0x1875cc, ebx: 0x1795f4, ecx: 0x14, edx: 0x0, presumed function bytes in hex: 1795f4-0-800-1875e4-0-ad7000-1875cc-cffd7c-, presumed function parameters: LPCWSTR="api-ms-win-core-synch-l1-2-0",HANDLE=0x0,DWORD=0x800,,
+name: GetProcAddress, address: 0x7575f550, eax: 0x76a40000, ebx: 0xad7000, ecx: 0x17968c, edx: 0xcffd2c, params bytes: 8, presumed function bytes in hex: 76a40000-177080-, presumed function parameters: HMODULE=0x76a40000,LPCSTR="InitializeCriticalSectionEx",,
+name: LoadLibraryExW, address: 0x7575f3a0, eax: 0x1875c8, ebx: 0x1795b8, ecx: 0x14, edx: 0x0, presumed function bytes in hex: 1795b8-0-800-1875d4-1599a5-ad7000-1875c8-cffd8c-, presumed function parameters: LPCWSTR="api-ms-win-core-fibers-l1-1-1",HANDLE=0x0,DWORD=0x800,,
+name: GetProcAddress, address: 0x7575f550, eax: 0x76a40000, ebx: 0xad7000, ecx: 0x17966c, edx: 0xcffd3c, params bytes: 8, presumed function bytes in hex: 76a40000-177054-, presumed function parameters: HMODULE=0x76a40000,LPCSTR="FlsAlloc",,
+name: GetProcAddress, address: 0x7575f550, eax: 0x76a40000, ebx: 0xad7000, ecx: 0x179684, edx: 0x0, params bytes: 8, presumed function bytes in hex: 76a40000-177074-, presumed function parameters: HMODULE=0x76a40000,LPCSTR="FlsSetValue",,
+name: LoadLibraryExW, address: 0x7575f3a0, eax: 0x187b3c, ebx: 0x17bdd8, ecx: 0x14, edx: 0x0, presumed function bytes in hex: 17bdd8-0-800-ffffffff-0-187bb8-187b3c-cffd60-, presumed function parameters: LPCWSTR="api-ms-win-core-synch-l1-2-0",HANDLE=0x0,DWORD=0x800,,
+name: GetProcAddress, address: 0x7575f550, eax: 0x76a40000, ebx: 0x187bb8, ecx: 0x17c1c8, edx: 0xcffd0c, params bytes: 8, presumed function bytes in hex: 76a40000-17c1c8-, presumed function parameters: HMODULE=0x76a40000,LPCSTR="InitializeCriticalSectionEx",,
+name: GetProcessHeap, address: 0x7575f380, eax: 0x1, ebx: 0x16ffb1, ecx: 0x16ffb1, edx: 0xfa0, presumed function bytes in hex: 16ffee-1599a5-1599a5-ad7000-cffdbc-, presumed function parameters: ,
+name: LoadLibraryExW, address: 0x7575f3a0, eax: 0x187b24, ebx: 0x17bc30, ecx: 0x14, edx: 0x0, presumed function bytes in hex: 17bc30-0-800-ffffffff-17b470-187b7c-187b24-cffd70-, presumed function parameters: LPCWSTR="api-ms-win-core-fibers-l1-1-1",HANDLE=0x0,DWORD=0x800,,
+name: GetProcAddress, address: 0x7575f550, eax: 0x76a40000, ebx: 0x187b7c, ecx: 0x17c110, edx: 0xcffd1c, params bytes: 8, presumed function bytes in hex: 76a40000-17c110-, presumed function parameters: HMODULE=0x76a40000,LPCSTR="FlsAlloc",,
+name: GetProcAddress, address: 0x7575f550, eax: 0x76a40000, ebx: 0x187b84, ecx: 0x17c134, edx: 0x0, params bytes: 8, presumed function bytes in hex: 76a40000-17c134-, presumed function parameters: HMODULE=0x76a40000,LPCSTR="FlsGetValue",,
+name: GetProcAddress, address: 0x7575f550, eax: 0x76a40000, ebx: 0x187b88, ecx: 0x17c148, edx: 0x0, params bytes: 8, presumed function bytes in hex: 76a40000-17c148-, presumed function parameters: HMODULE=0x76a40000,LPCSTR="FlsSetValue",,
+name: GetStartupInfoW, address: 0x75761550, eax: 0xcffd18, ebx: 0x0, ecx: 0x0, edx: 0xfa0, presumed function bytes in hex: cffd18-1876d8-cffd5c-16dc10-7-16dba9-cc85d728-17b438-, presumed function parameters: LPSTARTUPINFOW=0xcffd18,,
+name: GetStdHandle, address: 0x75761700, eax: 0xfffffff6, ebx: 0x0, ecx: 0x0, edx: 0xcffd18, presumed function bytes in hex: fffffff6-17b438-17b478-0-1671b7-cc85d7e0-17b438-17b478-, presumed function parameters: DWORD=0xfffffff6,,
+name: GetStdHandle, address: 0x75761700, eax: 0xfffffff5, ebx: 0x9c, ecx: 0x0, edx: 0x0, presumed function bytes in hex: fffffff5-17b438-17b478-0-1671b7-cc85d7e0-17b438-17b478-, presumed function parameters: DWORD=0xfffffff5,,
+name: GetStdHandle, address: 0x75761700, eax: 0xfffffff4, ebx: 0xa0, ecx: 0x0, edx: 0x0, presumed function bytes in hex: fffffff4-17b438-17b478-0-1671b7-cc85d7e0-17b438-17b478-, presumed function parameters: DWORD=0xfffffff4,,
+name: GetCommandLineA, address: 0x75761ee0, eax: 0x1, ebx: 0x163084, ecx: 0x163084, edx: 0x0, presumed function bytes in hex: 16ffee-1599a5-1599a5-ad7000-cffdbc-, presumed function parameters: ,
+name: GetCommandLineW, address: 0x75761d70, eax: 0x1174f18, ebx: 0x163084, ecx: 0x163084, edx: 0x0, presumed function bytes in hex: 16ffee-1599a5-1599a5-ad7000-cffdbc-, presumed function parameters: ,
+name: GetACP, address: 0x757603c0, eax: 0xfffffffd, ebx: 0x16d3af, ecx: 0x0, edx: 0xada000, presumed function bytes in hex: 695fa3c7-186200-186498-cc527800-cffd80-, presumed function parameters: ,
+name: IsValidCodePage, address: 0x757616a0, eax: 0x4e7, ebx: 0x4e7, ecx: 0x5, edx: 0x0, presumed function bytes in hex: 4e7-119ace0-1866b8-ffffffff-220-5-1199098-cffd54-, presumed function parameters: UINT=UINT 4e7,,
+name: GetCPInfo, address: 0x75761530, eax: 0xcffd38, ebx: 0x4e7, ecx: 0x5fd8b77c, edx: 0x0, presumed function bytes in hex: 4e7-cffd38-119ace0-1866b8-ffffffff-220-5-1199098-, presumed function parameters: UINT=UINT 4e7,LPCPINFO=0xcffd38,,
+name: GetCPInfo, address: 0x75761530, eax: 0xcff600, ebx: 0x4e7, ecx: 0x0, edx: 0x0, presumed function bytes in hex: 4e7-cff600-119acf8-119ace0-4e7-6b0073-6f0074-5c0070-, presumed function parameters: UINT=UINT 4e7,LPCPINFO=0xcff600,,
+name: GetStringTypeW, address: 0x75760c40, eax: 0x100, ebx: 0x4e7, ecx: 0x5fd8b77c, edx: 0xcffd14, presumed function bytes in hex: 1-cff3a8-100-cff614-cccc-0-10020-30002-, presumed function parameters: DWORD=0x1,_In_NLS_string_(cchSrc=0xcff3a8,,
+name: LoadLibraryExW, address: 0x7575f3a0, eax: 0x187b2c, ebx: 0x17bca8, ecx: 0x14, edx: 0x0, presumed function bytes in hex: 17bca8-0-800-ffffffff-100-187bc0-187b2c-cff304-, presumed function parameters: LPCWSTR="api-ms-win-core-localization-l1-2-1",HANDLE=0x0,DWORD=0x800,,
+name: GetProcAddress, address: 0x7575f550, eax: 0x76a40000, ebx: 0x187bc0, ecx: 0x17c208, edx: 0xcff2ac, params bytes: 8, presumed function bytes in hex: 76a40000-17c208-, presumed function parameters: HMODULE=0x76a40000,LPCSTR="LCMapStringEx",,
+name: GetModuleFileNameW, address: 0x75760900, eax: 0x0, ebx: 0x1, ecx: 0xcffb5c, edx: 0x20, params bytes: 2c, presumed function bytes in hex: 0-cffb5c-105-2f2e2d2c-33323130-11-3b3a3938-3f3e3d3c-63626140-67666564-12-, presumed function parameters: HMODULE=0x0,LPWSTR="",DWORD=0x105,,
+name: LoadLibraryExW, address: 0x7575f3a0, eax: 0x187b60, ebx: 0x17c024, ecx: 0x14, edx: 0x0, presumed function bytes in hex: 17c024-0-800-ffffffff-1877a0-187b70-187b60-cffb04-, presumed function parameters: LPCWSTR="kernel32",HANDLE=0x0,DWORD=0x800,,
+name: GetProcAddress, address: 0x7575f550, eax: 0x75740000, ebx: 0x187b70, ecx: 0x17c0c4, edx: 0xcffaac, params bytes: 8, presumed function bytes in hex: 75740000-17c0c4-, presumed function parameters: HMODULE=0x75740000,LPCSTR="AreFileApisANSI",,
+name: InitializeSListHead, address: 0x771e85c0, eax: 0x0, ebx: 0xad7000, ecx: 0x15a331, edx: 0x0, params bytes: 4, presumed function bytes in hex: 187560-, presumed function parameters: PSLIST_HEADER=0x187560,,
+name: GetEnvironmentStringsW, address: 0x75761ef0, eax: 0x1, ebx: 0xad7000, ecx: 0x0, edx: 0x0, presumed function bytes in hex: 15975e-176170-ad7000-0-cffdb8-, presumed function parameters: ,
+name: FreeEnvironmentStringsW, address: 0x75761ba0, eax: 0xcdb, ebx: 0x118fc70, ecx: 0x0, edx: 0x119c8be, presumed function bytes in hex: 119af08-15975e-176170-ad7000-cdb-cffdb8-, presumed function parameters: LPCH=0x119af08,,
+name: GetProcAddress, address: 0x7575f550, eax: 0x75740000, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-177054-, presumed function parameters: HMODULE=0x75740000,LPCSTR="FlsAlloc",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xb93c3454, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-177060-, presumed function parameters: HMODULE=0x75740000,LPCSTR="FlsFree",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xb93c0a24, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-177068-, presumed function parameters: HMODULE=0x75740000,LPCSTR="FlsGetValue",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xb93fcd04, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-177074-, presumed function parameters: HMODULE=0x75740000,LPCSTR="FlsSetValue",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xb93c3b94, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-177080-, presumed function parameters: HMODULE=0x75740000,LPCSTR="InitializeCriticalSectionEx",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xb93c0584, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-17709c-, presumed function parameters: HMODULE=0x75740000,LPCSTR="InitOnceExecuteOnce",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbaff8514, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-1770b0-, presumed function parameters: HMODULE=0x75740000,LPCSTR="CreateEventExW",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xb93c0524, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-1770c0-, presumed function parameters: HMODULE=0x75740000,LPCSTR="CreateSemaphoreW",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xb93c05b4, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-1770d4-, presumed function parameters: HMODULE=0x75740000,LPCSTR="CreateSemaphoreExW",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xb93c05c4, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-1770e8-, presumed function parameters: HMODULE=0x75740000,LPCSTR="CreateThreadpoolTimer",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xb93c3774, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-177100-, presumed function parameters: HMODULE=0x75740000,LPCSTR="SetThreadpoolTimer",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbb516fd4, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-177114-, presumed function parameters: HMODULE=0x75740000,LPCSTR="WaitForThreadpoolTimerCallbacks",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbb511614, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-177134-, presumed function parameters: HMODULE=0x75740000,LPCSTR="CloseThreadpoolTimer",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbb5111a4, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-17714c-, presumed function parameters: HMODULE=0x75740000,LPCSTR="CreateThreadpoolWait",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xb93c3bc4, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-177164-, presumed function parameters: HMODULE=0x75740000,LPCSTR="SetThreadpoolWait",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbb5150a4, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-177178-, presumed function parameters: HMODULE=0x75740000,LPCSTR="CloseThreadpoolWait",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbb5134c4, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-17718c-, presumed function parameters: HMODULE=0x75740000,LPCSTR="FlushProcessWriteBuffers",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbb551224, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-1771a8-, presumed function parameters: HMODULE=0x75740000,LPCSTR="FreeLibraryWhenCallbackReturns",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbb54ffb4, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-1771c8-, presumed function parameters: HMODULE=0x75740000,LPCSTR="GetCurrentProcessorNumber",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbb545e54, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-1771e4-, presumed function parameters: HMODULE=0x75740000,LPCSTR="CreateSymbolicLinkW",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xb93d11e4, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-1771f8-, presumed function parameters: HMODULE=0x75740000,LPCSTR="GetCurrentPackageId",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbafc9eb4, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-17720c-, presumed function parameters: HMODULE=0x75740000,LPCSTR="GetTickCount64",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xb93fe3b4, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-17721c-, presumed function parameters: HMODULE=0x75740000,LPCSTR="GetFileInformationByHandleEx",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xb93c0a44, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-17723c-, presumed function parameters: HMODULE=0x75740000,LPCSTR="SetFileInformationByHandle",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xb93c1f34, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-177258-, presumed function parameters: HMODULE=0x75740000,LPCSTR="GetSystemTimePreciseAsFileTime",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xb93c1c64, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-177278-, presumed function parameters: HMODULE=0x75740000,LPCSTR="InitializeConditionVariable",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbb546744, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-177294-, presumed function parameters: HMODULE=0x75740000,LPCSTR="WakeConditionVariable",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbb5531c4, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-1772ac-, presumed function parameters: HMODULE=0x75740000,LPCSTR="WakeAllConditionVariable",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbb548ee4, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-1772c8-, presumed function parameters: HMODULE=0x75740000,LPCSTR="SleepConditionVariableCS",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbaf51814, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-1772e4-, presumed function parameters: HMODULE=0x75740000,LPCSTR="InitializeSRWLock",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbb546744, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-1772f8-, presumed function parameters: HMODULE=0x75740000,LPCSTR="AcquireSRWLockExclusive",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbb560944, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-177310-, presumed function parameters: HMODULE=0x75740000,LPCSTR="TryAcquireSRWLockExclusive",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbb550de4, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-17732c-, presumed function parameters: HMODULE=0x75740000,LPCSTR="ReleaseSRWLockExclusive",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbb560ea4, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-177344-, presumed function parameters: HMODULE=0x75740000,LPCSTR="SleepConditionVariableSRW",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbafc6744, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-177360-, presumed function parameters: HMODULE=0x75740000,LPCSTR="CreateThreadpoolWork",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xb93c32b4, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-177378-, presumed function parameters: HMODULE=0x75740000,LPCSTR="SubmitThreadpoolWork",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbb5631f4, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-177390-, presumed function parameters: HMODULE=0x75740000,LPCSTR="CloseThreadpoolWork",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xbb54eeb4, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-1773a4-, presumed function parameters: HMODULE=0x75740000,LPCSTR="CompareStringEx",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xb93fbf94, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-1773b4-, presumed function parameters: HMODULE=0x75740000,LPCSTR="GetLocaleInfoEx",,
+name: GetProcAddress, address: 0x7575f550, eax: 0xb93c2614, ebx: 0xad7000, ecx: 0x4c9f7fea, edx: 0x0, params bytes: 8, presumed function bytes in hex: 75740000-1773c4-, presumed function parameters: HMODULE=0x75740000,LPCSTR="LCMapStringEx",,
+name: IsProcessorFeaturePresent, address: 0x75760b70, eax: 0x0, ebx: 0xad7000, ecx: 0x16abc3, edx: 0x0, presumed function bytes in hex: a-162d93-1599a5-1599a5-cffdfc-, presumed function parameters: DWORD=0xa,,
+name: SetUnhandledExceptionFilter, address: 0x75761720, eax: 0x159811, ebx: 0xd, ecx: 0x159811, edx: 0x1e9, presumed function bytes in hex: 15a2bc-159816-162d68-1599a5-1599a5-ad7000-159811-cffdfc-, presumed function parameters: LPTOP_LEVEL_EXCEPTION_FILTER=0x15a2bc,,
+name: EncodePointer, address: 0x771e5730, eax: 0x0, ebx: 0x1190478, ecx: 0x1190478, edx: 0x76c195d8, params bytes: 4, presumed function bytes in hex: 15a2bc-, presumed function parameters: PVOID=0x15a2bc,,
+name: LoadLibraryExW, address: 0x7575f3a0, eax: 0x187b38, ebx: 0x17bd9c, ecx: 0x14, edx: 0x0, presumed function bytes in hex: 17bd9c-0-800-ffffffff-cffd5c-187b74-187b38-cffd18-, presumed function parameters: LPCWSTR="api-ms-win-core-string-l1-1-0",HANDLE=0x0,DWORD=0x800,,
+name: GetProcAddress, address: 0x7575f550, eax: 0x76a40000, ebx: 0x187b74, ecx: 0x17c0dc, edx: 0xcffcc4, params bytes: 8, presumed function bytes in hex: 76a40000-17c0dc-, presumed function parameters: HMODULE=0x76a40000,LPCSTR="CompareStringEx",,
+name: GetProcAddress, address: 0x7575f550, eax: 0x76a40000, ebx: 0x187b78, ecx: 0x17c0f4, edx: 0x0, params bytes: 8, presumed function bytes in hex: 76a40000-17c0f4-, presumed function parameters: HMODULE=0x76a40000,LPCSTR="EnumSystemLocalesEx",,
+name: LoadLibraryExW, address: 0x7575f3a0, eax: 0x187b20, ebx: 0x17bbf0, ecx: 0x14, edx: 0x0, presumed function bytes in hex: 17bbf0-0-800-ffffffff-cffd5c-187b90-187b20-cffd18-, presumed function parameters: LPCWSTR="api-ms-win-core-datetime-l1-1-1",HANDLE=0x0,DWORD=0x800,,
+name: GetProcAddress, address: 0x7575f550, eax: 0x76a40000, ebx: 0x187b90, ecx: 0x17c15c, edx: 0xcffcc4, params bytes: 8, presumed function bytes in hex: 76a40000-17c15c-, presumed function parameters: HMODULE=0x76a40000,LPCSTR="GetDateFormatEx",,
+name: GetProcAddress, address: 0x7575f550, eax: 0x76a40000, ebx: 0x187b9c, ecx: 0x17c174, edx: 0x0, params bytes: 8, presumed function bytes in hex: 76a40000-17c174-, presumed function parameters: HMODULE=0x76a40000,LPCSTR="GetLocaleInfoEx",,
+name: GetProcAddress, address: 0x7575f550, eax: 0x76a40000, ebx: 0x187ba8, ecx: 0x17c18c, edx: 0x0, params bytes: 8, presumed function bytes in hex: 76a40000-17c18c-, presumed function parameters: HMODULE=0x76a40000,LPCSTR="GetTimeFormatEx",,
+name: GetProcAddress, address: 0x7575f550, eax: 0x76a40000, ebx: 0x187bac, ecx: 0x17c1a4, edx: 0x0, params bytes: 8, presumed function bytes in hex: 76a40000-17c1a4-, presumed function parameters: HMODULE=0x76a40000,LPCSTR="GetUserDefaultLocaleName",,
+name: GetProcAddress, address: 0x7575f550, eax: 0x76a40000, ebx: 0x187bbc, ecx: 0x17c1ec, edx: 0x0, params bytes: 8, presumed function bytes in hex: 76a40000-17c1ec-, presumed function parameters: HMODULE=0x76a40000,LPCSTR="IsValidLocaleName",,
+name: LoadLibraryExW, address: 0x7575f3a0, eax: 0x187b30, ebx: 0x17bcf0, ecx: 0x14, edx: 0x0, presumed function bytes in hex: 17bcf0-0-800-ffffffff-cffd5c-187bc4-187b30-cffd18-, presumed function parameters: LPCWSTR="api-ms-win-core-localization-obsolete-l1-2-0",HANDLE=0x0,DWORD=0x800,,
+name: GetProcAddress, address: 0x7575f550, eax: 0x76a40000, ebx: 0x187bc4, ecx: 0x17c220, edx: 0xcffcc4, params bytes: 8, presumed function bytes in hex: 76a40000-17c220-, presumed function parameters: HMODULE=0x76a40000,LPCSTR="LCIDToLocaleName",,
+name: GetProcAddress, address: 0x7575f550, eax: 0x76a40000, ebx: 0x187bc8, ecx: 0x17c23c, edx: 0x0, params bytes: 8, presumed function bytes in hex: 76a40000-17c23c-, presumed function parameters: HMODULE=0x76a40000,LPCSTR="LocaleNameToLCID",,
+name: EncodePointer, address: 0x771e5730, eax: 0x9, ebx: 0xd, ecx: 0x0, edx: 0x2, params bytes: 4, presumed function bytes in hex: 157a0e-, presumed function parameters: PVOID=0x157a0e,,
+name: GetStdHandle, address: 0x75761700, eax: 0x1175fb8, ebx: 0xad7000, ecx: 0x0, edx: 0xada000, presumed function bytes in hex: fffffff5-cffdb8-162d68-1599a5-1599a5-ad7000-cffdfc-, presumed function parameters: DWORD=0xfffffff5,,
+name: SetConsoleTextAttribute, address: 0x75763b60, eax: 0xa0, ebx: 0xad7000, ecx: 0x0, edx: 0xada000, presumed function bytes in hex: a0-2-a0-162d68-1599a5-1599a5-ad7000-cffdfc-, presumed function parameters: HANDLE=0xa0,WORD=0x2,,
+name: GetProcAddress, address: 0x7575f550, eax: 0x76a40000, ebx: 0xad7000, ecx: 0x17967c, edx: 0x0, params bytes: 8, presumed function bytes in hex: 76a40000-177068-, presumed function parameters: HMODULE=0x76a40000,LPCSTR="FlsGetValue",,
+name: DeleteCriticalSection, address: 0x771afbd0, eax: 0x0, ebx: 0xcffd0c, ecx: 0x186eb8, edx: 0xcc4a2a74, params bytes: 4, presumed function bytes in hex: 186ec0-, presumed function parameters: LPCRITICAL_SECTION=0x186ec0,,
+name: DeleteCriticalSection, address: 0x771afbd0, eax: 0x0, ebx: 0xcffd0c, ecx: 0x186ec0, edx: 0xcc4a2a74, params bytes: 4, presumed function bytes in hex: 186ed8-, presumed function parameters: LPCRITICAL_SECTION=0x186ed8,,
+name: DeleteCriticalSection, address: 0x771afbd0, eax: 0x0, ebx: 0xcffd0c, ecx: 0x186ed8, edx: 0xcc4a2a74, params bytes: 4, presumed function bytes in hex: 186ef0-, presumed function parameters: LPCRITICAL_SECTION=0x186ef0,,
+name: DeleteCriticalSection, address: 0x771afbd0, eax: 0x0, ebx: 0xcffd0c, ecx: 0x186ef0, edx: 0xcc4a2a74, params bytes: 4, presumed function bytes in hex: 186f08-, presumed function parameters: LPCRITICAL_SECTION=0x186f08,,
+name: DeleteCriticalSection, address: 0x771afbd0, eax: 0x0, ebx: 0xcffd0c, ecx: 0x186f08, edx: 0xcc4a2a74, params bytes: 4, presumed function bytes in hex: 186f20-, presumed function parameters: LPCRITICAL_SECTION=0x186f20,,
+name: DeleteCriticalSection, address: 0x771afbd0, eax: 0x0, ebx: 0xcffd0c, ecx: 0x186f20, edx: 0xcc4a2a74, params bytes: 4, presumed function bytes in hex: 186f38-, presumed function parameters: LPCRITICAL_SECTION=0x186f38,,
+name: DeleteCriticalSection, address: 0x771afbd0, eax: 0x0, ebx: 0xcffd0c, ecx: 0x186f38, edx: 0xcc4a2a74, params bytes: 4, presumed function bytes in hex: 186f50-, presumed function parameters: LPCRITICAL_SECTION=0x186f50,,
+name: DeleteCriticalSection, address: 0x771afbd0, eax: 0x0, ebx: 0xcffd0c, ecx: 0x186f50, edx: 0xcc4a2a74, params bytes: 4, presumed function bytes in hex: 186f68-, presumed function parameters: LPCRITICAL_SECTION=0x186f68,,
+name: DeleteCriticalSection, address: 0x771afbd0, eax: 0x186150, ebx: 0x4, ecx: 0x186130, edx: 0xada000, params bytes: 4, presumed function bytes in hex: 186150-, presumed function parameters: LPCRITICAL_SECTION=0x186150,,
+name: DeleteCriticalSection, address: 0x771afbd0, eax: 0x186188, ebx: 0x4, ecx: 0x186168, edx: 0xada000, params bytes: 4, presumed function bytes in hex: 186188-, presumed function parameters: LPCRITICAL_SECTION=0x186188,,
+name: DeleteCriticalSection, address: 0x771afbd0, eax: 0x1861c0, ebx: 0x4, ecx: 0x1861a0, edx: 0xada000, params bytes: 4, presumed function bytes in hex: 1861c0-, presumed function parameters: LPCRITICAL_SECTION=0x1861c0,,
+name: LoadLibraryExW, address: 0x7575f3a0, eax: 0x187b68, ebx: 0x17c048, ecx: 0x14, edx: 0x0, presumed function bytes in hex: 17c048-0-800-ffffffff-0-187be0-187b68-cffd4c-, presumed function parameters: LPCWSTR="api-ms-win-appmodel-runtime-l1-1-2",HANDLE=0x0,DWORD=0x800,,
+name: GetProcAddress, address: 0x7575f550, eax: 0x725b0000, ebx: 0x187be0, ecx: 0x17c254, edx: 0xcffdec, params bytes: 8, presumed function bytes in hex: 725b0000-17c254-, presumed function parameters: HMODULE=0x725b0000,LPCSTR="AppPolicyGetProcessTerminationMethod",,
+name: GetModuleHandleExW, address: 0x75761640, eax: 0xcffd74, ebx: 0xad7000, ecx: 0x0, edx: 0x0, presumed function bytes in hex: 0-17b28c-cffd74-0-cffd84-, presumed function parameters: DWORD=0x0,LPCWSTR="mscoree.dll",HMODULE*=0xcffd74,,
