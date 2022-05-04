@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QListWidget, QVBoxLayout, QListWidgetItem, QDialog, QTextEdit, \
-    QLabel, QTableWidget, QHeaderView, QTableWidgetItem, QTabWidget
+    QLabel, QTableWidget, QHeaderView, QTableWidgetItem, QTabWidget, QTreeWidget, QTreeWidgetItem
 
 from threading import Thread
 import time
@@ -153,11 +153,21 @@ class DLLs_and_functions_widget(QWidget):
         with open(self.dllFunctionLoggerPath,"r") as dllFunctionLoggerFile:
             self.lines = dllFunctionLoggerFile.readlines()
 
+        self.treeWidget = QTreeWidget()
+        self.treeWidget.setColumnCount(3)
+        self.treeWidget.setHeaderLabels(["Function Name", "Address", "Hook Status"])
+        #self.treeWidget.setResizeMode(stretch)
+        self.layout.addWidget(self.treeWidget)
+
+        items = []
 
         waiting_for_add = False
         for current_line in self.lines:
             current_line = current_line.replace('\n','')
             if current_line[-1:] == ':': #new DLL
+                self.item = QTreeWidgetItem([current_line])
+                items.append(self.item)
+                """
                 if waiting_for_add:
                     self.layout.addWidget(self.current_function_list_widget)
                     waiting_for_add = False
@@ -165,11 +175,18 @@ class DLLs_and_functions_widget(QWidget):
                 self.layout.addWidget(label)
                 self.current_function_list_widget = QListWidget()
                 waiting_for_add = True
+                
+                
             else:
                 QListWidgetItem(current_line, self.current_function_list_widget)
         if waiting_for_add:
             self.layout.addWidget(self.current_function_list_widget)
-
+                """
+            else:
+                first_space = current_line.find(' ')
+                second_space = current_line.find(' ',first_space+1)
+                child = QTreeWidgetItem([current_line[:first_space], current_line[first_space+1:second_space], current_line[second_space+1:]])
+                self.item.addChild(child)
         """
         self.dlls = [("kernel32.dll",["asdasdasdsad","asdsadsadjsndkasd","asdasbdjasbjndsajhdk"]),("wha.dll",["asdasdasdsad","asdsadsadjsndkasd","asdasbdjasbjndsajhdk"])]
     
@@ -184,5 +201,8 @@ class DLLs_and_functions_widget(QWidget):
 
             self.layout.addWidget(function_list_widget)
         """
+        self.treeWidget.addTopLevelItems(items)
+
+
         self.setLayout(self.layout)
         self.show()

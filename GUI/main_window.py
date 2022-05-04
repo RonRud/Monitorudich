@@ -25,15 +25,15 @@ class Ui_MainWindow(object):
         self.gridLayout = QGridLayout(self.gridLayoutWidget)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
-        self.textEdit = QTextEdit(self.gridLayoutWidget)
-        self.textEdit.setObjectName(u"textEdit")
+        #self.textEdit = QTextEdit(self.gridLayoutWidget)
+        #self.textEdit.setObjectName(u"textEdit")
 
-        self.gridLayout.addWidget(self.textEdit, 2, 1, 1, 1)
+        #self.gridLayout.addWidget(self.textEdit, 2, 1, 1, 1)
 
-        self.launchByPIDButton = QPushButton(self.gridLayoutWidget)
-        self.launchByPIDButton.setObjectName(u"launchByPIDButton")
+        #self.launchByPIDButton = QPushButton(self.gridLayoutWidget)
+        #self.launchByPIDButton.setObjectName(u"launchByPIDButton")
 
-        self.gridLayout.addWidget(self.launchByPIDButton, 3, 1, 1, 1)
+        #self.gridLayout.addWidget(self.launchByPIDButton, 3, 1, 1, 1)
 
         self.executablePathTextEdit = QTextEdit(self.gridLayoutWidget)
         self.executablePathTextEdit.setObjectName(u"executablePathTextEdit")
@@ -68,12 +68,12 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.actionopen_exe.setText(QCoreApplication.translate("MainWindow", u"open exe", None))
-        self.textEdit.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Or enter PID of running program</p></body></html>", None))
-        self.launchByPIDButton.setText(QCoreApplication.translate("MainWindow", u"Link To Running process", None))
+        #self.textEdit.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+#"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+#"p, li { white-space: pre-wrap; }\n"
+#"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+#"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Or enter PID of running program</p></body></html>", None))
+        #self.launchByPIDButton.setText(QCoreApplication.translate("MainWindow", u"Link To Running process", None))
         self.executablePathTextEdit.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"

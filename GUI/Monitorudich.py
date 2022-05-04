@@ -28,6 +28,7 @@ class Window(QMainWindow, Ui_MainWindow):
         #os.system()
 
         os.popen(f"cd .. && mainExecute.exe {self.executablePathTextEdit.toPlainText()}")
+
         """ use for debugging
         process = os.popen(f"cd .. && mainExecute.exe {self.executablePathTextEdit.toPlainText()}")
         print(process.read())

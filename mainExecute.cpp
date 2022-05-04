@@ -178,8 +178,8 @@ int main(int argc, char* argv[])
 	char thisFilePath[100] = { 0 };
 
 	GetModuleFileNameA(NULL, thisFilePath, 100);
-	//std::string loggerFilePath = std::string(thisFilePath);
-	std::string loggerFilePath = std::string("C:\\Users\\Rudic\\source\\repos\\RonRud\\Monitorudich\\");
+	std::string loggerFilePath = std::string(thisFilePath);
+	//std::string loggerFilePath = std::string("C:\\Users\\Rudic\\source\\repos\\RonRud\\Monitorudich\\");
 	const size_t last_slash_idx = loggerFilePath.rfind('\\'); //Get the last occurareance of \\ (before the exe name)
 	if (std::string::npos != last_slash_idx) {
 		loggerFilePath = loggerFilePath.substr(0, last_slash_idx + 1) + "logger_output.txt"; // Than add the logger file name to it

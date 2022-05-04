@@ -94,3 +94,6 @@ FreeEnvironmentStringsW-BOOL FreeEnvironmentStringsA( LPCH penv );
 SetEnvironmentVariableW-BOOL SetEnvironmentVariableW( LPCWSTR lpName, LPCWSTR lpValue );
 SetStdHandle-BOOL WINAPI SetStdHandle( DWORD nStdHandle, HANDLE hHandle );
 HeapSize-SIZE_T HeapSize( HANDLE hHeap, DWORD dwFlags, LPCVOID lpMem );
+_register_onexit_function-Traceback (most recent call last );
+_initialize_onexit_table-Traceback (most recent call last );
+_exit-Traceback (most recent call last );
