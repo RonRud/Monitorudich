@@ -166,6 +166,16 @@ class DLLs_and_functions_widget(QWidget):
             current_line = current_line.replace('\n','')
             if current_line[-1:] == ':': #new DLL
                 self.item = QTreeWidgetItem([current_line])
+
+                self.successfulItem = QTreeWidgetItem(["Hooked function successfully"])
+                self.item.addChild(self.successfulItem)
+
+                self.failedItem = QTreeWidgetItem(["Didn't Hook function"])
+                self.item.addChild(self.failedItem)
+
+                self.blacklistedItem = QTreeWidgetItem(["Blacklisted, not hooked"])
+                self.item.addChild(self.blacklistedItem)
+
                 items.append(self.item)
                 """
                 if waiting_for_add:
@@ -185,8 +195,16 @@ class DLLs_and_functions_widget(QWidget):
             else:
                 first_space = current_line.find(' ')
                 second_space = current_line.find(' ',first_space+1)
-                child = QTreeWidgetItem([current_line[:first_space], current_line[first_space+1:second_space], current_line[second_space+1:]])
-                self.item.addChild(child)
+                if current_line[second_space+1:] == "Hooked function successfully":
+                    child = QTreeWidgetItem([current_line[:first_space], current_line[first_space+1:second_space], current_line[second_space+1:]])
+                    self.successfulItem.addChild(child)
+                elif current_line[second_space+1:] == "Didn't Hook function":
+                    child = QTreeWidgetItem([current_line[:first_space], current_line[first_space+1:second_space], current_line[second_space+1:]])
+                    self.failedItem.addChild(child)
+                elif current_line[second_space+1:] == "Blacklisted, not hooked":
+                    child = QTreeWidgetItem([current_line[:first_space], current_line[first_space+1:second_space], current_line[second_space+1:]])
+                    self.blacklistedItem.addChild(child)
+
         """
         self.dlls = [("kernel32.dll",["asdasdasdsad","asdsadsadjsndkasd","asdasbdjasbjndsajhdk"]),("wha.dll",["asdasdasdsad","asdsadsadjsndkasd","asdasbdjasbjndsajhdk"])]
     
