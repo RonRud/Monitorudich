@@ -1,0 +1,210 @@
+
+GetStdHandle
+SetConsoleTextAttribute
+WideCharToMultiByte
+GetLastError
+EnterCriticalSection
+LeaveCriticalSection
+DeleteCriticalSection
+MultiByteToWideChar
+EncodePointer
+DecodePointer
+SetLastError
+InitializeCriticalSectionAndSpinCount
+SwitchToThread
+TlsAlloc
+TlsGetValue
+TlsSetValue
+TlsFree
+GetSystemTimeAsFileTime
+GetModuleHandleW
+GetProcAddress
+CompareStringW
+LCMapStringW
+GetLocaleInfoW
+GetStringTypeW
+GetCPInfo
+UnhandledExceptionFilter
+SetUnhandledExceptionFilter
+GetCurrentProcess
+TerminateProcess
+IsProcessorFeaturePresent
+QueryPerformanceCounter
+GetCurrentProcessId
+GetCurrentThreadId
+InitializeSListHead
+IsDebuggerPresent
+GetStartupInfoW
+CreateFileW
+RaiseException
+RtlUnwind
+FreeLibrary
+LoadLibraryExW
+WriteFile
+GetModuleFileNameW
+ExitProcess
+GetModuleHandleExW
+GetCommandLineA
+GetCommandLineW
+HeapAlloc
+HeapFree
+GetFileType
+IsValidLocale
+GetUserDefaultLCID
+EnumSystemLocalesW
+CloseHandle
+FlushFileBuffers
+GetConsoleCP
+GetConsoleMode
+ReadFile
+GetFileSizeEx
+SetFilePointerEx
+ReadConsoleW
+HeapReAlloc
+FindClose
+FindFirstFileExW
+FindNextFileW
+IsValidCodePage
+GetACP
+GetOEMCP
+GetEnvironmentStringsW
+FreeEnvironmentStringsW
+SetEnvironmentVariableW
+SetStdHandle
+GetProcessHeap
+HeapSize
+WriteConsoleW
+Main program can continue executing
+TlsGetValue
+IsProcessorFeaturePresent
+LoadLibraryExW
+GetProcAddress
+LoadLibraryExW
+GetProcAddress
+GetProcAddress
+LoadLibraryExW
+GetProcAddress
+GetProcessHeap
+LoadLibraryExW
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetStartupInfoW
+GetStdHandle
+GetStdHandle
+GetStdHandle
+GetCommandLineA
+GetCommandLineW
+GetACP
+IsValidCodePage
+GetCPInfo
+GetCPInfo
+GetStringTypeW
+LoadLibraryExW
+GetProcAddress
+GetModuleFileNameW
+LoadLibraryExW
+GetProcAddress
+InitializeSListHead
+GetEnvironmentStringsW
+FreeEnvironmentStringsW
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+IsProcessorFeaturePresent
+SetUnhandledExceptionFilter
+EncodePointer
+LoadLibraryExW
+GetProcAddress
+GetProcAddress
+LoadLibraryExW
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+GetProcAddress
+LoadLibraryExW
+GetProcAddress
+GetProcAddress
+EncodePointer
+GetStdHandle
+SetConsoleTextAttribute
+GetProcAddress
+DeleteCriticalSection
+DeleteCriticalSection
+DeleteCriticalSection
+DeleteCriticalSection
+DeleteCriticalSection
+DeleteCriticalSection
+DeleteCriticalSection
+DeleteCriticalSection
+DeleteCriticalSection
+DeleteCriticalSection
+DeleteCriticalSection
+LoadLibraryExW
+GetProcAddress
+GetModuleHandleExW
+cleaning up fanction , with offset: 757c1540
+cleaning up fanction , with offset: 757c12a8
+cleaning up fanction , with offset: 757c1150
+cleaning up fanction , with offset: 757c1878
+cleaning up fanction , with offset: 757c126c
+cleaning up fanction , with offset: 757c0f20
+cleaning up fanction , with offset: 757c175c
+cleaning up fanction , with offset: 757c1534
+cleaning up fanction , with offset: 757c1578
+cleaning up fanction , with offset: 757c1480
+cleaning up fanction , with offset: 757c147c
+cleaning up fanction , with offset: 757c148c
+cleaning up fanction , with offset: 757c0ee4
+cleaning up fanction , with offset: 757c1290
+cleaning up fanction , with offset: 757c1524
+cleaning up fanction , with offset: 757c1554
+cleaning up fanction , with offset: 757c1820
+cleaning up fanction , with offset: 757c0fb8
+cleaning up fanction , with offset: 757c106c
+cleaning up fanction , with offset: 757c1088
+cleaning up fanction , with offset: 757c107c
+cleaning up fanction , with offset: 757c0f88
+cleaning up fanction , with offset: 757c0d60
+cleaning up fanction , with offset: 757c0d5c
+cleaning up fanction , with offset: 757c0d3c
+cleaning up fanction , with offset: 757c0d38
+cleaning up fanction , with offset: 757c0db0
