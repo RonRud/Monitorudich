@@ -1,4 +1,5 @@
 import sys
+import time
 
 from PyQt5.QtWidgets import (
     QApplication, QDialog, QMainWindow, QMessageBox, QFileDialog, QAction
@@ -28,12 +29,14 @@ class Window(QMainWindow, Ui_MainWindow):
         #os.system()
 
         os.popen(f"cd .. && mainExecute.exe {self.executablePathTextEdit.toPlainText()}")
+        os.popen(f"cd ../stringsModule && MalwareStringsSorter.exe {self.executablePathTextEdit.toPlainText()}")
 
         """ use for debugging
         process = os.popen(f"cd .. && mainExecute.exe {self.executablePathTextEdit.toPlainText()}")
         print(process.read())
         process.close()
         """
+        time.sleep(2)
         self.logger_view_window = Logger_window()
         self.logger_view_window.show()
 
