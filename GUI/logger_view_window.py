@@ -7,11 +7,11 @@ import time
 import re
 
 class Logger_window(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, executable_name, parent=None):
         super(Logger_window,self).__init__(parent)
         self.resize(1000,1000)
 
-        self.setWindowTitle("Logger GUI")
+        self.setWindowTitle("Logger GUI - " + executable_name)
 
         self.layout = QVBoxLayout(self)
 
@@ -229,41 +229,35 @@ class DLLs_and_functions_widget(QWidget):
 
 class StringsWidget(QWidget):
     def __init__(self, parent=None):
-        try:
-            super(StringsWidget, self).__init__(parent)
+        super(StringsWidget, self).__init__(parent)
 
-            self.layout = QVBoxLayout(self)
+        self.layout = QVBoxLayout(self)
 
-            selectedStringsLabel = QLabel("Selected Strings:")
-            self.layout.addWidget(selectedStringsLabel)
+        selectedStringsLabel = QLabel("Selected Strings:")
+        self.layout.addWidget(selectedStringsLabel)
 
-            selectedStringsList = QListWidget()
-            self.layout.addWidget(selectedStringsList)
+        selectedStringsList = QListWidget()
+        self.layout.addWidget(selectedStringsList)
 
-            print("1")
-            with open("C:\Windows\Temp\info_to_dll.txt","r") as settings_file:
-                logger_file_path = settings_file.readline().replace('\n','')
-                self.words_folder_file_path = logger_file_path[:logger_file_path.rfind('\\')]
+        with open("C:\Windows\Temp\info_to_dll.txt","r") as settings_file:
+            logger_file_path = settings_file.readline().replace('\n','')
+            self.words_folder_file_path = logger_file_path[:logger_file_path.rfind('\\')]
 
-            print("2")
-            with open(self.words_folder_file_path + "\\StringsModule\\selected_strings.txt","r") as selectedStringsFile:
-                lines = selectedStringsFile.readlines()
-                for current_line in lines:
-                    selectedStringsList.addItem(QListWidgetItem(current_line))
-            print("3")
-            filteredStringsLabel = QLabel("Filtered Strings:")
-            self.layout.addWidget(filteredStringsLabel)
+        with open(self.words_folder_file_path + "\\StringsModule\\selected_strings.txt","r") as selectedStringsFile:
+            lines = selectedStringsFile.readlines()
+            for current_line in lines:
+                selectedStringsList.addItem(QListWidgetItem(current_line))
 
-            filteredStringsList = QListWidget()
-            self.layout.addWidget(filteredStringsList)
-            print("4")
-            with open(self.words_folder_file_path + "\\StringsModule\\filtered_strings.txt","r") as selectedStringsFile:
-                lines = selectedStringsFile.readlines()
-                for current_line in lines:
-                    filteredStringsList.addItem(QListWidgetItem(current_line))
-            print("5")
-            self.setLayout(self.layout)
+        filteredStringsLabel = QLabel("Filtered Strings:")
+        self.layout.addWidget(filteredStringsLabel)
 
-            self.show()
-        except Exception as e:
-            print(e)
+        filteredStringsList = QListWidget()
+        self.layout.addWidget(filteredStringsList)
+
+        with open(self.words_folder_file_path + "\\StringsModule\\filtered_strings.txt","r") as selectedStringsFile:
+            lines = selectedStringsFile.readlines()
+            for current_line in lines:
+                filteredStringsList.addItem(QListWidgetItem(current_line))
+
+        self.setLayout(self.layout)
+        self.show()

@@ -35,6 +35,14 @@ class Ui_MainWindow(object):
 
         #self.gridLayout.addWidget(self.launchByPIDButton, 3, 1, 1, 1)
 
+
+        self.saveButton = QPushButton("Save")
+        self.gridLayout.addWidget(self.saveButton,2,1,1,1)
+
+        self.loadButton = QPushButton("Load")
+        self.gridLayout.addWidget(self.loadButton,2,2,1,1)
+
+
         self.executablePathTextEdit = QTextEdit(self.gridLayoutWidget)
         self.executablePathTextEdit.setObjectName(u"executablePathTextEdit")
 
@@ -49,6 +57,14 @@ class Ui_MainWindow(object):
         self.fileExplorerButton.setObjectName(u"fileExplorerButton")
 
         self.gridLayout.addWidget(self.fileExplorerButton, 1, 0, 1, 1)
+
+        self.gridLayout.setColumnStretch(0,3)
+        self.gridLayout.setColumnStretch(1, 1)
+        self.gridLayout.setColumnStretch(2, 1)
+        #self.gridLayout.setRowStretch(0,3)
+        #self.gridLayout.setRowStretch(1, 3)
+        #self.gridLayout.setRowStretch(2, 3)
+
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
