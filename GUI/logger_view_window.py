@@ -51,9 +51,8 @@ class MoreInfoDialog(QWidget):
         self.layout = QVBoxLayout(self)
 
         self.fullDocumantationString = QLabel("Wha")
-        self.registersText = QLabel(f"Registers: eax:{regex_match.group('eax')}, ebx:{regex_match.group('ebx')}, ecx:{regex_match.group('ecx')}, edx:{regex_match.group('edx')}")
-        self.hexStackText = QLabel(f"The presumed stack hex values are: {regex_match.group('presumed_hex')}")
-        self.translatedStackText = QLabel(f"The presumed converted stack is: {regex_match.group('presumed_params')}")
+        self.registersText = QLabel(f'<font color="green">Registers:</font><font color="yellow"> eax:</font><font color="white">{regex_match.group("eax")}</font><font color="yellow">, ebx:</font><font color="white">{regex_match.group("ebx")}</font><font color="yellow">, ecx:</font><font color="white">{regex_match.group("ecx")}</font><font color="yellow">, edx:</font><font color="white">{regex_match.group("edx")}</font>');        self.hexStackText = QLabel(f"<font color='green'>The presumed stack hex values are: </font><font color='white'>{regex_match.group('presumed_hex')}</font>")
+        self.translatedStackText = QLabel(f"<font color='green'>The presumed converted stack is: </font><font color='white'>{regex_match.group('presumed_params')}</font>")
         self.layout.addWidget(self.fullDocumantationString)
         self.layout.addWidget(self.registersText)
         self.layout.addWidget(self.hexStackText)
@@ -148,7 +147,7 @@ class DLLs_and_functions_widget(QWidget):
         self.layout = QVBoxLayout(self)
 
         with open("C:\Windows\Temp\info_to_dll.txt","r") as settings_file:
-            for i in range(8):
+            for i in range(9):
                 self.dllFunctionLoggerPath = settings_file.readline().replace('\n','')
 
 

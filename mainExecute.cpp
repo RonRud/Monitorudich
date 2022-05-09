@@ -189,6 +189,7 @@ int main(int argc, char* argv[])
 	std::string pathOfOfflineScrapes = loggerFilePath.substr(0, last_slash_idx + 1) + "MSDNScrapes.txt";
 	std::string pathOfBlacklist = loggerFilePath.substr(0, last_slash_idx + 1) + "Natural_selector.txt";
 	std::string pathOfWebScrapper = loggerFilePath.substr(0, last_slash_idx + 1) + "webScrapperMSDN.py";
+	std::string pathOfFullWebScrapes = loggerFilePath.substr(0, last_slash_idx + 1) + "fullMSDNScrapes.txt";
 	std::string pathOfDllFunctionsLogger = loggerFilePath.substr(0, last_slash_idx + 1) + "dllFunctionLogger.txt";
 	std::cout << inspectedProcessPath << std::endl;
 	std::string pathOfExecutable = inspectedProcessPath.substr(0, inspectedProcessPath.rfind('\\')+1);
@@ -227,6 +228,7 @@ int main(int argc, char* argv[])
 		dllInfoFile << pathOfOfflineScrapes << std::endl;
 		dllInfoFile << pathOfBlacklist << std::endl;
 		dllInfoFile << pathOfWebScrapper << std::endl;
+		dllInfoFile << pathOfFullWebScrapes << std::endl;
 		dllInfoFile << pathOfExecutable << std::endl;
 		dllInfoFile << pathOfDllFunctionsLogger << std::endl;
 		dllInfoFile << pathOfDllFunctionsLogger << std::endl;
@@ -292,6 +294,7 @@ int main(int argc, char* argv[])
 			dllInfoFile << pathOfOfflineScrapes << std::endl;
 			dllInfoFile << pathOfBlacklist << std::endl;
 			dllInfoFile << pathOfWebScrapper << std::endl;
+			dllInfoFile << pathOfFullWebScrapes << std::endl;
 			dllInfoFile << pathOfExecutable << std::endl;
 			dllInfoFile << pathOfDllFunctionsLogger << std::endl;
 			dllInfoFile << isWebScrapingEnabled << std::endl;

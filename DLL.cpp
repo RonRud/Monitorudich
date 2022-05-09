@@ -25,6 +25,8 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 				std::getline(myfile, dllRecievedInfo);
 				strcpy(webScrapperPythonFilePath, dllRecievedInfo.c_str());
 				std::getline(myfile, dllRecievedInfo);
+				std::getline(myfile, dllRecievedInfo);
+				strcpy(fullScrapesFile, dllRecievedInfo.c_str());
 				strcpy(executablePath, dllRecievedInfo.c_str());
 				std::getline(myfile, dllRecievedInfo);
 				strcpy(dllFunctionsLoggerPath, dllRecievedInfo.c_str());
@@ -592,8 +594,12 @@ void webScrapeFunction(std::string* functionName) {
 		DWORD dwAvail = 0;
 
 		std::ofstream saveFile(offlineScrapesFile, std::ios::out | std::ios::app);
+		std::ofstream fullWebScrapesFile(fullScrapesFile, std::ios::out | std::ios::app);
+
 		while (ReadFile(hStdOutPipeRead, buffer, 1024, &dwRead, NULL))
 		{
+			fullWebScrapesFile << *functionName << "-" << buffer << std::endl;
+			fullWebScrapesFile.flush();
 			std::string* modifiedBuffer = new std::string("");
 			//buffer[dwRead] = '\0';
 			for (int i = 0; i < dwRead + 1; i++) {
@@ -644,6 +650,7 @@ void webScrapeFunction(std::string* functionName) {
 			//save string to the offlineScrapesFile
 			saveFile << *functionName << "-" << *nameToDocumantationString[functionName] << std::endl;
 		}
+		fullWebScrapesFile.close();
 		// Clean up and exit.
 		CloseHandle(hStdOutPipeRead);
 
