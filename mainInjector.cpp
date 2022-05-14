@@ -32,6 +32,7 @@ bool InjectDLL(DWORD ProcessID)
 	std::string pathOfOfflineScrapes = loggerFilePath.substr(0, last_slash_idx_logger + 1) + "MSDNScrapes.txt";
 	std::string pathOfBlacklist = loggerFilePath.substr(0, last_slash_idx_logger + 1) + "Natural_selector.txt";
 	std::string pathOfWebScrapper = loggerFilePath.substr(0, last_slash_idx_logger + 1) + "webScrapperMSDN.py";
+	std::string pathOfFullWebScrapes = loggerFilePath.substr(0, last_slash_idx_logger + 1) + "fullMSDNScrapes.py";
 	std::string pathOfDllFunctionsLogger = loggerFilePath.substr(0, last_slash_idx_logger + 1) + "dllFunctionLogger.txt";
 	std::string pathOfWebScrapper = "This isn't needed when injecting, let it fail";
 
@@ -47,6 +48,7 @@ bool InjectDLL(DWORD ProcessID)
 	dllInfoFile << pathOfOfflineScrapes << std::endl;
 	dllInfoFile << pathOfBlacklist << std::endl;
 	dllInfoFile << pathOfWebScrapper << std::endl;
+	dllInfoFile << pathOfFullWebScrapes << std::endl;
 	dllInfoFile << "main injector doesn't know the executables path" << std::endl; //suppose to be path of executable, not sure what to put here
 	dllInfoFile << pathOfDllFunctionsLogger << std::endl;
 	dllInfoFile << isWebScrapingEnabled << std::endl;

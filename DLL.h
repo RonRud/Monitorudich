@@ -33,6 +33,7 @@ char loggerFilePath[100];
 char infoToMainFilePath[100];
 char infoFromMainFilePath[100];
 char offlineScrapesFile[100];
+char fullScrapesFile[100];
 char blacklistFilePath[100];
 char webScrapperPythonFilePath[100];
 char executablePath[100];

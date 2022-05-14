@@ -25,8 +25,8 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 				std::getline(myfile, dllRecievedInfo);
 				strcpy(webScrapperPythonFilePath, dllRecievedInfo.c_str());
 				std::getline(myfile, dllRecievedInfo);
-				std::getline(myfile, dllRecievedInfo);
 				strcpy(fullScrapesFile, dllRecievedInfo.c_str());
+				std::getline(myfile, dllRecievedInfo);
 				strcpy(executablePath, dllRecievedInfo.c_str());
 				std::getline(myfile, dllRecievedInfo);
 				strcpy(dllFunctionsLoggerPath, dllRecievedInfo.c_str());
@@ -408,7 +408,7 @@ void logStack() {
 		}
 	}
 	else { saveFile << ","; }
-	saveFile << "," << std::endl;
+	saveFile << ", alerted:false," << std::endl;
 	saveFile.close();
 }
 

@@ -34,23 +34,24 @@ class Logger_window(QWidget):
         self.setLayout(self.layout)
 
 class CustomQTableWidgetItem(QTableWidgetItem):
-    def __init__(self, regex_match, string):
+    def __init__(self, regex_match, documentation_string, string):
         super(CustomQTableWidgetItem, self).__init__(string)
         self.regex_match = regex_match
+        self.documentation_string = documentation_string
 
 class MoreInfoDialog(QWidget):
     """
     Dialog that shows more info about a function call
     """
 
-    def __init__(self, regex_match, parent=None, ):
+    def __init__(self, regex_match, documentation_string, parent=None):
         super(MoreInfoDialog, self).__init__(parent)
         self.setWindowTitle("more info dialog")
         #self.parentWindow = window
 
         self.layout = QVBoxLayout(self)
 
-        self.fullDocumantationString = QLabel("Wha")
+        self.fullDocumantationString = QLabel(documentation_string)
         self.registersText = QLabel(f'<font color="green">Registers:</font><font color="yellow"> eax:</font><font color="white">{regex_match.group("eax")}</font><font color="yellow">, ebx:</font><font color="white">{regex_match.group("ebx")}</font><font color="yellow">, ecx:</font><font color="white">{regex_match.group("ecx")}</font><font color="yellow">, edx:</font><font color="white">{regex_match.group("edx")}</font>');        self.hexStackText = QLabel(f"<font color='green'>The presumed stack hex values are: </font><font color='white'>{regex_match.group('presumed_hex')}</font>")
         self.translatedStackText = QLabel(f"<font color='green'>The presumed converted stack is: </font><font color='white'>{regex_match.group('presumed_params')}</font>")
         self.layout.addWidget(self.fullDocumantationString)
@@ -67,6 +68,8 @@ class Table_view_logger_thingy_widget(QWidget):
 
         with open("C:\Windows\Temp\info_to_dll.txt","r") as settings_file:
             self.logger_file_path = settings_file.readline().replace('\n','')
+            for i in range(6):
+                self.fullDocumentationFilePath = settings_file.readline().replace('\n', '')  # get value from the seventh line
 
         self.table_logger = QTableWidget()
         self.table_logger.itemDoubleClicked.connect(self.open_more_options_dialog)
@@ -79,10 +82,17 @@ class Table_view_logger_thingy_widget(QWidget):
         window_layout.addWidget(self.table_logger)
         self.setLayout(window_layout)
 
+        self.documentation_dict_to_name = {}
+        with open(self.fullDocumentationFilePath, "r") as full_documentation_file:
+            pattern = re.compile(
+                r"\n(?P<function_name>[a-zA-Z]+)-(?P<documentation>.*?\);)",
+                re.MULTILINE | re.DOTALL)
+            matches = pattern.finditer(full_documentation_file.read())
+            for match in matches:
+                self.documentation_dict_to_name[match.group('function_name')] = match.group('documentation')
+
         self.logger_updater_thread = Thread(target=self.logger_list_updater)
         self.logger_updater_thread.start()
-
-
 
     def logger_list_updater(self):
         while (True):
@@ -91,14 +101,14 @@ class Table_view_logger_thingy_widget(QWidget):
             self.table_logger.setRowCount(0)
             with open(self.logger_file_path, "r") as logger_file:
                 pattern = re.compile(
-                    r"name: (?P<name>[a-zA-Z]*), address: (?P<address>0x[0-9a-zA-Z]*), eax: (?P<eax>0x[0-9a-zA-Z]*), ebx: (?P<ebx>0x[0-9a-zA-Z]*), ecx: (?P<ecx>0x[0-9a-zA-Z]*), edx: (?P<edx>0x[0-9a-zA-Z]*), (?P<param_bytes>params bytes: [0-9]*, )?presumed function bytes in hex: (?P<presumed_hex>[a-z0-9-]*), presumed function parameters: (?P<presumed_params>.*?),\n",
+                    r"name: (?P<name>[a-zA-Z]*), address: (?P<address>0x[0-9a-zA-Z]*), eax: (?P<eax>0x[0-9a-zA-Z]*), ebx: (?P<ebx>0x[0-9a-zA-Z]*), ecx: (?P<ecx>0x[0-9a-zA-Z]*), edx: (?P<edx>0x[0-9a-zA-Z]*), (?P<param_bytes>params bytes: [0-9]*, )?presumed function bytes in hex: (?P<presumed_hex>[a-z0-9-]*), presumed function parameters: (?P<presumed_params>.*?), alerted:(?P<already_alert>[a-z]*),\n",
                     re.MULTILINE | re.DOTALL)
                 matches = pattern.finditer(logger_file.read())
                 for match in matches:
                     self.table_logger.insertRow(self.table_logger.rowCount())
-                    tableWidgetNameItem = CustomQTableWidgetItem(match,match.group('name'))
+                    tableWidgetNameItem = CustomQTableWidgetItem(match,self.documentation_dict_to_name[match.group('name')],match.group('name'))
                     self.table_logger.setItem(self.table_logger.rowCount()-1,0, tableWidgetNameItem)
-                    tableWidgetPresumedItem = CustomQTableWidgetItem(match,match.group('presumed_params'))
+                    tableWidgetPresumedItem = CustomQTableWidgetItem(match,self.documentation_dict_to_name[match.group('name')],match.group('presumed_params'))
                     self.table_logger.setItem(self.table_logger.rowCount()-1,1, tableWidgetPresumedItem)
 
 
@@ -118,7 +128,7 @@ class Table_view_logger_thingy_widget(QWidget):
             time.sleep(7) # crushes if there are constant reads
 
     def open_more_options_dialog(self, customQTableWidgetItem):
-        self.dialog_instance = MoreInfoDialog(customQTableWidgetItem.regex_match)
+        self.dialog_instance = MoreInfoDialog(customQTableWidgetItem.regex_match,customQTableWidgetItem.documentation_string)
         self.dialog_instance.show()
 
 class PE_header_widget(QWidget):
@@ -149,7 +159,6 @@ class DLLs_and_functions_widget(QWidget):
         with open("C:\Windows\Temp\info_to_dll.txt","r") as settings_file:
             for i in range(9):
                 self.dllFunctionLoggerPath = settings_file.readline().replace('\n','')
-
 
         with open(self.dllFunctionLoggerPath,"r") as dllFunctionLoggerFile:
             self.lines = dllFunctionLoggerFile.readlines()
