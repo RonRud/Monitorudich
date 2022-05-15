@@ -29,4 +29,5 @@ WaitForSingleObject
 CreateProcessW
 GetProcAddress
 GetLastError
-cleaning up fanction , with offset: 76ac0db0
+GetModuleFileNameW
+
