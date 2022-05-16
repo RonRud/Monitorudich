@@ -116,12 +116,13 @@ class Table_view_logger_thingy_widget(QWidget):
                 full_file_text = logger_file.read()
                 matches = pattern.finditer(full_file_text)
                 for match in matches:
-                    if match.group('name').find(self.function_log_filter.toPlainText()) != -1 or self.function_log_filter.toPlainText() == "":
-                        self.table_logger.insertRow(self.table_logger.rowCount())
-                        tableWidgetNameItem = CustomQTableWidgetItem(match,self.documentation_dict_to_name[match.group('name')],match.group('name'))
-                        self.table_logger.setItem(self.table_logger.rowCount()-1,0, tableWidgetNameItem)
-                        tableWidgetPresumedItem = CustomQTableWidgetItem(match,self.documentation_dict_to_name[match.group('name')],match.group('presumed_params'))
-                        self.table_logger.setItem(self.table_logger.rowCount()-1,1, tableWidgetPresumedItem)
+                    if match.group('name') in self.documentation_dict_to_name:
+                        if match.group('name').find(self.function_log_filter.toPlainText()) != -1 or self.function_log_filter.toPlainText() == "":
+                            self.table_logger.insertRow(self.table_logger.rowCount())
+                            tableWidgetNameItem = CustomQTableWidgetItem(match,self.documentation_dict_to_name[match.group('name')],match.group('name'))
+                            self.table_logger.setItem(self.table_logger.rowCount()-1,0, tableWidgetNameItem)
+                            tableWidgetPresumedItem = CustomQTableWidgetItem(match,self.documentation_dict_to_name[match.group('name')],match.group('presumed_params'))
+                            self.table_logger.setItem(self.table_logger.rowCount()-1,1, tableWidgetPresumedItem)
 
                     if match.group('already_alert') == "false":
                         for filter_word in alert_if_has_word:
