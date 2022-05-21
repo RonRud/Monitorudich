@@ -83,6 +83,8 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID reserved)
 		std::ofstream sendToMainFile(infoToMainFilePath, std::ios::out | std::ios::app);
 		sendToMainFile << std::endl << "Main program can continue executing";
 		sendToMainFile.close();
+
+		startTime = std::chrono::system_clock::now();
 		break;
 	}
 	case DLL_PROCESS_DETACH:
@@ -408,7 +410,8 @@ void logStack() {
 		}
 	}
 	else { saveFile << ","; }
-	saveFile << ", alerted:false," << std::endl;
+	std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now()-startTime;
+	saveFile << ", time:" << elapsed_seconds.count() <<" , alerted:false," << std::endl;
 	saveFile.close();
 }
 

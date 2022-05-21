@@ -83,7 +83,7 @@ class Table_view_logger_thingy_widget(QWidget):
 
         self.table_logger = QTableWidget()
         self.table_logger.itemDoubleClicked.connect(self.open_more_options_dialog)
-        self.table_logger.setColumnCount(2)
+        self.table_logger.setColumnCount(3)
         self.table_logger.horizontalHeader().setStretchLastSection(True)
         self.table_logger.horizontalHeader().setSectionResizeMode(
             QHeaderView.Stretch)
@@ -111,17 +111,19 @@ class Table_view_logger_thingy_widget(QWidget):
             self.table_logger.setRowCount(0)
             with open(self.logger_file_path, "r+") as logger_file:
                 pattern = re.compile(
-                    r"name: (?P<name>[a-zA-Z]*), address: (?P<address>0x[0-9a-zA-Z]*), eax: (?P<eax>0x[0-9a-zA-Z]*), ebx: (?P<ebx>0x[0-9a-zA-Z]*), ecx: (?P<ecx>0x[0-9a-zA-Z]*), edx: (?P<edx>0x[0-9a-zA-Z]*), (?P<param_bytes>params bytes: [0-9]*, )?presumed function bytes in hex: (?P<presumed_hex>[a-z0-9-]*), presumed function parameters: (?P<presumed_params>.*?), alerted:(?P<already_alert>[a-z]*),\n",
+                    r"name: (?P<name>[a-zA-Z]*), address: (?P<address>0x[0-9a-zA-Z]*), eax: (?P<eax>0x[0-9a-zA-Z]*), ebx: (?P<ebx>0x[0-9a-zA-Z]*), ecx: (?P<ecx>0x[0-9a-zA-Z]*), edx: (?P<edx>0x[0-9a-zA-Z]*), (?P<param_bytes>params bytes: [0-9]*, )?presumed function bytes in hex: (?P<presumed_hex>[a-z0-9-]*), presumed function parameters: (?P<presumed_params>.*?),, time:(?P<time>.*?) , alerted:(?P<already_alert>[a-z]*),\n",
                     re.MULTILINE | re.DOTALL)
                 full_file_text = logger_file.read()
                 matches = pattern.finditer(full_file_text)
                 for match in matches:
                     if match.group('name').find(self.function_log_filter.toPlainText()) != -1 or self.function_log_filter.toPlainText() == "":
                         self.table_logger.insertRow(self.table_logger.rowCount())
+                        tableWidgetTimeItem = CustomQTableWidgetItem(match, self.documentation_dict_to_name[match.group('name')], match.group('time'))
+                        self.table_logger.setItem(self.table_logger.rowCount() - 1, 0, tableWidgetTimeItem)
                         tableWidgetNameItem = CustomQTableWidgetItem(match,self.documentation_dict_to_name[match.group('name')],match.group('name'))
-                        self.table_logger.setItem(self.table_logger.rowCount()-1,0, tableWidgetNameItem)
+                        self.table_logger.setItem(self.table_logger.rowCount()-1,1, tableWidgetNameItem)
                         tableWidgetPresumedItem = CustomQTableWidgetItem(match,self.documentation_dict_to_name[match.group('name')],match.group('presumed_params'))
-                        self.table_logger.setItem(self.table_logger.rowCount()-1,1, tableWidgetPresumedItem)
+                        self.table_logger.setItem(self.table_logger.rowCount()-1,2, tableWidgetPresumedItem)
 
                     if match.group('already_alert') == "false":
                         for filter_word in alert_if_has_word:
@@ -143,7 +145,7 @@ class Table_view_logger_thingy_widget(QWidget):
                     QListWidgetItem(current_line, self.log_list)
                 """
 
-            self.table_logger.setHorizontalHeaderLabels(("Name", "Presumed Capitalized Bullshit"))
+            self.table_logger.setHorizontalHeaderLabels(("Time", "Name", "Presumed Capitalized Bullshit"))
             time.sleep(7) # crushes if there are constant reads
 
     def open_more_options_dialog(self, customQTableWidgetItem):

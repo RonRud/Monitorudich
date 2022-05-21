@@ -10,6 +10,8 @@
 #include <map>
 #include <fstream>
 #include <vector>
+#include <chrono>
+#include <ctime>    
 
 #define IMPORT_TABLE_OFFSET 1
 
@@ -39,6 +41,7 @@ char webScrapperPythonFilePath[100];
 char executablePath[100];
 char dllFunctionsLoggerPath[100];
 
+std::chrono::system_clock::time_point startTime;
 int MAX_STACK_TO_SHOW = 8;
 DWORD originFuncAddr;
 std::map<DWORD, std::string*> addressToNameMap;
