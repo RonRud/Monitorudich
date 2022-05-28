@@ -104,7 +104,7 @@ class Table_view_logger_thingy_widget(QWidget):
         self.logger_updater_thread.start()
 
     def logger_list_updater(self):
-        alert_if_has_word = ["file","File","port","Port","thread","Thread","console","Console"]
+        alert_if_has_word = ["file","File","port","Port","thread","Thread","console","Console","socket","Socket","HTTP","http"]
         while (True):
             self.table_logger.clear()
             self.table_logger.clearContents()
