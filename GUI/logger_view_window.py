@@ -109,7 +109,7 @@ class Table_view_logger_thingy_widget(QWidget):
             self.table_logger.clear()
             self.table_logger.clearContents()
             self.table_logger.setRowCount(0)
-            with open(self.logger_file_path, "r+") as logger_file:
+            with open(self.logger_file_path, "r+", errors="ignore") as logger_file:
                 pattern = re.compile(
                     r"name: (?P<name>[a-zA-Z]*), address: (?P<address>0x[0-9a-zA-Z]*), eax: (?P<eax>0x[0-9a-zA-Z]*), ebx: (?P<ebx>0x[0-9a-zA-Z]*), ecx: (?P<ecx>0x[0-9a-zA-Z]*), edx: (?P<edx>0x[0-9a-zA-Z]*), (?P<param_bytes>params bytes: [0-9]*, )?presumed function bytes in hex: (?P<presumed_hex>[a-z0-9-]*), presumed function parameters: (?P<presumed_params>.*?),, time:(?P<time>.*?) , alerted:(?P<already_alert>[a-z]*),\n",
                     re.MULTILINE | re.DOTALL)

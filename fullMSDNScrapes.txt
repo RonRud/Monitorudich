@@ -1,81 +1,632 @@
-GetStdHandle-HANDLE WINAPI GetStdHandle(
-  _In_ DWORD nStdHandle
+htons-u_short htons(
+  [in] u_short hostshort
 );
 
-SetConsoleTextAttribute-BOOL WINAPI SetConsoleTextAttribute(
-  _In_ HANDLE hConsoleOutput,
-  _In_ WORD   wAttributes
+recv-int recv(
+  [in]  SOCKET s,
+  [out] char   *buf,
+  [in]  int    len,
+  [in]  int    flags
 );
 
-DeleteCriticalSection-void DeleteCriticalSection(
-  [in, out] LPCRITICAL_SECTION lpCriticalSection
+send-int WSAAPI send(
+  [in] SOCKET     s,
+  [in] const char *buf,
+  [in] int        len,
+  [in] int        flags
 );
 
-EncodePointer-PVOID EncodePointer(
-  _In_ PVOID Ptr
+socket-SOCKET WSAAPI socket(
+  [in] int af,
+  [in] int type,
+  [in] int protocol
 );
 
-InitializeCriticalSectionAndSpinCount-BOOL InitializeCriticalSectionAndSpinCount(
-  [out] LPCRITICAL_SECTION lpCriticalSection,
-  [in]  DWORD              dwSpinCount
+gethostbyname-void gethostbyname(
+  [in]  a
 );
 
-SwitchToThread-BOOL SwitchToThread();
-
-TlsAlloc-DWORD TlsAlloc();
-
-TlsGetValue-LPVOID TlsGetValue(
-  [in] DWORD dwTlsIndex
+WSAStertup-int WSAStartup(
+        WORD      wVersionRequired,
+  [out] LPWSADATA lpWSAData
 );
 
-TlsSetValue-BOOL TlsSetValue(
-  [in]           DWORD  dwTlsIndex,
-  [in, optional] LPVOID lpTlsValue
+WSACleanup-int WSACleanup();
+
+closesocket-int closesocket(
+  [in] SOCKET s
 );
 
-TlsFree-BOOL TlsFree(
-  [in] DWORD dwTlsIndex
+connect-int WSAAPI connect(
+  [in] SOCKET         s,
+  [in] const sockaddr *name,
+  [in] int            namelen
 );
 
-GetSystemTimeAsFileTime-void GetSystemTimeAsFileTime(
-  [out] LPFILETIME lpSystemTimeAsFileTime
+_set_app_type-typedef enum _crt_app_type
+{
+    _crt_unknown_app,
+    _crt_console_app,
+    _crt_gui_app
+} _crt_app_type;
+
+void __cdecl _set_app_type(
+    _crt_app_type appType
+    );
+
+__setusermatherr-void __setusermatherr(
+   _HANDLE_MATH_ERROR pf
+   )
+
+_initterm-void __cdecl _initterm(
+   PVFV *,
+   PVFV *
+);
+
+int __cdecl _initterm_e(
+   PVFV *,
+   PVFV *
 );
 
-CompareStringW-int CompareStringW(
-  [in] LCID                              Locale,
-  [in] DWORD                             dwCmpFlags,
-  [in] _In_NLS_string_(cchCount1)PCNZWCH lpString1,
-  [in] int                               cchCount1,
-  [in] _In_NLS_string_(cchCount2)PCNZWCH lpString2,
-  [in] int                               cchCount2
+_initterm_e-void __cdecl _initterm(
+   PVFV *,
+   PVFV *
+);
+
+int __cdecl _initterm_e(
+   PVFV *,
+   PVFV *
 );
 
-LCMapStringW-int LCMapStringW(
-  [in]            LCID    Locale,
-  [in]            DWORD   dwMapFlags,
-  [in]            LPCWSTR lpSrcStr,
-  [in]            int     cchSrc,
-  [out, optional] LPWSTR  lpDestStr,
-  [in]            int     cchDest
+_set_fmode-errno_t _set_fmode(
+   int mode
 );
 
-GetLocaleInfoW-int GetLocaleInfoW(
-  [in]            LCID   Locale,
-  [in]            LCTYPE LCType,
-  [out, optional] LPWSTR lpLCData,
-  [in]            int    cchData
+__p___argc-extern int __argc;
+extern char ** __argv;
+extern wchar_t ** __wargv;
+
+__p___argv-extern int __argc;
+extern char ** __argv;
+extern wchar_t ** __wargv;
+
+_cexit-void _cexit( void );
+void _c_exit( void );
+
+_c_exit-void _cexit( void );
+void _c_exit( void );
+
+ungetc-int ungetc(
+   int c,
+   FILE *stream
+);
+wint_t ungetwc(
+   wint_t c,
+   FILE *stream
 );
 
-GetStringTypeW-BOOL GetStringTypeW(
-  [in]  DWORD                         dwInfoType,
-  [in]  _In_NLS_string_(cchSrc)LPCWCH lpSrcStr,
-  [in]  int                           cchSrc,
-  [out] LPWORD                        lpCharType
+_configthreadlocale-int _configthreadlocale( int per_thread_locale_type );
+
+__p__commode-int * __p__commode(
+   );
+
+_seh_filter_dll-int __cdecl _seh_filter_dll(
+   unsigned long _ExceptionNum,
+   struct _EXCEPTION_POINTERS* _ExceptionPtr
+);
+int __cdecl _seh_filter_exe(
+   unsigned long _ExceptionNum,
+   struct _EXCEPTION_POINTERS* _ExceptionPtr
 );
 
-GetCPInfo-BOOL GetCPInfo(
-  [in]  UINT     CodePage,
-  [out] LPCPINFO lpCPInfo
+malloc-void *malloc(
+   size_t size
+);
+
+_crt_atexit-int atexit(
+   void (__cdecl *func )( void )
+);
+
+strcpy_s-errno_t strcpy_s(
+   char *dest,
+   rsize_t dest_size,
+   const char *src
+);
+errno_t wcscpy_s(
+   wchar_t *dest,
+   rsize_t dest_size,
+   const wchar_t *src
+);
+errno_t _mbscpy_s(
+   unsigned char *dest,
+   rsize_t dest_size,
+   const unsigned char *src
+);
+errno_t _mbscpy_s_l(
+   unsigned char *dest,
+   rsize_t dest_size,
+   const unsigned char *src,
+   _locale_t locale
+);
+
+strcat_s-errno_t strcat_s(
+   char *strDestination,
+   size_t numberOfElements,
+   const char *strSource
+);
+errno_t wcscat_s(
+   wchar_t *strDestination,
+   size_t numberOfElements,
+   const wchar_t *strSource
+);
+errno_t _mbscat_s(
+   unsigned char *strDestination,
+   size_t numberOfElements,
+   const unsigned char *strSource
+);
+errno_t _mbscat_s_l(
+   unsigned char *strDestination,
+   size_t numberOfElements,
+   const unsigned char *strSource,
+   _locale_t locale
+);
+template <size_t size>
+errno_t strcat_s(
+   char (&strDestination)[size],
+   const char *strSource
+); // C++ only
+template <size_t size>
+errno_t wcscat_s(
+   wchar_t (&strDestination)[size],
+   const wchar_t *strSource
+); // C++ only
+template <size_t size>
+errno_t _mbscat_s(
+   unsigned char (&strDestination)[size],
+   const unsigned char *strSource
+); // C++ only
+template <size_t size>
+errno_t _mbscat_s_l(
+   unsigned char (&strDestination)[size],
+   const unsigned char *strSource,
+   _locale_t locale
+); // C++ on
+strcat_s-ly
+o_t strcat_s(
+   char *strDestination,
+   size_t numberOfElements,
+   const char *strSource
+);
+errno_t wcscat_s(
+   wchar_t *strDestination,
+   size_t numberOfElements,
+   const wchar_t *strSource
+);
+errno_t _mbscat_s(
+   unsigned char *strDestination,
+   size_t numberOfElements,
+   const unsigned char *strSource
+);
+errno_t _mbscat_s_l(
+   unsigned char *strDestination,
+   size_t numberOfElements,
+   const unsigned char *strSource,
+   _locale_t locale
+);
+template <size_t size>
+errno_t strcat_s(
+   char (&strDestination)[size],
+   const char *strSource
+); // C++ only
+template <size_t size>
+errno_t wcscat_s(
+   wchar_t (&strDestination)[size],
+   const wchar_t *strSource
+); // C++ only
+template <size_t size>
+errno_t _mbscat_s(
+   unsigned char (&strDestination)[size],
+   const unsigned char *strSource
+); // C++ only
+template <size_t size>
+errno_t _mbscat_s_l(
+   unsigned char (&strDestination)[size],
+   const unsigned char *strSource,
+   _locale_t locale
+); // C++ on
+_controlfp_s-errno_t _controlfp_s(
+    unsigned int *currentControl,
+    unsigned int newControl,
+    unsigned int mask
+);
+
+terminate-void terminate( void );
+
+_wmakepath_s-errno_t _makepath_s(
+   char *path,
+   size_t sizeInBytes,
+   const char *drive,
+   const char *dir,
+   const char *fname,
+   const char *ext
+);
+errno_t _wmakepath_s(
+   wchar_t *path,
+   size_t sizeInWords,
+   const wchar_t *drive,
+   const wchar_t *dir,
+   const wchar_t *fname,
+   const wchar_t *ext
+);
+template <size_t size>
+errno_t _makepath_s(
+   char (&path)[size],
+   const char *drive,
+   const char *dir,
+   const char *fname,
+   const char *ext
+); // C++ only
+template <size_t size>
+errno_t _wmakepath_s(
+   wchar_t (&path)[size],
+   const wchar_t *drive,
+   const wchar_t *dir,
+   const wchar_t *fname,
+   const wchar_t *ext
+); // C++ only
+
+_wsplitpath_s-errno_t _splitpath_s(
+   const char * path,
+   char * drive,
+   size_t driveNumberOfElements,
+   char * dir,
+   size_t dirNumberOfElements,
+   char * fname,
+   size_t nameNumberOfElements,
+   char * ext,
+   size_t extNumberOfElements
+);
+errno_t _wsplitpath_s(
+   const wchar_t * path,
+   wchar_t * drive,
+   size_t driveNumberOfElements,
+   wchar_t *dir,
+   size_t dirNumberOfElements,
+   wchar_t * fname,
+   size_t nameNumberOfElements,
+   wchar_t * ext,
+   size_t extNumberOfElements
+);
+template <size_t drivesize, size_t dirsize, size_t fnamesize, size_t extsize>
+errno_t _splitpath_s(
+   const char *path,
+   char (&drive)[drivesize],
+   char (&dir)[dirsize],
+   char (&fname)[fnamesize],
+   char (&ext)[extsize]
+); // C++ only
+template <size_t drivesize, size_t dirsize, size_t fnamesize, size_t extsize>
+errno_t _wsplitpath_s(
+   const wchar_t *path,
+   wchar_t (&drive)[drivesize],
+   wchar_t (&dir)[dirsize],
+   wchar_t (&fname)[fnamesize],
+   wchar_t (&ext)[extsize]
+); // C++ o
+_wsplitpath_s-nly
+_t _splitpath_s(
+   const char * path,
+   char * drive,
+   size_t driveNumberOfElements,
+   char * dir,
+   size_t dirNumberOfElements,
+   char * fname,
+   size_t nameNumberOfElements,
+   char * ext,
+   size_t extNumberOfElements
+);
+errno_t _wsplitpath_s(
+   const wchar_t * path,
+   wchar_t * drive,
+   size_t driveNumberOfElements,
+   wchar_t *dir,
+   size_t dirNumberOfElements,
+   wchar_t * fname,
+   size_t nameNumberOfElements,
+   wchar_t * ext,
+   size_t extNumberOfElements
+);
+template <size_t drivesize, size_t dirsize, size_t fnamesize, size_t extsize>
+errno_t _splitpath_s(
+   const char *path,
+   char (&drive)[drivesize],
+   char (&dir)[dirsize],
+   char (&fname)[fnamesize],
+   char (&ext)[extsize]
+); // C++ only
+template <size_t drivesize, size_t dirsize, size_t fnamesize, size_t extsize>
+errno_t _wsplitpath_s(
+   const wchar_t *path,
+   wchar_t (&drive)[drivesize],
+   wchar_t (&dir)[dirsize],
+   wchar_t (&fname)[fnamesize],
+   wchar_t (&ext)[extsize]
+); // C++ o
+wcscpy_s-errno_t strcpy_s(
+   char *dest,
+   rsize_t dest_size,
+   const char *src
+);
+errno_t wcscpy_s(
+   wchar_t *dest,
+   rsize_t dest_size,
+   const wchar_t *src
+);
+errno_t _mbscpy_s(
+   unsigned char *dest,
+   rsize_t dest_size,
+   const unsigned char *src
+);
+errno_t _mbscpy_s_l(
+   unsigned char *dest,
+   rsize_t dest_size,
+   const unsigned char *src,
+   _locale_t locale
+);
+
+_callnewh-int _callnewh(
+   size_t size
+   )
+
+setvbuf-int setvbuf(
+   FILE *stream,
+   char *buffer,
+   int mode,
+   size_t size
+);
+
+fwrite-size_t fwrite(
+   const void *buffer,
+   size_t size,
+   size_t count,
+   FILE *stream
+);
+
+_fseeki64-int fseek(
+   FILE *stream,
+   long offset,
+   int origin
+);
+int _fseeki64(
+   FILE *stream,
+   __int64 offset,
+   int origin
+);
+
+fsetpos-int fsetpos(
+   FILE *stream,
+   const fpos_t *pos
+);
+
+fread-size_t fread(
+   void *buffer,
+   size_t size,
+   size_t count,
+   FILE *stream
+);
+
+fputc-int fputc(
+   int c,
+   FILE *stream
+);
+wint_t fputwc(
+   wchar_t c,
+   FILE *stream
+);
+
+fgetpos-int fgetpos(
+   FILE *stream,
+   fpos_t *pos
+);
+
+fgetc-int fgetc(
+   FILE *stream
+);
+wint_t fgetwc(
+   FILE *stream
+);
+
+fflush-int fflush(
+   FILE *stream
+);
+
+fclose-int fclose(
+   FILE *stream
+);
+int _fcloseall( void );
+
+_invalid_parameter-extern "C" void __cdecl
+_invalid_parameter(
+    wchar_t const* const expression,
+    wchar_t const* const function_name,
+    wchar_t const* const file_name,
+    unsigned int   const line_number,
+    uintptr_t      const reserved);
+
+extern "C" void __cdecl
+_invalid_parameter_noinfo(void);
+
+extern "C" __declspec(noreturn) void __cdecl
+_invalid_parameter_noinfo_noreturn(void);
+
+extern "C" __declspec(noreturn) void __cdecl
+_invoke_watson(
+    wchar_t const* const expression,
+    wchar_t const* const function_name,
+    wchar_t const* const file_name,
+    unsigned int   const line_number,
+    uintptr_t      const reserved);
+
+_CrtDbgReportW-int _CrtDbgReport(
+   int reportType,
+   const char *filename,
+   int linenumber,
+   const char *moduleName,
+   const char *format [,
+   argument] ...
+);
+int _CrtDbgReportW(
+   int reportType,
+   const wchar_t *filename,
+   int linenumber,
+   const wchar_t *moduleName,
+   const wchar_t *format [,
+   argument] ...
+);
+
+_malloc_dbg-void *_malloc_dbg(
+   size_t size,
+   int blockType,
+   const char *filename,
+   int linenumber
+);
+
+_CrtDbgReport-int _CrtDbgReport(
+   int reportType,
+   const char *filename,
+   int linenumber,
+   const char *moduleName,
+   const char *format [,
+   argument] ...
+);
+int _CrtDbgReportW(
+   int reportType,
+   const wchar_t *filename,
+   int linenumber,
+   const wchar_t *moduleName,
+   const wchar_t *format [,
+   argument] ...
+);
+
+system-int system(
+   const char *command
+);
+int _wsystem(
+   const wchar_t *command
+);
+
+strncpy_s-errno_t strncpy_s(
+   char *strDest,
+   size_t numberOfElements,
+   const char *strSource,
+   size_t count
+);
+errno_t _strncpy_s_l(
+   char *strDest,
+   size_t numberOfElements,
+   const char *strSource,
+   size_t count,
+   _locale_t locale
+);
+errno_t wcsncpy_s(
+   wchar_t *strDest,
+   size_t numberOfElements,
+   const wchar_t *strSource,
+   size_t count
+);
+errno_t _wcsncpy_s_l(
+   wchar_t *strDest,
+   size_t numberOfElements,
+   const wchar_t *strSource,
+   size_t count,
+   _locale_t locale
+);
+errno_t _mbsncpy_s(
+   unsigned char *strDest,
+   size_t numberOfElements,
+   const unsigned char *strSource,
+   size_t count
+);
+errno_t _mbsncpy_s_l(
+   unsigned char *strDest,
+   size_t numberOfElements,
+   const unsigned char *strSource,
+   size_t count,
+   _locale_t locale
+);
+template <size_t size>
+errno_t strncpy_s(
+   char (&strDest)[size],
+   const char *strSource,
+   size_t count
+); // C++ only
+template <size_t size>
+errno_t _strncpy_s_l(
+   char (&strDest)[size],
+strncpy_s-
+   const char *strSource,
+   size_t count,
+   _locale_t locale
+); // C++ only
+template <size_t size>
+errno_t wcsncpy_s(
+   wchar_t (&strDest)[size],
+   const wchar_t *strSource,
+   size_t count
+); // C++ only
+template <size_t size>
+errno_t _wcsncpy_s_l(
+   wchar_t (&strDest)[size],
+   const wchar_t *strSource,
+   size_t count,
+   _locale_t locale
+); // C++ only
+template <size_t size>
+errno_t _mbsncpy_s(
+   unsigned char (&strDest)[size],
+   const unsigned char *strSource,
+   size_t count
+); // C++ only
+template <size_t size>
+errno_t _mbsncpy_s_l(
+   unsigned char (&strDest)[size],
+   const unsigned char *strSource,
+   size_t count,
+   _locale_t locale
+); // C++ only
+est,
+   size_t numberOfElements,
+   const unsigned char *strSource,
+   size_t count,
+   _locale_t locale
+);
+template <size_t size>
+errno_t strncpy_s(
+   char (&strDest)[size],
+   const char *strSource,
+   size_t count
+); // C++ only
+template <size_t size>
+errno_t _strncpy_s_l(
+   char (&strDest)[size],
+_unlock_file-BOOL UnlockFile(
+  [in] HANDLE hFile,
+  [in] DWORD  dwFileOffsetLow,
+  [in] DWORD  dwFileOffsetHigh,
+  [in] DWORD  nNumberOfBytesToUnlockLow,
+  [in] DWORD  nNumberOfBytesToUnlockHigh
+);
+
+_lock_file-BOOL LockFile(
+  [in] HANDLE hFile,
+  [in] DWORD  dwFileOffsetLow,
+  [in] DWORD  dwFileOffsetHigh,
+  [in] DWORD  nNumberOfBytesToLockLow,
+  [in] DWORD  nNumberOfBytesToLockHigh
+);
+
+_register_thread_local_exe_atexit_callback-int atexit(
+   void (__cdecl *func )( void )
 );
 
 UnhandledExceptionFilter-LONG UnhandledExceptionFilter(
@@ -97,21 +648,7 @@ IsProcessorFeaturePresent-BOOL IsProcessorFeaturePresent(
   [in] DWORD ProcessorFeature
 );
 
-QueryPerformanceCounter-BOOL QueryPerformanceCounter(
-  [out] LARGE_INTEGER *lpPerformanceCount
-);
-
-GetCurrentProcessId-DWORD GetCurrentProcessId();
-
-InitializeSListHead-void InitializeSListHead(
-  [in, out] PSLIST_HEADER ListHead
-);
-
 IsDebuggerPresent-BOOL IsDebuggerPresent();
-
-GetStartupInfoW-void GetStartupInfoW(
-  [out] LPSTARTUPINFOW lpStartupInfo
-);
 
 RaiseException-void RaiseException(
   [in] DWORD           dwExceptionCode,
@@ -120,315 +657,33 @@ RaiseException-void RaiseException(
   [in] const ULONG_PTR *lpArguments
 );
 
-RtlUnwind-NTSYSAPI VOID RtlUnwind(
-  [in, optional] PVOID             TargetFrame,
-  [in, optional] PVOID             TargetIp,
-  [in, optional] PEXCEPTION_RECORD ExceptionRecord,
-  [in]           PVOID             ReturnValue
+QueryPerformanceCounter-BOOL QueryPerformanceCounter(
+  [out] LARGE_INTEGER *lpPerformanceCount
 );
 
-FreeLibrary-BOOL FreeLibrary(
-  [in] HMODULE hLibModule
+GetCurrentProcessId-DWORD GetCurrentProcessId();
+
+GetSystemTimeAsFileTime-void GetSystemTimeAsFileTime(
+  [out] LPFILETIME lpSystemTimeAsFileTime
 );
 
-LoadLibraryExW-HMODULE LoadLibraryExW(
-  [in] LPCWSTR lpLibFileName,
-       HANDLE  hFile,
-  [in] DWORD   dwFlags
+InitializeSListHead-void InitializeSListHead(
+  [in, out] PSLIST_HEADER ListHead
 );
 
-GetModuleHandleExW-BOOL GetModuleHandleExW(
-  [in]           DWORD   dwFlags,
-  [in, optional] LPCWSTR lpModuleName,
-  [out]          HMODULE *phModule
-);
-
-GetCommandLineA-LPSTR GetCommandLineA();
-
-GetCommandLineW-LPWSTR GetCommandLineW();
-
-IsValidLocale-BOOL IsValidLocale(
-  [in] LCID  Locale,
-  [in] DWORD dwFlags
-);
-
-GetUserDefaultLCID-LCID GetUserDefaultLCID();
-
-EnumSystemLocalesW-BOOL EnumSystemLocalesA(
-  [in] LOCALE_ENUMPROCA lpLocaleEnumProc,
-  [in] DWORD            dwFlags
-);
-
-FlushFileBuffers-BOOL FlushFileBuffers(
-  [in] HANDLE hFile
-);
-
-GetConsoleCP-UINT WINAPI GetConsoleCP(void);
-
-GetConsoleMode-BOOL WINAPI GetConsoleMode(
-  _In_  HANDLE  hConsoleHandle,
-  _Out_ LPDWORD lpMode
-);
-
-GetFileSizeEx-BOOL GetFileSizeEx(
-  [in]  HANDLE         hFile,
-  [out] PLARGE_INTEGER lpFileSize
-);
-
-ReadConsoleW-BOOL WINAPI ReadConsole(
-  _In_     HANDLE  hConsoleInput,
-  _Out_    LPVOID  lpBuffer,
-  _In_     DWORD   nNumberOfCharsToRead,
-  _Out_    LPDWORD lpNumberOfCharsRead,
-  _In_opt_ LPVOID  pInputControl
-);
-
-HeapReAlloc-DECLSPEC_ALLOCATOR LPVOID HeapReAlloc(
-  [in] HANDLE                 hHeap,
-  [in] DWORD                  dwFlags,
-  [in] _Frees_ptr_opt_ LPVOID lpMem,
-  [in] SIZE_T                 dwBytes
-);
-
-FindClose-BOOL FindClose(
-  [in, out] HANDLE hFindFile
-);
-
-FindFirstFileExW-HANDLE FindFirstFileExW(
-  [in]  LPCWSTR            lpFileName,
-  [in]  FINDEX_INFO_LEVELS fInfoLevelId,
-  [out] LPVOID             lpFindFileData,
-  [in]  FINDEX_SEARCH_OPS  fSearchOp,
-        LPVOID             lpSearchFilter,
-  [in]  DWORD              dwAdditionalFlags
-);
-
-FindNextFileW-BOOL FindNextFileW(
-  [in]  HANDLE             hFindFile,
-  [out] LPWIN32_FIND_DATAW lpFindFileData
-);
-
-IsValidCodePage-BOOL IsValidCodePage(
-  [in] UINT CodePage
-);
-
-GetACP-UINT GetACP();
-
-GetOEMCP-UINT GetOEMCP();
-
-GetEnvironmentStringsW-LPWCH GetEnvironmentStringsW();
-
-FreeEnvironmentStringsW-BOOL FreeEnvironmentStringsA(
-  LPCH penv
-);
-
-SetEnvironmentVariableW-BOOL SetEnvironmentVariableW(
-  [in]           LPCWSTR lpName,
-  [in, optional] LPCWSTR lpValue
-);
-
-SetStdHandle-BOOL WINAPI SetStdHandle(
-  _In_ DWORD  nStdHandle,
-  _In_ HANDLE hHandle
+GetStartupInfoW-void GetStartupInfoW(
+  [out] LPSTARTUPINFOW lpStartupInfo
 );
 
 GetProcessHeap-HANDLE GetProcessHeap();
 
-HeapSize-SIZE_T HeapSize(
-  [in] HANDLE  hHeap,
-  [in] DWORD   dwFlags,
-  [in] LPCVOID lpMem
+VirtualQuery-SIZE_T VirtualQuery(
+  [in, optional] LPCVOID                   lpAddress,
+  [out]          PMEMORY_BASIC_INFORMATION lpBuffer,
+  [in]           SIZE_T                    dwLength
 );
 
-WriteConsoleW-BOOL WINAPI WriteConsole(
-  _In_             HANDLE  hConsoleOutput,
-  _In_       const VOID    *lpBuffer,
-  _In_             DWORD   nNumberOfCharsToWrite,
-  _Out_opt_        LPDWORD lpNumberOfCharsWritten,
-  _Reserved_       LPVOID  lpReserved
-);
-
-lstrcmpA-int lstrcmpA(
-  [in] LPCSTR lpString1,
-  [in] LPCSTR lpString2
-);
-
-InitializeCriticalSectionEx-BOOL InitializeCriticalSectionEx(
-  [out] LPCRITICAL_SECTION lpCriticalSection,
-  [in]  DWORD              dwSpinCount,
-  [in]  DWORD              Flags
-);
-
-LCMapStringEx-int LCMapStringEx(
-  [in, optional]  LPCWSTR          lpLocaleName,
-  [in]            DWORD            dwMapFlags,
-  [in]            LPCWSTR          lpSrcStr,
-  [in]            int              cchSrc,
-  [out, optional] LPWSTR           lpDestStr,
-  [in]            int              cchDest,
-  [in, optional]  LPNLSVERSIONINFO lpVersionInformation,
-  [in, optional]  LPVOID           lpReserved,
-  [in, optional]  LPARAM           sortHandle
-);
-
-GetExitCodeProcess-BOOL GetExitCodeProcess(
-  [in]  HANDLE  hProcess,
-  [out] LPDWORD lpExitCode
-);
-
-GetFileAttributesExW-BOOL GetFileAttributesExW(
-  [in]  LPCWSTR                lpFileName,
-  [in]  GET_FILEEX_INFO_LEVELS fInfoLevelId,
-  [out] LPVOID                 lpFileInformation
-);
-
-GetConsoleOutputCP-UINT WINAPI GetConsoleOutputCP(void);
-
-SetEndOfFile-BOOL SetEndOfFile(
-  [in] HANDLE hFile
-);
-
-RtlCaptureContext-NTSYSAPI VOID RtlCaptureContext(
-  [out] PCONTEXT ContextRecord
-);
-
-ReleaseMutex-BOOL ReleaseMutex(
-  [in] HANDLE hMutex
-);
-
-GetCurrentDirectoryW-DWORD GetCurrentDirectory(
-  [in]  DWORD  nBufferLength,
-  [out] LPTSTR lpBuffer
-);
-
-GetEnvironmentVariableW-DWORD GetEnvironmentVariableW(
-  [in, optional]  LPCWSTR lpName,
-  [out, optional] LPWSTR  lpBuffer,
-  [in]            DWORD   nSize
-);
-
-AddVectoredExceptionHandler-PVOID AddVectoredExceptionHandler(
-  ULONG                       First,
-  PVECTORED_EXCEPTION_HANDLER Handler
-);
-
-SetThreadStackGuarantee-BOOL SetThreadStackGuarantee(
-  [in, out] PULONG StackSizeInBytes
-);
-
-InitializeCriticalSection-void InitializeCriticalSection(
-  [out] LPCRITICAL_SECTION lpCriticalSection
-);
-
-WaitForSingleObjectEx-DWORD WaitForSingleObjectEx(
-  [in] HANDLE hHandle,
-  [in] DWORD  dwMilliseconds,
-  [in] BOOL   bAlertable
-);
-
-LoadLibraryA-HMODULE LoadLibraryA(
-  [in] LPCSTR lpLibFileName
-);
-
-CreateMutexA-HANDLE CreateMutexA(
-  [in, optional] LPSECURITY_ATTRIBUTES lpMutexAttributes,
-  [in]           BOOL                  bInitialOwner,
-  [in, optional] LPCSTR                lpName
-);
-
-GetFileInformationByHandle-BOOL GetFileInformationByHandle(
-  [in]  HANDLE                       hFile,
-  [out] LPBY_HANDLE_FILE_INFORMATION lpFileInformation
-);
-
-DeviceIoControl-BOOL DeviceIoControl(
-  [in]                HANDLE       hDevice,
-  [in]                DWORD        dwIoControlCode,
-  [in, optional]      LPVOID       lpInBuffer,
-  [in]                DWORD        nInBufferSize,
-  [out, optional]     LPVOID       lpOutBuffer,
-  [in]                DWORD        nOutBufferSize,
-  [out, optional]     LPDWORD      lpBytesReturned,
-  [in, out, optional] LPOVERLAPPED lpOverlapped
-);
-
-FormatMessageW-DWORD FormatMessageW(
-  [in]           DWORD   dwFlags,
-  [in, optional] LPCVOID lpSource,
-  [in]           DWORD   dwMessageId,
-  [in]           DWORD   dwLanguageId,
-  [out]          LPWSTR  lpBuffer,
-  [in]           DWORD   nSize,
-  [in, optional] va_list *Arguments
-);
-
-GetFullPathNameW-DWORD GetFullPathNameW(
-  [in]  LPCWSTR lpFileName,
-  [in]  DWORD   nBufferLength,
-  [out] LPWSTR  lpBuffer,
-  [out] LPWSTR  *lpFilePart
-);
-
-GetModuleHandleA-HMODULE GetModuleHandleA(
-  [in, optional] LPCSTR lpModuleName
-);
-
-_register_thread_local_exe_atexit_callback-int atexit(
-   void (__cdecl *func )( void )
-);
-
-_initterm_e-void __cdecl _initterm(
-   PVFV *,
-   PVFV *
-);
-
-int __cdecl _initterm_e(
-   PVFV *,
-   PVFV *
-);
-
-_initterm-void __cdecl _initterm(
-   PVFV *,
-   PVFV *
-);
-
-int __cdecl _initterm_e(
-   PVFV *,
-   PVFV *
-);
-
-_crt_atexit-int atexit(
-   void (__cdecl *func )( void )
-);
-
-_controlfp_s-errno_t _controlfp_s(
-    unsigned int *currentControl,
-    unsigned int newControl,
-    unsigned int mask
-);
-
-_set_app_type-typedef enum _crt_app_type
-{
-    _crt_unknown_app,
-    _crt_console_app,
-    _crt_gui_app
-} _crt_app_type;
-
-void __cdecl _set_app_type(
-    _crt_app_type appType
-    );
-
-__setusermatherr-void __setusermatherr(
-   _HANDLE_MATH_ERROR pf
-   )
-
-_set_fmode-errno_t _set_fmode(
-   int mode
-);
-
-_configthreadlocale-int _configthreadlocale( int per_thread_locale_type );
-
-free-void free(
-   void *memblock
+FreeLibrary-BOOL FreeLibrary(
+  [in] HMODULE hLibModule
 );
 

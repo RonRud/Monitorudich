@@ -132,8 +132,12 @@ bool IAThooking(HMODULE hInstance, int attamptToHookNumFunctions)
 	while (*(WORD*)importedModule != 0) //over on the modules (DLLs)
 	{
 		if (strcmp((char*)((PBYTE)hInstance + importedModule->Name), (char*)"COMCTL32.dll") == 0 || strcmp((char*)((PBYTE)hInstance + importedModule->Name), (char*)"SHELL32.dll") == 0
-			|| strcmp((char*)((PBYTE)hInstance + importedModule->Name), (char*)"OLEAUT32.dll") == 0) {
+			|| strcmp((char*)((PBYTE)hInstance + importedModule->Name), (char*)"OLEAUT32.dll") == 0 ) { //|| strcmp((char*)((PBYTE)hInstance + importedModule->Name), (char*)"WS2_32.dll") == 0 ) {
 			std::cout << (char*)((PBYTE)hInstance + importedModule->Name) << "skipped" << std::endl;
+			//char dllPathBuffer[100];
+			//HMODULE dllHandle = GetModuleHandleA((char*)((PBYTE)hInstance + importedModule->Name));
+			//GetModuleFileNameA(dllHandle,dllPathBuffer,100);
+			//std::cout << "DLL path is: " << dllPathBuffer << std::endl;
 			importedModule++;
 			continue;
 		}
@@ -146,11 +150,85 @@ bool IAThooking(HMODULE hInstance, int attamptToHookNumFunctions)
 
 		while (*(WORD*)pFirstThunk != 0 && *(WORD*)pOriginalFirstThunk != 0) //moving over IAT and over names' table
 		{
-			saveFile << "0x" << std::hex << pFirstThunk->u1.Function << "\t\t" << pFuncData->Name << std::endl;//printing function's name and addr
-			dllFunctionsLogFile << pFuncData->Name << " " << "0x" << std::hex << pFirstThunk->u1.Function << " ";//printing function's name and addr
+			char functionName[1000];
+			DWORD functionAddress;
+			
+			if( !( pOriginalFirstThunk->u1.AddressOfData & IMAGE_ORDINAL_FLAG32 ) ) //regular function linking, imported by name
+			{
+				int counter = 0;
+				while(pFuncData->Name[counter] != '\0') {
+					functionName[counter] = pFuncData->Name[counter];
+					counter++;
+				}
+				functionName[counter] = '\0';
+
+			}
+			// Check OriginalFirstThunk ordinal and see if flag is set
+			// if flag is set, function is called by ordinal number. ( import by ordinal )
+			else if( ( pOriginalFirstThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG32 ) )
+			{
+				functionAddress = DWORD{pFirstThunk->u1.Function};
+				
+				/*
+				char dllPath[200];
+				HMODULE dllHandle = GetModuleHandleA((char*)((PBYTE)hInstance + importedModule->Name));
+				GetModuleFileNameA(dllHandle,dllPath,200);
+
+				dllFunctionsLogFile << "10" << std::endl;
+				IMAGE_DOS_HEADER dosHeader;
+				IMAGE_NT_HEADERS ntHeader;
+				IMAGE_OPTIONAL_HEADER optionalHeader;
+				IMAGE_DATA_DIRECTORY dataDirecory;
+				IMAGE_EXPORT_DIRECTORY exportDirectory;
+
+				FILE* dll_file = fopen(dllPath, "rb");
+				fseek(dll_file, 0, SEEK_SET);
+				dllFunctionsLogFile << "15, " << dll_file << std::endl;
+
+				fread(&dosHeader,sizeof(IMAGE_DOS_HEADER),1,dll_file);
+
+				dllFunctionsLogFile << "dll file magic " << dosHeader.e_magic << std::endl;
+				
+				dllFunctionsLogFile << "dllPath= " << dllPath << std::endl;
+				dllFunctionsLogFile << "hInstance= " << hInstance << std::endl;
+				*/
+				
+				PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)hInstance;//cast hInstance to (IMAGE_DOS_HEADER *) - the MZ Header
+				PIMAGE_NT_HEADERS ntHeader = (PIMAGE_NT_HEADERS)((PBYTE)dosHeader + dosHeader->e_lfanew);//The PE Header begin after the MZ Header (which has size of e_lfanew)
+				IMAGE_OPTIONAL_HEADER optionalHeader = (IMAGE_OPTIONAL_HEADER)(ntHeader->OptionalHeader); //Getting OptionalHeader
+				IMAGE_DATA_DIRECTORY dataDirecory = (IMAGE_DATA_DIRECTORY)(optionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT]);
+				PIMAGE_EXPORT_DIRECTORY exportDirectory = (PIMAGE_EXPORT_DIRECTORY)((PBYTE)hInstance + dataDirecory.VirtualAddress);//Getting the export table from DataDirectory
+				
+				/*
+				DWORD imageBase = optionalHeader.ImageBase;
+
+				WORD* ord_table = (WORD*)(imageBase+exportDirectory->AddressOfNameOrdinals); //Get an array of ordinals
+				DWORD* name_table = (DWORD*)(imageBase+exportDirectory->AddressOfNames); //Get an array of function names
+
+				dllFunctionsLogFile << exportDirectory->NumberOfFunctions << std::endl;
+				for(int i=0;i<exportDirectory->NumberOfFunctions;i++) {
+					dllFunctionsLogFile << ord_table << std::endl;
+				}
+				*/
+				std::map<int,std::string> nameByOrdinal = { {9,"htons"}, {16,"recv"}, {19,"send"}, {23,"socket"}, {52,"gethostbyname"}, {115,"WSAStertup"}, {116,"WSACleanup"}, {3,"closesocket"}, {4,"connect"}};
+
+				std::string stringForOrdinal = nameByOrdinal[(WORD)pOriginalFirstThunk->u1.Ordinal];
+				int counter = 0;
+				while(stringForOrdinal.c_str()[counter] != '\0') {
+					functionName[counter] = stringForOrdinal.c_str()[counter];
+					counter++;
+				}
+				functionName[counter] = '\0';
+
+			}else {
+				std::cout << "Problems reading function !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+			}
+
+			saveFile << "0x" << std::hex << pFirstThunk->u1.Function << "\t\t" << functionName << std::endl;//printing function's name and addr
+			dllFunctionsLogFile << functionName << " " << "0x" << std::hex << pFirstThunk->u1.Function << " ";//printing function's name and addr
 			
 			std::ofstream infoToMainFile(infoToMainFilePath, std::ios::out | std::ios::app);
-			infoToMainFile << std::endl << pFuncData->Name;
+			infoToMainFile << std::endl << functionName; 
 			infoToMainFile.close();
 			/*
 			std::vector<const char*> blackList = { "EnterCriticalSection", "LeaveCriticalSection", "HeapFree", "HeapAlloc", //8B = mov function crushes
@@ -169,7 +247,7 @@ bool IAThooking(HMODULE hInstance, int attamptToHookNumFunctions)
 
 			bool shouldHook = true;
 			for (const char* name : blackList) {
-				if (strcmp(name, (char*)pFuncData->Name) == 0) {
+				if (strcmp(name, (char*)functionName) == 0) {
 					shouldHook = false;
 					saveFile << "Blacklisted, not hooked" << std::endl << std::endl;
 					dllFunctionsLogFile << "Blacklisted, not hooked" << std::endl;
@@ -178,7 +256,7 @@ bool IAThooking(HMODULE hInstance, int attamptToHookNumFunctions)
 			}
 
 			if (shouldHook) {
-				bool isHooked = inlineHookFunction(pFirstThunk->u1.Function, new std::string(pFuncData->Name));
+				bool isHooked = inlineHookFunction(pFirstThunk->u1.Function, new std::string(functionName));
 				if (isHooked) {
 					saveFile << "Hooked function successfully" << std::endl;
 					dllFunctionsLogFile << "Hooked function successfully" << std::endl;
@@ -359,6 +437,9 @@ void logStack() {
 				//Desicion tree on how to treat data types
 				if (functionDocStr.substr(secondSpace + 1, nextSpace - secondSpace - 2) == "lpBuffer") {
 					saveFile << "~wstr " << "\"" << utf8_encode((LPCWSTR)functionParameters[i]) << "\"";
+				}
+				else if (parameterType == "char*") {
+					saveFile << (char*)functionParameters[i]; //should read as string
 				}
 				else if (parameterType == "LPARAM" || parameterType == "long") {
 					saveFile << "long" << (LPARAM)functionParameters[i]; //basically long
