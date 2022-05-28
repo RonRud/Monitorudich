@@ -687,3 +687,315 @@ FreeLibrary-BOOL FreeLibrary(
   [in] HMODULE hLibModule
 );
 
+RtlCaptureContext-NTSYSAPI VOID RtlCaptureContext(
+  [out] PCONTEXT ContextRecord
+);
+
+ReleaseMutex-BOOL ReleaseMutex(
+  [in] HANDLE hMutex
+);
+
+GetCurrentDirectoryW-DWORD GetCurrentDirectory(
+  [in]  DWORD  nBufferLength,
+  [out] LPTSTR lpBuffer
+);
+
+GetStdHandle-HANDLE WINAPI GetStdHandle(
+  _In_ DWORD nStdHandle
+);
+
+AddVectoredExceptionHandler-PVOID AddVectoredExceptionHandler(
+  ULONG                       First,
+  PVECTORED_EXCEPTION_HANDLER Handler
+);
+
+SetThreadStackGuarantee-BOOL SetThreadStackGuarantee(
+  [in, out] PULONG StackSizeInBytes
+);
+
+InitializeCriticalSection-void InitializeCriticalSection(
+  [out] LPCRITICAL_SECTION lpCriticalSection
+);
+
+WaitForSingleObjectEx-DWORD WaitForSingleObjectEx(
+  [in] HANDLE hHandle,
+  [in] DWORD  dwMilliseconds,
+  [in] BOOL   bAlertable
+);
+
+LoadLibraryA-HMODULE LoadLibraryA(
+  [in] LPCSTR lpLibFileName
+);
+
+CreateMutexA-HANDLE CreateMutexA(
+  [in, optional] LPSECURITY_ATTRIBUTES lpMutexAttributes,
+  [in]           BOOL                  bInitialOwner,
+  [in, optional] LPCSTR                lpName
+);
+
+GetFileInformationByHandle-BOOL GetFileInformationByHandle(
+  [in]  HANDLE                       hFile,
+  [out] LPBY_HANDLE_FILE_INFORMATION lpFileInformation
+);
+
+DeviceIoControl-BOOL DeviceIoControl(
+  [in]                HANDLE       hDevice,
+  [in]                DWORD        dwIoControlCode,
+  [in, optional]      LPVOID       lpInBuffer,
+  [in]                DWORD        nInBufferSize,
+  [out, optional]     LPVOID       lpOutBuffer,
+  [in]                DWORD        nOutBufferSize,
+  [out, optional]     LPDWORD      lpBytesReturned,
+  [in, out, optional] LPOVERLAPPED lpOverlapped
+);
+
+FormatMessageW-DWORD FormatMessageW(
+  [in]           DWORD   dwFlags,
+  [in, optional] LPCVOID lpSource,
+  [in]           DWORD   dwMessageId,
+  [in]           DWORD   dwLanguageId,
+  [out]          LPWSTR  lpBuffer,
+  [in]           DWORD   nSize,
+  [in, optional] va_list *Arguments
+);
+
+GetFullPathNameW-DWORD GetFullPathNameW(
+  [in]  LPCWSTR lpFileName,
+  [in]  DWORD   nBufferLength,
+  [out] LPWSTR  lpBuffer,
+  [out] LPWSTR  *lpFilePart
+);
+
+TlsGetValue-LPVOID TlsGetValue(
+  [in] DWORD dwTlsIndex
+);
+
+TlsSetValue-BOOL TlsSetValue(
+  [in]           DWORD  dwTlsIndex,
+  [in, optional] LPVOID lpTlsValue
+);
+
+GetModuleHandleA-HMODULE GetModuleHandleA(
+  [in, optional] LPCSTR lpModuleName
+);
+
+GetConsoleMode-BOOL WINAPI GetConsoleMode(
+  _In_  HANDLE  hConsoleHandle,
+  _Out_ LPDWORD lpMode
+);
+
+WriteConsoleW-BOOL WINAPI WriteConsole(
+  _In_             HANDLE  hConsoleOutput,
+  _In_       const VOID    *lpBuffer,
+  _In_             DWORD   nNumberOfCharsToWrite,
+  _Out_opt_        LPDWORD lpNumberOfCharsWritten,
+  _Reserved_       LPVOID  lpReserved
+);
+
+ReadConsoleW-BOOL WINAPI ReadConsole(
+  _In_     HANDLE  hConsoleInput,
+  _Out_    LPVOID  lpBuffer,
+  _In_     DWORD   nNumberOfCharsToRead,
+  _Out_    LPDWORD lpNumberOfCharsRead,
+  _In_opt_ LPVOID  pInputControl
+);
+
+HeapReAlloc-DECLSPEC_ALLOCATOR LPVOID HeapReAlloc(
+  [in] HANDLE                 hHeap,
+  [in] DWORD                  dwFlags,
+  [in] _Frees_ptr_opt_ LPVOID lpMem,
+  [in] SIZE_T                 dwBytes
+);
+
+free-void free(
+   void *memblock
+);
+
+lstrcmpA-int lstrcmpA(
+  [in] LPCSTR lpString1,
+  [in] LPCSTR lpString2
+);
+
+InitializeCriticalSectionEx-BOOL InitializeCriticalSectionEx(
+  [out] LPCRITICAL_SECTION lpCriticalSection,
+  [in]  DWORD              dwSpinCount,
+  [in]  DWORD              Flags
+);
+
+DeleteCriticalSection-void DeleteCriticalSection(
+  [in, out] LPCRITICAL_SECTION lpCriticalSection
+);
+
+EncodePointer-PVOID EncodePointer(
+  _In_ PVOID Ptr
+);
+
+LCMapStringEx-int LCMapStringEx(
+  [in, optional]  LPCWSTR          lpLocaleName,
+  [in]            DWORD            dwMapFlags,
+  [in]            LPCWSTR          lpSrcStr,
+  [in]            int              cchSrc,
+  [out, optional] LPWSTR           lpDestStr,
+  [in]            int              cchDest,
+  [in, optional]  LPNLSVERSIONINFO lpVersionInformation,
+  [in, optional]  LPVOID           lpReserved,
+  [in, optional]  LPARAM           sortHandle
+);
+
+GetStringTypeW-BOOL GetStringTypeW(
+  [in]  DWORD                         dwInfoType,
+  [in]  _In_NLS_string_(cchSrc)LPCWCH lpSrcStr,
+  [in]  int                           cchSrc,
+  [out] LPWORD                        lpCharType
+);
+
+GetCPInfo-BOOL GetCPInfo(
+  [in]  UINT     CodePage,
+  [out] LPCPINFO lpCPInfo
+);
+
+RtlUnwind-NTSYSAPI VOID RtlUnwind(
+  [in, optional] PVOID             TargetFrame,
+  [in, optional] PVOID             TargetIp,
+  [in, optional] PEXCEPTION_RECORD ExceptionRecord,
+  [in]           PVOID             ReturnValue
+);
+
+InitializeCriticalSectionAndSpinCount-BOOL InitializeCriticalSectionAndSpinCount(
+  [out] LPCRITICAL_SECTION lpCriticalSection,
+  [in]  DWORD              dwSpinCount
+);
+
+TlsAlloc-DWORD TlsAlloc();
+
+TlsFree-BOOL TlsFree(
+  [in] DWORD dwTlsIndex
+);
+
+LoadLibraryExW-HMODULE LoadLibraryExW(
+  [in] LPCWSTR lpLibFileName,
+       HANDLE  hFile,
+  [in] DWORD   dwFlags
+);
+
+GetModuleHandleExW-BOOL GetModuleHandleExW(
+  [in]           DWORD   dwFlags,
+  [in, optional] LPCWSTR lpModuleName,
+  [out]          HMODULE *phModule
+);
+
+GetCommandLineA-LPSTR GetCommandLineA();
+
+GetCommandLineW-LPWSTR GetCommandLineW();
+
+GetExitCodeProcess-BOOL GetExitCodeProcess(
+  [in]  HANDLE  hProcess,
+  [out] LPDWORD lpExitCode
+);
+
+GetFileAttributesExW-BOOL GetFileAttributesExW(
+  [in]  LPCWSTR                lpFileName,
+  [in]  GET_FILEEX_INFO_LEVELS fInfoLevelId,
+  [out] LPVOID                 lpFileInformation
+);
+
+CompareStringW-int CompareStringW(
+  [in] LCID                              Locale,
+  [in] DWORD                             dwCmpFlags,
+  [in] _In_NLS_string_(cchCount1)PCNZWCH lpString1,
+  [in] int                               cchCount1,
+  [in] _In_NLS_string_(cchCount2)PCNZWCH lpString2,
+  [in] int                               cchCount2
+);
+
+LCMapStringW-int LCMapStringW(
+  [in]            LCID    Locale,
+  [in]            DWORD   dwMapFlags,
+  [in]            LPCWSTR lpSrcStr,
+  [in]            int     cchSrc,
+  [out, optional] LPWSTR  lpDestStr,
+  [in]            int     cchDest
+);
+
+GetLocaleInfoW-int GetLocaleInfoW(
+  [in]            LCID   Locale,
+  [in]            LCTYPE LCType,
+  [out, optional] LPWSTR lpLCData,
+  [in]            int    cchData
+);
+
+IsValidLocale-BOOL IsValidLocale(
+  [in] LCID  Locale,
+  [in] DWORD dwFlags
+);
+
+GetUserDefaultLCID-LCID GetUserDefaultLCID();
+
+EnumSystemLocalesW-BOOL EnumSystemLocalesA(
+  [in] LOCALE_ENUMPROCA lpLocaleEnumProc,
+  [in] DWORD            dwFlags
+);
+
+FlushFileBuffers-BOOL FlushFileBuffers(
+  [in] HANDLE hFile
+);
+
+GetConsoleOutputCP-UINT WINAPI GetConsoleOutputCP(void);
+
+GetFileSizeEx-BOOL GetFileSizeEx(
+  [in]  HANDLE         hFile,
+  [out] PLARGE_INTEGER lpFileSize
+);
+
+FindClose-BOOL FindClose(
+  [in, out] HANDLE hFindFile
+);
+
+FindFirstFileExW-HANDLE FindFirstFileExW(
+  [in]  LPCWSTR            lpFileName,
+  [in]  FINDEX_INFO_LEVELS fInfoLevelId,
+  [out] LPVOID             lpFindFileData,
+  [in]  FINDEX_SEARCH_OPS  fSearchOp,
+        LPVOID             lpSearchFilter,
+  [in]  DWORD              dwAdditionalFlags
+);
+
+FindNextFileW-BOOL FindNextFileW(
+  [in]  HANDLE             hFindFile,
+  [out] LPWIN32_FIND_DATAW lpFindFileData
+);
+
+IsValidCodePage-BOOL IsValidCodePage(
+  [in] UINT CodePage
+);
+
+GetACP-UINT GetACP();
+
+GetOEMCP-UINT GetOEMCP();
+
+GetEnvironmentStringsW-LPWCH GetEnvironmentStringsW();
+
+FreeEnvironmentStringsW-BOOL FreeEnvironmentStringsA(
+  LPCH penv
+);
+
+SetEnvironmentVariableW-BOOL SetEnvironmentVariableW(
+  [in]           LPCWSTR lpName,
+  [in, optional] LPCWSTR lpValue
+);
+
+SetStdHandle-BOOL WINAPI SetStdHandle(
+  _In_ DWORD  nStdHandle,
+  _In_ HANDLE hHandle
+);
+
+HeapSize-SIZE_T HeapSize(
+  [in] HANDLE  hHeap,
+  [in] DWORD   dwFlags,
+  [in] LPCVOID lpMem
+);
+
+SetEndOfFile-BOOL SetEndOfFile(
+  [in] HANDLE hFile
+);
+
