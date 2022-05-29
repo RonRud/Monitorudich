@@ -13,6 +13,8 @@ class Logger_window(QWidget):
         super(Logger_window,self).__init__(parent)
         self.resize(1000,1000)
 
+        active_alerts = []
+
         self.setWindowTitle("Logger GUI - " + executable_name)
 
         self.layout = QVBoxLayout(self)
@@ -106,47 +108,58 @@ class Table_view_logger_thingy_widget(QWidget):
     def logger_list_updater(self):
         alert_if_has_word = ["file","File","port","Port","thread","Thread","console","Console","socket","Socket","HTTP","http"]
         while (True):
-            self.table_logger.clear()
-            self.table_logger.clearContents()
-            self.table_logger.setRowCount(0)
-            with open(self.logger_file_path, "r+", errors="ignore") as logger_file:
-                pattern = re.compile(
-                    r"name: (?P<name>[a-zA-Z]*), address: (?P<address>0x[0-9a-zA-Z]*), eax: (?P<eax>0x[0-9a-zA-Z]*), ebx: (?P<ebx>0x[0-9a-zA-Z]*), ecx: (?P<ecx>0x[0-9a-zA-Z]*), edx: (?P<edx>0x[0-9a-zA-Z]*), (?P<param_bytes>params bytes: [0-9]*, )?presumed function bytes in hex: (?P<presumed_hex>[a-z0-9-]*), presumed function parameters: (?P<presumed_params>.*?),, time:(?P<time>.*?) , alerted:(?P<already_alert>[a-z]*),\n",
-                    re.MULTILINE | re.DOTALL)
-                full_file_text = logger_file.read()
-                matches = pattern.finditer(full_file_text)
-                for match in matches:
-                    if match.group('name').find(self.function_log_filter.toPlainText()) != -1 or self.function_log_filter.toPlainText() == "":
-                        self.table_logger.insertRow(self.table_logger.rowCount())
-                        tableWidgetTimeItem = CustomQTableWidgetItem(match, self.documentation_dict_to_name[match.group('name')], match.group('time'))
-                        self.table_logger.setItem(self.table_logger.rowCount() - 1, 0, tableWidgetTimeItem)
-                        tableWidgetNameItem = CustomQTableWidgetItem(match,self.documentation_dict_to_name[match.group('name')],match.group('name'))
-                        self.table_logger.setItem(self.table_logger.rowCount()-1,1, tableWidgetNameItem)
-                        tableWidgetPresumedItem = CustomQTableWidgetItem(match,self.documentation_dict_to_name[match.group('name')],match.group('presumed_params'))
-                        self.table_logger.setItem(self.table_logger.rowCount()-1,2, tableWidgetPresumedItem)
+            try:
+                self.table_logger.clear()
+                self.table_logger.clearContents()
+                self.table_logger.setRowCount(0)
+                with open(self.logger_file_path, "r+", errors="ignore") as logger_file:
+                    pattern = re.compile(
+                        r"name: (?P<name>[a-zA-Z]*), address: (?P<address>0x[0-9a-zA-Z]*), eax: (?P<eax>0x[0-9a-zA-Z]*), ebx: (?P<ebx>0x[0-9a-zA-Z]*), ecx: (?P<ecx>0x[0-9a-zA-Z]*), edx: (?P<edx>0x[0-9a-zA-Z]*), (?P<param_bytes>params bytes: [0-9]*, )?presumed function bytes in hex: (?P<presumed_hex>[a-z0-9-]*), presumed function parameters: (?P<presumed_params>.*?),, time:(?P<time>.*?) , alerted:(?P<already_alert>[a-z]*),\n",
+                        re.MULTILINE | re.DOTALL)
+                    full_file_text = logger_file.read()
+                    matches = pattern.finditer(full_file_text)
+                    for match in matches:
+                        if match.group('name').find(
+                                self.function_log_filter.toPlainText()) != -1 or self.function_log_filter.toPlainText() == "":
+                            self.table_logger.insertRow(self.table_logger.rowCount())
+                            tableWidgetTimeItem = CustomQTableWidgetItem(match, self.documentation_dict_to_name[
+                                match.group('name')], match.group('time'))
+                            self.table_logger.setItem(self.table_logger.rowCount() - 1, 0, tableWidgetTimeItem)
+                            tableWidgetNameItem = CustomQTableWidgetItem(match, self.documentation_dict_to_name[
+                                match.group('name')], match.group('name'))
+                            self.table_logger.setItem(self.table_logger.rowCount() - 1, 1, tableWidgetNameItem)
+                            tableWidgetPresumedItem = CustomQTableWidgetItem(match, self.documentation_dict_to_name[
+                                match.group('name')], match.group('presumed_params'))
+                            self.table_logger.setItem(self.table_logger.rowCount() - 1, 2, tableWidgetPresumedItem)
 
-                    if match.group('already_alert') == "false":
-                        for filter_word in alert_if_has_word:
-                            if match.group('name').find(filter_word) != -1:
-                                alert_if_has_word.remove(filter_word)
-                                active_alerts.append(f"Executable might have interacted with {filter_word}")
-                                full_file_text = full_file_text[:match.span('already_alert')[0]] + "true " + full_file_text[match.span('already_alert')[1]:]
-                        #listWidgetItem = CustomQListWidgetItem(match, f"name: {match.group('name')}, presumed function parameters: {match.group('presumed_params')}")
-                    #self.table_logger.addItem(listWidgetItem)
+                        if match.group('already_alert') == "false":
+                            for filter_word in alert_if_has_word:
+                                if match.group('name').find(filter_word) != -1:
+                                    alert_if_has_word.remove(filter_word)
+                                    active_alerts.append(f"Executable might have interacted with {filter_word}")
+                                    full_file_text = full_file_text[
+                                                     :match.span('already_alert')[0]] + "true " + full_file_text[
+                                                                                                  match.span(
+                                                                                                      'already_alert')[
+                                                                                                      1]:]
+                            # listWidgetItem = CustomQListWidgetItem(match, f"name: {match.group('name')}, presumed function parameters: {match.group('presumed_params')}")
+                        # self.table_logger.addItem(listWidgetItem)
 
-                    #QListWidgetItem(f"name: {match.group('name')}, presumed function parameters: {match.group('presumed_params')}", self.log_list)
-                logger_file.seek(0)
-                logger_file.write(full_file_text)
-                """logger_lines = logger_file.readlines()
-                print("wha")
-                print(logger_lines)
-                for current_line in logger_lines:
-                    current_line = current_line.replace('\n', '')
-                    QListWidgetItem(current_line, self.log_list)
-                """
+                        # QListWidgetItem(f"name: {match.group('name')}, presumed function parameters: {match.group('presumed_params')}", self.log_list)
+                    logger_file.seek(0)
+                    logger_file.write(full_file_text)
+                    """logger_lines = logger_file.readlines()
+                    print("wha")
+                    print(logger_lines)
+                    for current_line in logger_lines:
+                        current_line = current_line.replace('\n', '')
+                        QListWidgetItem(current_line, self.log_list)
+                    """
 
-            self.table_logger.setHorizontalHeaderLabels(("Time", "Name", "Presumed Capitalized Bullshit"))
-            time.sleep(7) # crushes if there are constant reads
+                self.table_logger.setHorizontalHeaderLabels(("Time", "Name", "Presumed Capitalized Bullshit"))
+                time.sleep(7)  # crushes if there are constant reads
+            except NameError:
+                break
 
     def open_more_options_dialog(self, customQTableWidgetItem):
         self.dialog_instance = MoreInfoDialog(customQTableWidgetItem.regex_match,customQTableWidgetItem.documentation_string)
@@ -296,6 +309,7 @@ class AlertsWidget(QWidget):
     def __init__(self, parent=None):
         super(AlertsWidget, self).__init__(parent)
 
+        active_alerts = []
         self.layout = QVBoxLayout(self)
 
         self.alertList = QListWidget()
@@ -307,12 +321,18 @@ class AlertsWidget(QWidget):
         self.setLayout(self.layout)
         self.show()
 
+    def __del__(self):
+        active_alerts = []
+
     def showAlerts(self):
 
         while True:
 
-            self.alertList.clear()
+            try:
+                self.alertList.clear()
 
-            for alert_str in active_alerts:
-                self.alertList.addItem(QListWidgetItem(alert_str))
-            time.sleep(4)
+                for alert_str in active_alerts:
+                    self.alertList.addItem(QListWidgetItem(alert_str))
+                time.sleep(4)
+            except NameError:
+                break

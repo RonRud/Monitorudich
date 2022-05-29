@@ -127,3 +127,6 @@ SetEnvironmentVariableW-BOOL SetEnvironmentVariableW( LPCWSTR lpName, LPCWSTR lp
 SetStdHandle-BOOL WINAPI SetStdHandle( _In_ DWORD  nStdHandle, _In_ HANDLE hHandle );
 HeapSize-SIZE_T HeapSize( HANDLE hHeap, DWORD dwFlags, LPCVOID lpMem );
 SetEndOfFile-BOOL SetEndOfFile( HANDLE hFile );
+SetConsoleTextAttribute-BOOL WINAPI SetConsoleTextAttribute( _In_ HANDLE hConsoleOutput, _In_ WORD   wAttributes );
+SwitchToThread-BOOL SwitchToThread( );
+GetConsoleCP-UINT WINAPI GetConsoleCP(void );

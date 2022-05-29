@@ -50,3 +50,18 @@ _get_stream_buffer_pointers
 _free_dbg
 ??0_Lockit@std@@QAE@H@Z
 
+IsProcessorFeaturePresent
+_initterm_e
+_set_app_type
+_set_fmode
+__p__commode
+_crt_atexit
+_malloc_dbg
+_CrtDbgReportW
+__p___argv
+_lock_file
+InitializeSListHead
+_controlfp_s
+_configthreadlocale
+VirtualQuery
+_execute_onexit_table

@@ -999,3 +999,12 @@ SetEndOfFile-BOOL SetEndOfFile(
   [in] HANDLE hFile
 );
 
+SetConsoleTextAttribute-BOOL WINAPI SetConsoleTextAttribute(
+  _In_ HANDLE hConsoleOutput,
+  _In_ WORD   wAttributes
+);
+
+SwitchToThread-BOOL SwitchToThread();
+
+GetConsoleCP-UINT WINAPI GetConsoleCP(void);
+
